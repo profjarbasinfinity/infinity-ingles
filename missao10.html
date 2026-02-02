@@ -3,95 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 10</title>
+    <title>InFinity | Missão 08</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
         
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
-        .logo-img { width: 100%; height: auto; }
+        .logo-img { width: 180px; margin: 20px 0; }
 
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 550px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); background: #000; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
         .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
-        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; line-height: 1.4; }
 
-        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
+        .quiz-scroll { max-height: 500px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
         .quiz-scroll::-webkit-scrollbar { width: 5px; }
         .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
 
-        .quiz-item { margin-bottom: 15px; background: #161d3a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b; }
-        .quiz-item p { margin: 0 0 10px 0; font-size: 0.9rem; color: var(--text); }
-        .eng-term { color: var(--primary); font-weight: 600; }
+        .quiz-item { margin-bottom: 20px; background: #161d3a; padding: 18px; border-radius: 12px; border: 1px solid #1e293b; }
+        .eng-phrase { display: block; font-weight: 800; color: var(--primary); margin-bottom: 5px; font-size: 1rem; }
+        .vocabulary { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; font-style: italic; }
 
-        select { width: 100%; background: #0a1025; color: white; border: 1px solid #2a5ff0; padding: 10px; border-radius: 8px; margin-top: 5px; cursor: pointer; }
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; color: #cbd5e1; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #2a5ff0; border-radius: 8px; background: #0a1025; color: white; outline: none; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 223, 154, 0.2); }
 
-        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     </style>
 </head>
 <body>
 
-    <div class="logo-container">
-        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
-    </div>
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
 
     <div class="card">
         <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/-c_GGZ5jzd0" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/S2R6M-M6Yv0" allowfullscreen></iframe>
         </div>
 
-        <div class="task-title">MISSÃO 10: SUPRESSÃO</div>
-        <p class="instruction">Aplique a técnica de supressão para tornar a leitura mais natural, retirando o excesso de palavras:</p>
+        <div class="task-title">MISSÃO 08: TÉCNICA DE OMISSÃO</div>
+        <p class="instruction">Aplique a omissão para que a tradução fique natural. O que podemos "deixar de fora" sem perder o sentido?</p>
 
         <div class="quiz-scroll">
             <div class="quiz-item">
-                <p>1. Como adaptamos <span class="eng-term">"Delivery guy"</span> usando a supressão?</p>
-                <select id="q1">
-                    <option value="">Escolha...</option>
-                    <option value="ok">Entregador</option>
-                    <option value="err">Rapaz das entregas</option>
-                </select>
+                <span class="eng-phrase">a) The police officer helped the elderly lady.</span>
+                <span class="vocabulary">elderly = idoso(a), lady = senhora</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q1f" placeholder="Escreva aqui...">
+                </div>
+                <div class="input-group">
+                    <label>O que foi retirado (omitido)?</label>
+                    <input type="text" id="q1o" placeholder="Palavras em inglês que saíram...">
+                </div>
             </div>
 
             <div class="quiz-item">
-                <p>2. Qual a melhor forma suprimida para <span class="eng-term">"Serving dish"</span>?</p>
-                <select id="q2">
-                    <option value="">Escolha...</option>
-                    <option value="err">Louça de servir</option>
-                    <option value="ok">Travessa</option>
-                </select>
+                <span class="eng-phrase">b) The teacher has an electric guitar.</span>
+                <span class="vocabulary">has = tem</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q2f">
+                </div>
             </div>
 
             <div class="quiz-item">
-                <p>3. Como simplificamos <span class="eng-term">"Coat hanger"</span>?</p>
-                <select id="q3">
-                    <option value="">Escolha...</option>
-                    <option value="ok">Cabide</option>
-                    <option value="err">Pendurador de casacos</option>
-                </select>
+                <span class="eng-phrase">c) The baking powder is in the storage room.</span>
+                <span class="vocabulary">baking = panificação, powder = pó, storage = armazenamento, room = sala</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q3f">
+                </div>
             </div>
 
             <div class="quiz-item">
-                <p>4. No avião, o <span class="eng-term">"Overhead compartment"</span> vira apenas:</p>
-                <select id="q4">
-                    <option value="">Escolha...</option>
-                    <option value="err">Compartimento acima da cabeça</option>
-                    <option value="ok">Bagageiro</option>
-                </select>
+                <span class="eng-phrase">d) I bought my spare tire at the city market.</span>
+                <span class="vocabulary">I = eu, bought = comprei, spare tire = estepe, market = feira</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q4f">
+                </div>
             </div>
 
             <div class="quiz-item">
-                <p>5. O que define a técnica de SUPRESSÃO?</p>
-                <select id="q5">
-                    <option value="">Escolha...</option>
-                    <option value="ok">Retirar palavras do original para dar mais fluidez.</option>
-                    <option value="err">Adicionar palavras novas para aumentar o texto.</option>
-                </select>
+                <span class="eng-phrase">e) We plugged the TV in the extension cord.</span>
+                <span class="vocabulary">plugged = plugar, cord = fio</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q5f">
+                </div>
             </div>
         </div>
 
@@ -99,26 +103,29 @@
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 4rem;">✂️</h1>
-        <h2 style="color: var(--primary);">Menos é Mais!</h2>
-        <p>Você dominou a arte da supressão na leitura técnica.</p>
-        <button class="btn" style="width:220px" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+        <h1 style="font-size: 5rem; margin: 0;">➖</h1>
+        <h2 style="color: var(--primary); font-size: 1.8rem;">Omissão Perfeita!</h2>
+        <p>Menos é mais. Você aprendeu a tornar a tradução fluida.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
         function checkMission() {
-            const a1 = document.getElementById('q1').value === 'ok';
-            const a2 = document.getElementById('q2').value === 'ok';
-            const a3 = document.getElementById('q3').value === 'ok';
-            const a4 = document.getElementById('q4').value === 'ok';
-            const a5 = document.getElementById('q5').value === 'ok';
+            const getV = (id) => document.getElementById(id).value.trim().toLowerCase();
 
-            if(a1 && a2 && a3 && a4 && a5) {
-                localStorage.setItem('m10_complete', 'true');
+            // Validação das respostas conforme gabarito do Professor
+            const c1 = (getV('q1f').includes("o policial ajudou a idosa")) && (getV('q1o').includes("officer") && getV('q1o').includes("lady"));
+            const c2 = (getV('q2f').includes("o professor tem uma guitarra"));
+            const c3 = (getV('q3f').includes("o fermento está na dispensa"));
+            const c4 = (getV('q4f').includes("eu comprei meu estepe na feira"));
+            const c5 = (getV('q5f').includes("nós plugamos a tv na extensão"));
+
+            if(c1 && c2 && c3 && c4 && c5) {
+                localStorage.setItem('m8_complete', 'true');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('success-screen').style.display = 'flex';
             } else {
-                alert("Revise suas escolhas! Lembre-se que na supressão queremos a forma mais direta e natural possível.");
+                alert("Alguma frase não está de acordo com a técnica de omissão. Lembre-se de deixar a frase o mais natural possível em português!");
             }
         }
     </script>

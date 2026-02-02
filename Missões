@@ -1,0 +1,2500 @@
+{
+  "name": "InFinity English Platform",
+  "short_name": "InFinity",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo-horizontal.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 01</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        .header { display: flex; align-items: center; margin-bottom: 20px; }
+        .logo-text { font-size: 2rem; font-weight: 800; }
+        .if-brand { color: var(--if-green); }
+        .degrade { background: linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Container do Vídeo do YouTube */
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .word-bank { line-height: 2.2; background: #0a1025; padding: 15px; border-radius: 12px; margin: 15px 0; text-align: justify; }
+        .word { cursor: pointer; padding: 0 4px; border-radius: 6px; border-bottom: 2px solid #1e293b; transition: 0.2s; display: inline-block; }
+        .selected { background: var(--if-green); color: white; border-bottom-color: transparent; }
+
+        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; background: #161d3a; border: 1px solid #1e293b; color: white; font-family: inherit; box-sizing: border-box; }
+        .btn { width: 100%; padding: 18px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text">
+            <span class="if-brand">I</span><span class="degrade">n</span><span class="if-brand">F</span><span class="degrade">inity</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/nsmBAcnaji4" 
+                title="InFinity - Missão 01" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <h3 style="color:var(--primary); margin:0;">Missão 01: Cognatos</h3>
+        <p style="font-size: 0.9rem;">1. Toque nos cognatos enquanto assiste:</p>
+        <div id="text-container" class="word-bank"></div>
+
+        <p style="font-size: 0.9rem;">2. Total de cognatos identificados:</p>
+        <input type="number" id="ans-count" placeholder="Ex: 23">
+
+        <div id="trans-div" style="display:none">
+            <p style="font-size: 0.9rem;">3. Tradução dos termos:</p>
+            <div id="trans-list"></div>
+        </div>
+
+        <p style="font-size: 0.9rem;">4. Resumo da lição:</p>
+        <textarea id="summary"></textarea>
+
+        <button class="btn" onclick="finish()">CONCLUIR MISSÃO</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">🎉</h1>
+        <h2>Parabéns, Aluno!</h2>
+        <p>Você cumpriu a missão 01 com sucesso!</p>
+        <button class="btn" style="width:200px" onclick="location.reload()">REFAZER</button>
+    </div>
+
+    <script>
+        // Texto original da Missão 001
+        const raw = "In modern days, technology has become an essential part of education. Many students use digital platforms to organize their activities, communicate with teachers, and access important materials. However, the excessive use of electronic devices can also create problems, such as anxiety or lack of concentration.";
+        const box = document.getElementById('text-container');
+        let sel = new Set();
+        
+        const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        raw.split(" ").forEach(w => {
+            const span = document.createElement('span');
+            span.className = 'word';
+            span.innerText = w + " ";
+            span.onclick = () => {
+                span.classList.toggle('selected');
+                const clean = w.replace(/[.,]/g, "").toLowerCase();
+                span.classList.contains('selected') ? sel.add(clean) : sel.delete(clean);
+                render();
+            };
+            box.appendChild(span);
+        });
+
+        function render() {
+            const div = document.getElementById('trans-div');
+            const list = document.getElementById('trans-list');
+            if(sel.size > 0) {
+                div.style.display = 'block';
+                list.innerHTML = Array.from(sel).map(w => `<div style="margin-bottom:8px"><small>${w}:</small><input type="text"></div>`).join('');
+            } else { div.style.display = 'none'; }
+        }
+
+        function finish() {
+            // Validação original baseada nos 23 cognatos do texto
+            if(document.getElementById('ans-count').value == 23) {
+                winSound.play();
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Dica: São 23 cognatos únicos. Revise o texto!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 02</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Espaço para sua Logo Horizontal Oficial */
+        .logo-container {
+            width: 100%;
+            max-width: 280px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .logo-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Container do Vídeo */
+        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2a5ff0; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--if-green); }
+
+        .quiz-item { margin-bottom: 15px; background: #161d3a; padding: 12px; border-radius: 12px; }
+        .quiz-item label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
+
+        select { width: 100%; padding: 10px; border-radius: 8px; background: #0a1025; color: white; border: 1px solid #1e293b; font-family: inherit; }
+
+        .btn { width: 100%; padding: 18px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/WJwNE45sN6k" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">PARTE 1: SIGNIFICADOS</div>
+        
+        <div class="quiz-item">
+            <label>1. LUNCH</label>
+            <select id="q1">
+                <option value="">Escolha...</option>
+                <option value="right">Almoço</option>
+                <option value="w1">Lançar</option>
+                <option value="w2">Horário de lanche</option>
+            </select>
+        </div>
+
+        <div class="quiz-item">
+            <label>2. PARENTS</label>
+            <select id="q2">
+                <option value="">Escolha...</option>
+                <option value="w1">Parêntesis</option>
+                <option value="right">Pais</option>
+                <option value="w2">Aparente</option>
+            </select>
+        </div>
+
+        <div class="quiz-item">
+            <label>3. PUSH</label>
+            <select id="q3">
+                <option value="">Escolha...</option>
+                <option value="right">Empurrar</option>
+                <option value="w1">Soltar</option>
+                <option value="w2">Puxar</option>
+            </select>
+        </div>
+
+        <div class="quiz-item">
+            <label>4. SORRY</label>
+            <select id="q4">
+                <option value="">Escolha...</option>
+                <option value="w1">Sorrir</option>
+                <option value="right">Me desculpe</option>
+                <option value="w2">Serrar</option>
+            </select>
+        </div>
+
+        <div class="quiz-item">
+            <label>5. REALIZE</label>
+            <select id="q5">
+                <option value="">Escolha...</option>
+                <option value="w1">Realizar</option>
+                <option value="w2">Pedir</option>
+                <option value="right">Perceber</option>
+            </select>
+        </div>
+
+        <div class="task-title" style="margin-top:30px">PARTE 2: ASSOCIAÇÃO</div>
+        <div class="quiz-item">
+            <label>Mother and Father:</label>
+            <select id="a1"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+        </div>
+        <div class="quiz-item">
+            <label>Food you eat at 12h00:</label>
+            <select id="a2"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+        </div>
+        <div class="quiz-item">
+            <label>Comprehend:</label>
+            <select id="a3"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+        </div>
+        <div class="quiz-item">
+            <label>Lamentation:</label>
+            <select id="a4"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+        </div>
+        <div class="quiz-item">
+            <label>Press / Force:</label>
+            <select id="a5"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+        </div>
+
+        <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 02</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">✨</h1>
+        <h2 style="color:var(--primary)">Missão Cumprida!</h2>
+        <p>Você dominou os Falsos Cognatos.</p>
+        <button class="btn" style="width:200px" onclick="location.reload()">REFAZER</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const p1 = [document.getElementById('q1').value, document.getElementById('q2').value, document.getElementById('q3').value, document.getElementById('q4').value, document.getElementById('q5').value];
+            const p2 = [document.getElementById('a1').value, document.getElementById('a2').value, document.getElementById('a3').value, document.getElementById('a4').value, document.getElementById('a5').value];
+
+            const p1Correct = p1.every(v => v === 'right');
+            const p2Correct = (p2[0]==='p' && p2[1]==='l' && p2[2]==='r' && p2[3]==='s' && p2[4]==='f');
+
+            if(p1Correct && p2Correct) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Algumas respostas estão incorretas. Revise o vídeo!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 03 (Light)</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        /* Cores para o Tema Claro */
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00b880; /* Um verde mais forte para contraste no branco */
+            --secondary: #1a4bc2; 
+            --bg: #f8fafc; /* Fundo cinza bem clarinho */
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 24px; 
+            width: 100%; max-width: 480px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+        }
+        
+        .video-wrapper { 
+            position: relative; padding-bottom: 177.77%; height: 0; 
+            border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
+            border: 2px solid var(--border);
+            background: #000;
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .task-title::before {
+            content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px;
+        }
+
+        .instruction { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; }
+
+        .quiz-scroll { 
+            max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; 
+        }
+        .quiz-scroll::-webkit-scrollbar { width: 4px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .quiz-item { 
+            margin-bottom: 12px; background: #f1f5f9; padding: 14px; 
+            border-radius: 12px; border: 1px solid var(--border); 
+            font-size: 1rem; color: #334155;
+        }
+        
+        select { 
+            background: #ffffff; color: var(--secondary); 
+            border: 2px solid #cbd5e1; padding: 4px 8px; 
+            border-radius: 8px; font-weight: 700; cursor: pointer; outline: none;
+        }
+        select:focus { border-color: var(--primary); }
+
+        .btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 16px; 
+            background: linear-gradient(135deg, var(--secondary), #4f46e5); 
+            color: #ffffff; font-weight: 800; cursor: pointer; font-size: 1.1rem;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+        }
+
+        #success-screen { 
+            display: none; position: fixed; inset: 0; background: #ffffff; 
+            flex-direction: column; align-items: center; justify-content: center; 
+            text-align: center; z-index: 1000; padding: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/inHUvOsSeXU" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 03: ARTIGOS</div>
+        <p class="instruction">Complete as frases com <b>A</b> ou <b>AN</b> (Observe o som da palavra seguinte):</p>
+
+        <div class="quiz-scroll" id="quiz-list"></div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">🎯</h1>
+        <h2 style="color: var(--secondary); font-size: 2rem;">Perfeito!</h2>
+        <p style="color: var(--text-sub);">Você completou o desafio dos artigos e cognatos.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const questions = [
+            { t: "Mary used ___ calculator.", a: "a" },
+            { t: "Carlos was involved in ___ accident.", a: "an" },
+            { t: "The cartoonist created ___ monster.", a: "a" },
+            { t: "She performed ___ Arabic dance.", a: "an" },
+            { t: "I visited ___ museum yesterday.", a: "a" },
+            { t: "It was ___ emotional moment.", a: "an" },
+            { t: "He is ___ intelligent person.", a: "an" },
+            { t: "They need ___ radical transformation.", a: "a" },
+            { t: "She has ___ plastic camera.", a: "a" },
+            { t: "That is ___ interesting idea.", a: "an" },
+            { t: "We saw ___ giant elephant.", a: "a" },
+            { t: "He wrote ___ original poem.", a: "an" },
+            { t: "She is ___ excellent pianist.", a: "an" },
+            { t: "The project needs ___ final decision.", a: "a" },
+            { t: "I ate ___ exotic fruit.", a: "an" }
+        ];
+
+        const container = document.getElementById('quiz-list');
+        questions.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = 'quiz-item';
+            const part = q.t.split("___");
+            div.innerHTML = `${i+1}. ${part[0]} <select id="ans${i}"><option value="">?</option><option value="a">A</option><option value="an">AN</option></select> ${part[1]}`;
+            container.appendChild(div);
+        });
+
+        function checkMission() {
+            let allCorrect = true;
+            questions.forEach((q, i) => {
+                if(document.getElementById(`ans${i}`).value !== q.a) allCorrect = false;
+            });
+
+            if(allCorrect) {
+                localStorage.setItem('m3_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Algumas respostas estão incorretas. Tente novamente!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 04</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        
+        /* Scroll interno para as 10 questões não ocuparem a tela toda */
+        .quiz-scroll { max-height: 450px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 5px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 12px; background: #161d3a; padding: 12px; border-radius: 12px; border: 1px solid #1e293b; }
+        .quiz-item p { margin: 0 0 8px 0; font-weight: 600; font-size: 0.9rem; color: var(--primary); letter-spacing: 1px; }
+
+        .row { display: flex; gap: 8px; align-items: center; }
+        select { flex: 1; background: #0a1025; color: white; border: 1px solid #2a5ff0; padding: 6px; border-radius: 6px; font-size: 0.85rem; }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/Xf1qTokOAp0" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 04: JOBS & PLACES</div>
+        <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">Assista e complete. Cuidado com os novos termos!</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <p>1. STUDENT</p>
+                <div class="row">
+                    <select id="art1"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <div style="flex:1; color:#64748b; font-size:0.8rem; text-align:center;">(Foco no artigo)</div>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. ARTIST</p>
+                <div class="row">
+                    <select id="art2"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl2"><option value="">Lugar...</option><option value="s">Studio</option><option value="h">Hospital</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. DOCTOR</p>
+                <div class="row">
+                    <select id="art3"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl3"><option value="">Lugar...</option><option value="h">Hospital</option><option value="r">Restaurant</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. AGRICULTURIST</p>
+                <div class="row">
+                    <select id="art4"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl4"><option value="">Lugar...</option><option value="f">Farm</option><option value="s">School</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>5. TEACHER</p>
+                <div class="row">
+                    <select id="art5"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl5"><option value="">Lugar...</option><option value="sc">School</option><option value="l">Lab</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>6. CHEF</p>
+                <div class="row">
+                    <select id="art6"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl6"><option value="">Lugar...</option><option value="r">Restaurant</option><option value="p">Police Station</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>7. CASHIER</p>
+                <div class="row">
+                    <select id="art7"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl7"><option value="">Lugar...</option><option value="sm">Supermarket</option><option value="a">Airplane</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>8. DENTIST</p>
+                <div class="row">
+                    <select id="art8"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl8"><option value="">Lugar...</option><option value="dc">Dental Clinic</option><option value="g">Garden</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>9. PILOT</p>
+                <div class="row">
+                    <select id="art9"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl9"><option value="">Lugar...</option><option value="ap">Airplane</option><option value="f">Farm</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>10. SCIENTIST</p>
+                <div class="row">
+                    <select id="art10"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl10"><option value="">Lugar...</option><option value="lab">Science Lab</option><option value="sm">Supermarket</option></select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 04</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">🎖️</h1>
+        <h2 style="color: var(--primary);">Vocabulário Dominado!</h2>
+        <p>Você completou o desafio das 10 profissões.</p>
+        <button class="btn" style="width:220px" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const checks = [
+                document.getElementById('art1').value === 'a',
+                document.getElementById('art2').value === 'an' && document.getElementById('pl2').value === 's',
+                document.getElementById('art3').value === 'a' && document.getElementById('pl3').value === 'h',
+                document.getElementById('art4').value === 'an' && document.getElementById('pl4').value === 'f',
+                document.getElementById('art5').value === 'a' && document.getElementById('pl5').value === 'sc',
+                document.getElementById('art6').value === 'a' && document.getElementById('pl6').value === 'r',
+                document.getElementById('art7').value === 'a' && document.getElementById('pl7').value === 'sm',
+                document.getElementById('art8').value === 'a' && document.getElementById('pl8').value === 'dc',
+                document.getElementById('art9').value === 'a' && document.getElementById('pl9').value === 'ap',
+                document.getElementById('art10').value === 'a' && document.getElementById('pl10').value === 'lab'
+            ];
+
+            if(checks.every(c => c === true)) {
+                localStorage.setItem('m4_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma profissão está com o artigo ou o lugar errado. Verifique especialmente as novas palavras!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 05</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00b880; 
+            --secondary: #1a4bc2; 
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-sub: #64748b; 
+            --border: #e2e8f0; 
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 24px; 
+            width: 100%; max-width: 480px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+        }
+        
+        .video-wrapper { 
+            position: relative; padding-bottom: 56.25%; height: 0; 
+            border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
+            border: 2px solid var(--border); background: #000; 
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            font-size: 1.2rem; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .task-title::before { content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px; }
+
+        .instruction { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; }
+
+        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 4px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .quiz-item { 
+            margin-bottom: 12px; background: #f1f5f9; padding: 14px; 
+            border-radius: 12px; border: 1px solid var(--border); 
+        }
+        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.95rem; color: var(--secondary); }
+        
+        select { 
+            background: #ffffff; color: var(--secondary); 
+            border: 2px solid #cbd5e1; padding: 8px; 
+            border-radius: 8px; font-weight: 700; width: 100%; outline: none; 
+        }
+
+        .btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 16px; 
+            background: linear-gradient(135deg, var(--secondary), #4f46e5); 
+            color: #ffffff; font-weight: 800; cursor: pointer; font-size: 1.1rem; 
+        }
+
+        #success-screen { 
+            display: none; position: fixed; inset: 0; background: #ffffff; 
+            flex-direction: column; align-items: center; justify-content: center; 
+            text-align: center; z-index: 1000; padding: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtu.be/CRWIGab9QK8" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 05: PERSONAL PRONOUNS</div>
+        <p class="instruction">Identifique o pronome correto para cada pessoa do discurso:</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <p>1. O emissor (EU) em uma conversa:</p>
+                <select id="q1"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="he">HE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. O receptor (VOCÊ) da mensagem:</p>
+                <select id="q2"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="they">THEY</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. O assunto (ELE - masculino) de quem se fala:</p>
+                <select id="q3"><option value="">?</option><option value="she">SHE</option><option value="it">IT</option><option value="he">HE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. O assunto (ELA - feminino) de quem se fala:</p>
+                <select id="q4"><option value="">?</option><option value="she">SHE</option><option value="he">HE</option><option value="we">WE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>5. Um substantivo NEUTRO de quem se fala:</p>
+                <select id="q5"><option value="">?</option><option value="you">YOU</option><option value="it">IT</option><option value="i">I</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>6. Os emissores (NÓS) no plural:</p>
+                <select id="q6"><option value="">?</option><option value="we">WE</option><option value="they">THEY</option><option value="you">YOU</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>7. Os receptores (VOCÊS) no plural:</p>
+                <select id="q7"><option value="">?</option><option value="they">THEY</option><option value="we">WE</option><option value="you">YOU</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>8. Os assuntos (ELES/ELAS) de quem se fala:</p>
+                <select id="q8"><option value="">?</option><option value="it">IT</option><option value="they">THEY</option><option value="we">WE</option></select>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 05</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">👥</h1>
+        <h2 style="color: var(--secondary); font-size: 2rem;">Perfeito!</h2>
+        <p style="color: var(--text-sub);">Você identificou corretamente todas as pessoas do discurso e substantivos neutros.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const a = [
+                document.getElementById('q1').value === 'i',
+                document.getElementById('q2').value === 'you',
+                document.getElementById('q3').value === 'he',
+                document.getElementById('q4').value === 'she',
+                document.getElementById('q5').value === 'it',
+                document.getElementById('q6').value === 'we',
+                document.getElementById('q7').value === 'you',
+                document.getElementById('q8').value === 'they'
+            ];
+
+            if(a.every(v => v === true)) {
+                localStorage.setItem('m5_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma resposta está incorreta. Revise o vídeo e tente novamente!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 06</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; line-height: 1.4; }
+
+        .quiz-scroll { max-height: 450px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 5px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 15px; background: #161d3a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b; }
+        .quiz-item p { margin: 0 0 10px 0; font-size: 0.95rem; line-height: 1.5; }
+        .highlight { color: var(--primary); font-weight: 600; border-bottom: 1px dashed var(--primary); }
+
+        select { width: 100%; background: #0a1025; color: white; border: 1px solid #2a5ff0; padding: 10px; border-radius: 8px; margin-top: 5px; cursor: pointer; outline: none; }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img" style="width: 200px; margin-bottom: 20px;">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/T4xBL3QeQOU" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 06: ELE OU ELA?</div>
+        <p class="instruction">Observe o pronome em destaque e determine o equivalente em inglês (He, She ou It):</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <p>a) O mestre me falou a verdade mas <span class="highlight">ela</span> não me convenceu.</p>
+                <select id="q1">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>b) Meu irmão subiu na moto mas <span class="highlight">ele</span> não saiu do lugar.</p>
+                <select id="q2">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>c) Mesmo <span class="highlight">ela</span> não sendo forte, o vento não atrasou a mulher.</p>
+                <select id="q3">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>d) A tempestade não abalou a pescadora, apesar de <span class="highlight">ela</span> ser jovem.</p>
+                <select id="q4">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>e) O barulho assustou o guarda, mas <span class="highlight">ele</span> não me incomodou.</p>
+                <select id="q5">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>f) A lua iluminou a casa onde a mulher estava e podíamos ouvi-<span class="highlight">la</span> de muito longe.</p>
+                <select id="q6">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>g) A cobra mordeu o tejo enquanto José filmava, mas <span class="highlight">ele</span> não se deu por vencido.</p>
+                <select id="q7">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+
+            <div class="quiz-item">
+                <p>h) O homem pegou a chave para consertar o rádio mas <span class="highlight">ele</span> estava perdido sem saber o que fazer.</p>
+                <select id="q8">
+                    <option value="">Escolha...</option>
+                    <option value="he">HE</option>
+                    <option value="she">SHE</option>
+                    <option value="it">IT</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 06</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">🧠</h1>
+        <h2 style="color: var(--primary);">Análise Perfeita!</h2>
+        <p>Você aplicou corretamente a regra do substantivo neutro.</p>
+        <button class="btn" style="width:220px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const answers = {
+                q1: 'it',
+                q2: 'he',
+                q3: 'she',
+                q4: 'she',
+                q5: 'it',
+                q6: 'she',
+                q7: 'it',
+                q8: 'he'
+            };
+
+            let allCorrect = true;
+            for (let i = 1; i <= 8; i++) {
+                if (document.getElementById(`q${i}`).value !== answers[`q${i}`]) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+
+            if(allCorrect) {
+                localStorage.setItem('m6_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma análise não está correta. Lembre-se: 'ele' ou 'ela' para coisas sem órgão reprodutor é IT!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 07</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 500px; border: 1px solid #1e293b; position: relative; overflow: hidden; }
+        
+        .timer-bar { position: absolute; top: 0; left: 0; height: 5px; background: var(--primary); width: 100%; transition: linear; }
+
+        .verb-box { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 30px 0; text-align: center; text-transform: uppercase; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-btn { 
+            background: #161d3a; border: 2px solid #2a5ff044; color: white; padding: 15px; 
+            border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: 0.2s;
+        }
+        .opt-btn:hover { border-color: var(--primary); background: #1f2937; }
+        .opt-btn.correct { background: var(--primary); color: #000; border-color: white; }
+        .opt-btn.wrong { background: #ff4b2b; border-color: white; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin-bottom: 20px;">
+
+    <div class="card" id="quiz-card">
+        <div class="timer-bar" id="timer"></div>
+        <h3 style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 10px;">QUAL É A AÇÃO?</h3>
+        
+        <div class="verb-box" id="verb-display">WALK</div>
+        
+        <div class="options-grid" id="options">
+            </div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🏃‍♂️</h1>
+        <h2 style="color: var(--primary);">VOCABULÁRIO ATIVADO!</h2>
+        <p>Você domina as ações básicas do cotidiano.</p>
+        <button class="opt-btn" style="width: 250px; background: var(--primary); color: black;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const verbs = [
+            { eng: "Walk", options: ["Correr", "Andar", "Pular", "Dormir"], correct: "Andar" },
+            { eng: "Jump", options: ["Caminhar", "Gritar", "Pular", "Rir"], correct: "Pular" },
+            { eng: "Eat", options: ["Beber", "Comer", "Dormir", "Escrever"], correct: "Comer" },
+            { eng: "Sleep", options: ["Sonhar", "Escrever", "Andar", "Dormir"], correct: "Dormir" },
+            { eng: "Write", options: ["Ler", "Escrever", "Rir", "Correr"], correct: "Escrever" },
+            { eng: "Run", options: ["Pular", "Andar", "Correr", "Chorar"], correct: "Correr" },
+            { eng: "Laugh", options: ["Rir", "Chorar", "Comer", "Dormir"], correct: "Rir" },
+            { eng: "Cry", options: ["Rir", "Caminhar", "Dormir", "Chorar"], correct: "Chorar" }
+        ];
+
+        let current = 0;
+        let timerWidth = 100;
+        let timerInterval;
+
+        function startTimer() {
+            timerWidth = 100;
+            document.getElementById('timer').style.width = '100%';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerWidth -= 2;
+                document.getElementById('timer').style.width = timerWidth + '%';
+                if (timerWidth <= 0) {
+                    alert("Tempo esgotado! Tente ser mais rápido.");
+                    resetQuiz();
+                }
+            }, 100);
+        }
+
+        function loadVerb() {
+            if (current >= verbs.length) {
+                showSuccess();
+                return;
+            }
+            const v = verbs[current];
+            document.getElementById('verb-display').innerText = v.eng;
+            const optContainer = document.getElementById('options');
+            optContainer.innerHTML = '';
+            
+            v.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => check(opt, btn);
+                optContainer.appendChild(btn);
+            });
+            startTimer();
+        }
+
+        function check(choice, btn) {
+            clearInterval(timerInterval);
+            if (choice === verbs[current].correct) {
+                btn.classList.add('correct');
+                current++;
+                setTimeout(loadVerb, 600);
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => {
+                    alert("Ops! Vamos recomeçar o treino.");
+                    resetQuiz();
+                }, 400);
+            }
+        }
+
+        function resetQuiz() {
+            current = 0;
+            loadVerb();
+        }
+
+        function showSuccess() {
+            localStorage.setItem('m07_complete', 'true');
+            confetti({ particleCount: 150, spread: 70 });
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        loadVerb();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 08</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00b880; --secondary: #1a4bc2; --bg: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --border: #e2e8f0; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 24px; padding: 24px; width: 100%; max-width: 550px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--border); background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 8px; font-size: 1.1rem; }
+        .instruction { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; border-left: 3px solid var(--if-green); padding-left: 10px; }
+
+        .quiz-scroll { max-height: 550px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 4px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 25px; background: #f8fafc; padding: 18px; border-radius: 15px; border: 1px solid var(--border); }
+        .eng-phrase { display: block; font-weight: 800; color: var(--secondary); margin-bottom: 5px; font-size: 1rem; }
+        .vocabulary { display: block; font-size: 0.75rem; color: #64748b; margin-bottom: 15px; font-style: italic; line-height: 1.3; }
+
+        /* Estilo para imagem ao lado do texto na letra B */
+        .flex-container { display: flex; align-items: flex-start; gap: 15px; }
+        .subway-img { width: 120px; border-radius: 8px; border: 1px solid #eee; }
+
+        .input-group { margin-bottom: 12px; width: 100%; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        input[type="text"] { width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: var(--secondary); }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 16px; background: linear-gradient(135deg, var(--secondary), #4f46e5); color: #ffffff; font-weight: 800; cursor: pointer; }
+        #success-screen { display: none; position: fixed; inset: 0; background: #ffffff; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/cM5gQeCESMw" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 08: TÉCNICA DE ADIÇÃO</div>
+        <p class="instruction">Utilizando adições, adapte as frases para que expressem o melhor sentido em português:</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <span class="eng-phrase">a) Start exercising!</span>
+                <span class="vocabulary">Start = começar; exercising = exercitar</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q1f" placeholder="Traduza com adaptação...">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q1a" placeholder="Quais palavras você inseriu?">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <div class="flex-container">
+                    <div style="flex: 1;">
+                        <span class="eng-phrase">b) Eat Fresh!</span>
+                        <span class="vocabulary">Eat = comer; fresh = fresco</span>
+                        <div class="input-group">
+                            <label>Frase em português:</label>
+                            <input type="text" id="q2f">
+                        </div>
+                        <div class="input-group">
+                            <label>O que foi adicionado?</label>
+                            <input type="text" id="q2a">
+                        </div>
+                    </div>
+                    <img src="Subway eat fresh.jpeg" alt="Subway Logo" class="subway-img">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">c) Students start university after turning 18 or 19.</span>
+                <span class="vocabulary">Students = estudantes, start = começar, university = universidade, after = após/depois, turning = completarem, or = ou</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q3f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q3a">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">d) I will fail you.</span>
+                <span class="vocabulary">I = eu, will = vou, fail = falhar, you = você</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q4f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q4a">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">e) I bought crackers and pork.</span>
+                <span class="vocabulary">Assista ao vídeo para lembrar os termos culturais usados pelo professor.</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q5f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q5a">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 08</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">➕</h1>
+        <h2 style="color: var(--secondary); font-size: 1.8rem;">Adaptação Concluída!</h2>
+        <p>Você dominou a arte de adicionar clareza aos textos.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const getV = (id) => document.getElementById(id).value.trim().toLowerCase();
+            
+            // Validação flexível
+            const c1 = (getV('q1f').includes("comece a se exercitar")) && (getV('q1a').includes('a') && getV('q1a').includes('se'));
+            const c2 = (getV('q2f').includes("coma comida fresca")) && (getV('q2a').includes("comida"));
+            const c3 = (getV('q3f').includes("estudantes começam a universidade")) && (getV('q3a').includes("a") || getV('q3a').includes("anos"));
+            const c4 = (getV('q4f').includes("vou falhar com você")) && (getV('q4a').includes("com"));
+            const c5 = (getV('q5f').includes("bolacha") && getV('q5f').includes("carne")) && (getV('q5a').includes("bolacha") || getV('q5a').includes("carne"));
+
+            if(c1 && c2 && c3 && c4 && c5) {
+                localStorage.setItem('m8_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin:
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 09</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 550px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; line-height: 1.4; }
+
+        .quiz-scroll { max-height: 500px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 5px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 20px; background: #161d3a; padding: 18px; border-radius: 12px; border: 1px solid #1e293b; }
+        .eng-phrase { display: block; font-weight: 800; color: var(--primary); margin-bottom: 5px; font-size: 1rem; }
+        .vocabulary { display: block; font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; font-style: italic; }
+
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 5px; color: #cbd5e1; }
+        input[type="text"] { width: 100%; padding: 12px; border: 1px solid #2a5ff0; border-radius: 8px; background: #0a1025; color: white; outline: none; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(0, 223, 154, 0.2); }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/-c_GGZ5jzd0" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 09: TÉCNICA DE SUPRESSÃO</div>
+        <p class="instruction">Aplique a omissão para que a tradução fique natural. O que podemos "deixar de fora" sem perder o sentido?</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <span class="eng-phrase">a) The police officer helped the elderly lady.</span>
+                <span class="vocabulary">elderly = idoso(a), lady = senhora</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q1f" placeholder="Escreva aqui...">
+                </div>
+                <div class="input-group">
+                    <label>O que foi retirado (omitido)?</label>
+                    <input type="text" id="q1o" placeholder="Palavras em inglês que saíram...">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">b) The teacher has an electric guitar.</span>
+                <span class="vocabulary">has = tem</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q2f">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">c) The baking powder is in the storage room.</span>
+                <span class="vocabulary">baking = panificação, powder = pó, storage = armazenamento, room = sala</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q3f">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">d) I bought my spare tire at the city market.</span>
+                <span class="vocabulary">I = eu, bought = comprei, spare tire = estepe, market = feira</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q4f">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">e) We plugged the TV in the extension cord.</span>
+                <span class="vocabulary">plugged = plugar, cord = fio</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q5f">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 08</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">➖</h1>
+        <h2 style="color: var(--primary); font-size: 1.8rem;">Omissão Perfeita!</h2>
+        <p>Menos é mais. Você aprendeu a tornar a tradução fluida.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const getV = (id) => document.getElementById(id).value.trim().toLowerCase();
+
+            // Validação das respostas conforme gabarito do Professor
+            const c1 = (getV('q1f').includes("o policial ajudou a idosa")) && (getV('q1o').includes("officer") && getV('q1o').includes("lady"));
+            const c2 = (getV('q2f').includes("o professor tem uma guitarra"));
+            const c3 = (getV('q3f').includes("o fermento está na dispensa"));
+            const c4 = (getV('q4f').includes("eu comprei meu estepe na feira"));
+            const c5 = (getV('q5f').includes("nós plugamos a tv na extensão"));
+
+            if(c1 && c2 && c3 && c4 && c5) {
+                localStorage.setItem('m9_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma frase não está de acordo com a técnica de omissão. Lembre-se de deixar a frase o mais natural possível em português!");
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 09</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 550px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+
+        .quiz-item { margin-bottom: 30px; background: #161d3a; padding: 18px; border-radius: 12px; border: 1px solid #1e293b; }
+        .eng-phrase { display: block; font-weight: 800; color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; text-align: center; }
+
+        .word-pool, .answer-zone { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-height: 45px; padding: 10px; border-radius: 8px; }
+        .answer-zone { border: 2px dashed #2a5ff0; margin-bottom: 15px; background: #0a1025; }
+        
+        .word-btn { 
+            padding: 8px 15px; background: #ffffff; color: #000; border-radius: 8px; 
+            cursor: pointer; font-weight: 600; font-size: 0.9rem; user-select: none;
+            transition: 0.2s; border: none;
+        }
+        .word-btn:hover { background: #e2e8f0; }
+        .word-btn:active { transform: scale(0.95); }
+
+        .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/48qf5LEMc_U" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 10: REORDENAÇÃO</div>
+        <p class="instruction">As palavras estão embaralhadas! Clique nelas na ordem correta para montar a tradução natural:</p>
+
+        <div id="quiz-container"></div>
+
+        <button class="btn-check" onclick="verifyAll()">CONCLUIR MISSÃO 10</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">🔄</h1>
+        <h2 style="color: var(--primary); font-size: 1.8rem;">Desafio Vencido!</h2>
+        <p>Você provou que domina a estrutura do nosso idioma.</p>
+        <button class="btn-check" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const missions = [
+            { id: 'a', eng: 'a) A very important decision', words: ['Uma', 'muito', 'importante', 'decisão'], correct: 'Uma decisão muito importante' },
+            { id: 'b', eng: 'b) Gross Domestic Product', words: ['Produto', 'Interno', 'Bruto'], correct: 'Produto Interno Bruto' },
+            { id: 'c', eng: 'c) The school teacher saved the school system', words: ['O', 'professor', 'escolar', 'salvou', 'o', 'sistema', 'escolar'], correct: 'O professor escolar salvou o sistema escolar' },
+            { id: 'd', eng: 'd) His new car activated an advanced electric system', words: ['O', 'carro', 'novo', 'dele', 'ativou', 'um', 'sistema', 'elétrico', 'avançado'], correct: 'O carro novo dele ativou um sistema elétrico avançado' },
+            { id: 'e', eng: 'e) His younger brother had a better idea', words: ['O', 'irmão', 'mais', 'novo', 'dele', 'teve', 'uma', 'ideia', 'melhor'], correct: 'O irmão mais novo dele teve uma ideia melhor' },
+            { id: 'f', eng: 'f) Sergeant Pepper\'s lonely hearts club band', words: ['Banda', 'Clube', 'dos', 'corações', 'solitários', 'do', 'sargento', 'Pimenta'], correct: 'Banda Clube dos corações solitários do sargento Pimenta' }
+        ];
+
+        // Função para embaralhar o array (Fisher-Yates Shuffle)
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            missions.forEach((m, idx) => {
+                const item = document.createElement('div');
+                item.className = 'quiz-item';
+                
+                // Criamos uma cópia das palavras e embaralhamos
+                const shuffledWords = shuffle([...m.words]);
+
+                item.innerHTML = `
+                    <span class="eng-phrase">${m.eng}</span>
+                    <div class="answer-zone" id="ans-${idx}"></div>
+                    <div class="word-pool" id="pool-${idx}">
+                        ${shuffledWords.map(w => `<button class="word-btn" onclick="moveWord(this, '${idx}')">${w}</button>`).join('')}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function moveWord(btn, idx) {
+            const answerZone = document.getElementById(`ans-${idx}`);
+            const pool = document.getElementById(`pool-${idx}`);
+            if (btn.parentElement === pool) {
+                answerZone.appendChild(btn);
+            } else {
+                pool.appendChild(btn);
+            }
+        }
+
+        function verifyAll() {
+            let allCorrect = true;
+            missions.forEach((m, idx) => {
+                const userWords = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText);
+                const userPhrase = userWords.join(' ');
+                if (userPhrase.toLowerCase() !== m.correct.toLowerCase()) {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                localStorage.setItem('m10_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma frase ainda não está na ordem correta. Analise a posição dos adjetivos e tente novamente!");
+            }
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 11</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 600px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Container do Vídeo */
+        .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+
+        .quiz-item { margin-bottom: 40px; background: #161d3a; padding: 20px; border-radius: 15px; border: 1px solid #2a5ff044; }
+        .eng-phrase { display: block; font-weight: 800; color: #fff; margin-bottom: 15px; font-size: 1.1rem; text-align: center; background: #0a1025; padding: 10px; border-radius: 8px; }
+
+        .answer-zone { 
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; 
+            min-height: 50px; padding: 12px; border: 2px solid var(--secondary); 
+            border-radius: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3);
+        }
+        
+        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; }
+        
+        .word-btn { 
+            padding: 8px 14px; background: #ffffff; color: #000; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; font-size: 0.85rem; border: none;
+            transition: all 0.2s;
+        }
+        .word-btn:hover { background: var(--primary); transform: translateY(-2px); }
+
+        .btn-verify { 
+            width: 100%; padding: 20px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; font-size: 1.1rem;
+        }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/B88YDENvsxk" 
+                title="Missão 11 - InFinity" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 11: RETEXTUALIZAÇÃO</div>
+        <p class="instruction">Cuidado! O pool abaixo contém as peças da tradução correta e da tradução literal (errada). Escolha apenas os termos que formam uma adaptação natural para o português:</p>
+
+        <div id="quiz-container"></div>
+
+        <button class="btn-verify" onclick="verifyFinalMission()">FINALIZAR MISSÃO 11</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">🎓</h1>
+        <h2 style="color: var(--primary); font-size: 2.2rem;">MISSÃO CONCLUÍDA!</h2>
+        <p style="max-width: 400px;">Você provou que não é um robô. Suas adaptações foram naturais, precisas e profissionais.</p>
+        <button class="btn-verify" style="width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const missions = [
+            {
+                eng: "The old man lost his earpiece",
+                pool: ['O', 'idoso', 'perdeu', 'seu', 'ponto', 'eletrônico', 'velho', 'homem', 'pedaço', 'de', 'orelha'],
+                correct: 'O idoso perdeu seu ponto eletrônico'
+            },
+            {
+                eng: "She is so free-spirited!",
+                pool: ['Ela', 'é', 'tão', 'independente', 'livre', 'de', 'espírito'],
+                correct: 'Ela é tão independente'
+            },
+            {
+                eng: "The police officer took my driver's license",
+                pool: ['O', 'policial', 'pegou', 'minha', 'habilitação', 'oficial', 'de', 'polícia', 'licença', 'dirigir'],
+                correct: 'O policial pegou minha habilitação'
+            },
+            {
+                eng: "The businessman wore a baseball hat",
+                pool: ['O', 'empresário', 'usou', 'um', 'boné', 'homem', 'negócios', 'chapéu', 'beisebol'],
+                correct: 'O empresário usou um boné'
+            },
+            {
+                eng: "The delivery guy bought his spare tire at the city market",
+                pool: ['O', 'entregador', 'comprou', 'seu', 'estepe', 'na', 'feira', 'rapaz', 'entregas', 'pneu', 'sobressalente', 'mercado', 'cidade'],
+                correct: 'O entregador comprou seu estepe na feira'
+            }
+        ];
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function init() {
+            const container = document.getElementById('quiz-container');
+            missions.forEach((m, idx) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-item';
+                const shuffledPool = shuffle([...m.pool]);
+                
+                div.innerHTML = `
+                    <span class="eng-phrase">${m.eng}</span>
+                    <div class="answer-zone" id="ans-${idx}"></div>
+                    <div class="word-pool" id="pool-${idx}">
+                        ${shuffledPool.map(w => `<button class="word-btn" onclick="toggleWord(this, ${idx})">${w}</button>`).join('')}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function toggleWord(btn, idx) {
+            const ans = document.getElementById(`ans-${idx}`);
+            const pool = document.getElementById(`pool-${idx}`);
+            if (btn.parentElement === pool) ans.appendChild(btn);
+            else pool.appendChild(btn);
+        }
+
+        function verifyFinalMission() {
+            let win = true;
+            missions.forEach((m, idx) => {
+                const userText = Array.from(document.getElementById(`ans-${idx}`).children)
+                                     .map(b => b.innerText).join(' ').toLowerCase();
+                if (userText !== m.correct.toLowerCase()) win = false;
+            });
+
+            if (win) {
+                localStorage.setItem('m11_complete', 'true');
+                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Atenção! Algumas traduções ainda contêm termos literais ou estão incompletas. Pense como um tradutor profissional!");
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 12</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            text-align: center; 
+            padding: 20px; 
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 30px; 
+            width: 100%;
+            max-width: 500px; 
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+        
+        /* Container do Vídeo (Shorts) */
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.78%; /* Proporção 9:16 */
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000;
+            border: 2px solid var(--secondary);
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .word-display { 
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin: 20px 0; 
+            letter-spacing: 2px;
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 12px;
+        }
+        
+        .mic-btn { 
+            width: 80px; height: 80px; border-radius: 50%; border: none; 
+            background: var(--primary); cursor: pointer; font-size: 2.2rem;
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 223, 154, 0.3);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto;
+        }
+        .mic-btn.recording { background: #ff4b2b; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .status { margin-top: 20px; min-height: 24px; color: #64748b; font-weight: 600; }
+        .transcript { font-style: italic; color: var(--secondary); margin-top: 10px; font-size: 1.2rem; }
+
+        .btn-finish {
+            display: none; /* Só aparece no final */
+            width: 100%; padding: 18px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: white; font-weight: 800; cursor: pointer; margin-top: 25px;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/n2VSL7V4wvQ" 
+                title="O Sopro do TH" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <h3 style="margin-top:0; color: var(--secondary);">MISSÃO 12: O SOPRO DO TH</h3>
+        <p style="font-size: 0.85rem; color: #64748b;">Assista ao vídeo e depois clique no microfone para pronunciar as palavras com a língua entre os dentes:</p>
+
+        <div id="target-word" class="word-display">THINK</div>
+        
+        <button id="mic-btn" class="mic-btn" onclick="startSpeech()">🎤</button>
+        
+        <div class="status" id="status">Aguardando microfone...</div>
+        <div class="transcript" id="transcript"></div>
+
+        <button id="finish-btn" class="btn-finish" onclick="completeMission()">ENCERRAR MISSÃO 12</button>
+
+        <p style="font-size: 0.7rem; margin-top: 30px; color: #94a3b8;">(Nota: Use o Google Chrome ou navegadores compatíveis com Speech Recognition)</p>
+    </div>
+
+    <script>
+        const words = ["THINK", "THEY", "BIRTHDAY", "FATHER", "THROUGH"];
+        let currentIdx = 0;
+
+        // Configuração de Reconhecimento de Voz
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        function startSpeech() {
+            recognition.start();
+            document.getElementById('mic-btn').classList.add('recording');
+            document.getElementById('status').innerText = "Ouvindo...";
+        }
+
+        recognition.onresult = (event) => {
+            const result = event.results[0][0].transcript.toUpperCase();
+            const target = words[currentIdx];
+            document.getElementById('transcript').innerText = `Você disse: "${result}"`;
+            document.getElementById('mic-btn').classList.remove('recording');
+
+            if (result.includes(target)) {
+                document.getElementById('status').innerText = "✔️ Excelente pronúncia!";
+                document.getElementById('status').style.color = "#2f9e41";
+                confetti({ particleCount: 50, spread: 50 });
+                
+                setTimeout(() => {
+                    currentIdx++;
+                    if (currentIdx < words.length) {
+                        document.getElementById('target-word').innerText = words[currentIdx];
+                        document.getElementById('status').innerText = "Próxima palavra...";
+                        document.getElementById('status').style.color = "#64748b";
+                        document.getElementById('transcript').innerText = "";
+                    } else {
+                        document.getElementById('target-word').innerText = "CONCLUÍDO!";
+                        document.getElementById('status').innerText = "Missão cumprida!";
+                        document.getElementById('mic-btn').style.display = "none";
+                        document.getElementById('finish-btn').style.display = "block";
+                    }
+                }, 2000);
+            } else {
+                document.getElementById('status').innerText = "❌ Tente novamente. Sopre mais!";
+                document.getElementById('status').style.color = "#ff4b2b";
+            }
+        };
+
+        recognition.onerror = () => {
+            document.getElementById('mic-btn').classList.remove('recording');
+            document.getElementById('status').innerText = "Erro no microfone. Verifique as permissões.";
+        };
+
+        function completeMission() {
+            localStorage.setItem('m12_complete', 'true');
+            location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 13</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 25px; 
+            width: 100%; 
+            max-width: 450px; 
+            border: 1px solid #e2e8f0; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        /* Container do Vídeo (Shorts) */
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.78%; 
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000;
+            border: 2px solid var(--secondary);
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .verb-display { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin: 20px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+        }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        
+        .opt-btn { 
+            background: #f1f5f9; 
+            border: 2px solid #e2e8f0; 
+            color: var(--text); 
+            padding: 18px 10px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-size: 1rem; 
+            font-weight: 600;
+        }
+        
+        .opt-btn:hover { border-color: var(--secondary); background: #fff; }
+        .opt-btn.correct { background: var(--if-green) !important; color: white !important; border-color: white !important; }
+        .opt-btn.wrong { background: #ff4b2b !important; color: white !important; border-color: white !important; animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .progress { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--if-green); width: 0%; transition: 0.4s; }
+
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            text-align: center; 
+            padding: 20px; 
+        }
+
+        .btn-finish {
+            width: 100%; padding: 20px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:160px; margin-bottom: 20px;">
+
+    <div class="card" id="quiz-card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/4NlbLTtyC-Y" 
+                title="Missão 13 - Verbos de Ação" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="progress"><div class="progress-bar" id="pb"></div></div>
+        <p style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin: 0;">MISSÃO 13: O PODER DA AÇÃO</p>
+        
+        <div class="verb-display" id="verb-text">PLAY</div>
+        
+        <div class="options-grid" id="options"></div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">⚡</h1>
+        <h2 style="color: var(--secondary); font-size: 2rem;">VOCABULÁRIO CONCLUÍDO!</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">Você dominou mais uma bateria de verbos essenciais.</p>
+        <button class="btn-finish" style="max-width: 300px;" onclick="location.href='index.html'">RETORNAR AO MAPA</button>
+    </div>
+
+    <script>
+        const missionData = [
+            { en: 'PLAY', pt: 'Brincar / Jogar', distractors: ['Trabalhar', 'Correr', 'Beber'] },
+            { en: 'READ', pt: 'Ler', distractors: ['Ouvir', 'Escrever', 'Limpar'] },
+            { en: 'DRINK', pt: 'Beber', distractors: ['Comer', 'Voar', 'Dirigir'] },
+            { en: 'BUY', pt: 'Comprar', distractors: ['Vender', 'Alugar', 'Pagar'] },
+            { en: 'LISTEN', pt: 'Ouvir / Escutar', distractors: ['Falar', 'Olhar', 'Sentir'] },
+            { en: 'DRIVE', pt: 'Dirigir', distractors: ['Caminhar', 'Voar', 'Navegar'] },
+            { en: 'FLY', pt: 'Voar', distractors: ['Pular', 'Correr', 'Cair'] },
+            { en: 'CLEAN', pt: 'Limpar', distractors: ['Sujar', 'Arrumar', 'Lavar'] }
+        ];
+
+        let step = 0;
+
+        function init() {
+            if (step >= missionData.length) {
+                finish();
+                return;
+            }
+            
+            const data = missionData[step];
+            document.getElementById('verb-text').innerText = data.en;
+            document.getElementById('pb').style.width = (step / missionData.length) * 100 + '%';
+            
+            const container = document.getElementById('options');
+            container.innerHTML = '';
+
+            let choices = [data.pt, ...data.distractors].sort(() => Math.random() - 0.5);
+
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = choice;
+                btn.onclick = () => check(choice, data.pt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function check(selected, correct, btn) {
+            if (selected === correct) {
+                btn.classList.add('correct');
+                confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
+                step++;
+                setTimeout(init, 700);
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 500);
+            }
+        }
+
+        function finish() {
+            localStorage.setItem('m13_complete', 'true');
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        init();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 14</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .step-container { background: #161d3a; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #2a5ff044; }
+        .eng-text { color: var(--primary); font-weight: 800; font-size: 1.2rem; display: block; margin-bottom: 10px; text-align: center; }
+        
+        .tech-selector { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .tech-tag { 
+            padding: 5px 12px; border: 1px solid #4a5568; border-radius: 20px; font-size: 0.75rem; 
+            cursor: pointer; transition: 0.3s; background: #0a1025;
+        }
+        .tech-tag.active { background: var(--secondary); border-color: white; font-weight: bold; }
+
+        .answer-zone { min-height: 50px; border: 2px dashed var(--secondary); border-radius: 10px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; margin: 15px 0; }
+        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .word-btn { padding: 8px 14px; background: white; color: black; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+
+        .btn-verify { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/aHVET_AjUdI" allowfullscreen></iframe>
+        </div>
+
+        <h3 style="color: var(--primary); text-align: center;">MISSÃO 14: ADAPTAÇÕES SIMULTÂNEAS</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-bottom: 25px;">
+            Analise a manchete e aplique as múltiplas técnicas explicadas pelo Professor Jarbas.
+        </p>
+
+        <div id="quiz-box">
+            </div>
+
+        <button class="btn-verify" id="main-btn" onclick="checkStep()">PRÓXIMO</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🧠</h1>
+        <h2 style="color: var(--primary);">PENSAMENTO MULTINÍVEL!</h2>
+        <p>Você destrinchou a manchete como um profissional.</p>
+        <button class="btn-verify" style="width: 250px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                eng: "Breaking News",
+                pool: ['Plantão', 'Quebrantes', 'Notícias', 'Urgente'],
+                correct: 'Plantão',
+                techs: ['Retextualização']
+            },
+            {
+                eng: "United Nations officials",
+                pool: ['oficiais', 'das', 'Nações', 'Unidas', 'unidas', 'nações'],
+                correct: 'oficiais das Nações Unidas',
+                techs: ['Reordenação', 'Adição']
+            },
+            {
+                eng: "long-term negotiations",
+                pool: ['negociações', 'de', 'longo', 'prazo', 'termo'],
+                correct: 'negociações de longo prazo',
+                techs: ['Reordenação', 'Adição', 'Retextualização']
+            }
+        ];
+
+        let currentStep = 0;
+        let selectedTechs = new Set();
+
+        function renderStep() {
+            const s = steps[currentStep];
+            const container = document.getElementById('quiz-box');
+            selectedTechs.clear();
+            
+            container.innerHTML = `
+                <div class="step-container">
+                    <span class="eng-text">"${s.eng}"</span>
+                    
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin: 0;">Quais técnicas são necessárias aqui?</p>
+                    <div class="tech-selector">
+                        ${['Adição', 'Supressão', 'Reordenação', 'Retextualização'].map(t => 
+                            `<div class="tech-tag" onclick="toggleTech(this, '${t}')">${t}</div>`
+                        ).join('')}
+                    </div>
+
+                    <div class="answer-zone" id="ans-zone"></div>
+                    <div class="word-pool" id="pool-zone">
+                        ${s.pool.sort(() => Math.random() - 0.5).map(w => 
+                            `<button class="word-btn" onclick="moveWord(this)">${w}</button>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleTech(el, tech) {
+            el.classList.toggle('active');
+            if(selectedTechs.has(tech)) selectedTechs.delete(tech);
+            else selectedTechs.add(tech);
+        }
+
+        function moveWord(btn) {
+            const ans = document.getElementById('ans-zone');
+            const pool = document.getElementById('pool-zone');
+            if(btn.parentElement === pool) ans.appendChild(btn);
+            else pool.appendChild(btn);
+        }
+
+        function checkStep() {
+            const s = steps[currentStep];
+            const userPhrase = Array.from(document.getElementById('ans-zone').children).map(b => b.innerText).join(' ');
+            
+            // Valida se as técnicas selecionadas batem com o gabarito do vídeo
+            const techCorrect = s.techs.every(t => selectedTechs.has(t)) && selectedTechs.size === s.techs.length;
+            
+            if(userPhrase.toLowerCase() === s.correct.toLowerCase() && techCorrect) {
+                confetti({ particleCount: 50, spread: 40 });
+                currentStep++;
+                if(currentStep < steps.length) {
+                    renderStep();
+                } else {
+                    localStorage.setItem('m14_complete', 'true');
+                    document.getElementById('success-screen').style.display = 'flex';
+                }
+            } else {
+                alert("Algo está errado. Verifique se escolheu TODAS as técnicas corretas mencionadas no vídeo e se a frase está natural.");
+            }
+        }
+
+        renderStep();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 15</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .analysis-box { background: #161d3a; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .term-title { font-weight: 800; color: var(--primary); font-size: 1rem; display: block; margin-bottom: 10px; }
+        
+        .tech-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .tech-btn { 
+            background: #0a1025; border: 1px solid #4a5568; color: #94a3b8; padding: 10px; 
+            border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; text-align: center;
+        }
+        .tech-btn.selected { background: var(--secondary); color: white; border-color: white; font-weight: bold; }
+
+        .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; font-size: 1.1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/wyZJ5cK9AZE" allowfullscreen></iframe>
+        </div>
+
+        <h3 style="color: var(--primary); text-align: center; margin-bottom: 5px;">MISSÃO 15: O DESAFIO DO MESTRE</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; text-align: center; margin-bottom: 20px;">
+            A tradução final você já tem. Agora, identifique quais técnicas foram usadas em cada termo:
+        </p>
+
+        <div id="quiz-area"></div>
+
+        <button class="btn-check" onclick="verifyFinal()">CONCLUIR SÉRIE DE ADAPTAÇÕES</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🏆</h1>
+        <h2 style="color: var(--primary);">NÍVEL PROFISSIONAL ALCANÇADO!</h2>
+        <p>Você não apenas traduz, você entende o "porquê" de cada mudança. Joel Santana ficaria orgulhoso!</p>
+        <button class="btn-check" style="width: 250px;" onclick="location.href='index.html'">FINALIZAR MAPA</button>
+    </div>
+
+    <script>
+        const analysisData = [
+            {
+                term: "1. 'Modern-day Brazilian celebrities' para 'Celebridades brasileiras atuais'",
+                techs: ['Reordenação', 'Retextualização'] // Reordenou a posição e retextualizou modern-day para atuais
+            },
+            {
+                term: "2. 'Earn money on' para 'Ganham dinheiro com a'",
+                techs: ['Retextualização', 'Adição'] // on virou 'com' e adicionou 'a'
+            },
+            {
+                term: "3. 'Downfall' para 'Desgraça'",
+                techs: ['Retextualização'] // Troca de termo por contexto
+            },
+            {
+                term: "4. 'Promoting online casinos' para 'Promovendo cassinos online'",
+                techs: ['Reordenação'] // Inversão adjetivo/substantivo
+            },
+            {
+                term: "EXTRA: 'Sea Food' (Joel Santana) para 'Fruto do mar'",
+                techs: ['Omissão', 'Reordenação', 'Retextualização'] // Joel omitiu 'sea', inverteu e adaptou o sentido
+            }
+        ];
+
+        let userChoices = analysisData.map(() => new Set());
+
+        function renderQuiz() {
+            const area = document.getElementById('quiz-area');
+            area.innerHTML = analysisData.map((item, qIdx) => `
+                <div class="analysis-box">
+                    <span class="term-title">${item.term}</span>
+                    <div class="tech-options">
+                        ${['Adição', 'Omissão', 'Reordenação', 'Retextualização'].map(t => `
+                            <div class="tech-btn" id="btn-${qIdx}-${t}" onclick="selectTech(${qIdx}, '${t}')">${t}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectTech(qIdx, tech) {
+            const btn = document.getElementById(`btn-${qIdx}-${tech}`);
+            if(userChoices[qIdx].has(tech)) {
+                userChoices[qIdx].delete(tech);
+                btn.classList.remove('selected');
+            } else {
+                userChoices[qIdx].add(tech);
+                btn.classList.add('selected');
+            }
+        }
+
+        function verifyFinal() {
+            let allCorrect = true;
+            analysisData.forEach((item, idx) => {
+                const userSet = userChoices[idx];
+                const isCorrect = item.techs.every(t => userSet.has(t)) && userSet.size === item.techs.length;
+                if(!isCorrect) allCorrect = false;
+            });
+
+            if(allCorrect) {
+                localStorage.setItem('m15_complete', 'true');
+                confetti({ particleCount: 150, spread: 70 });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma análise técnica está incompleta ou incorreta. Assista ao vídeo novamente e veja onde o Professor aplicou cada mudança!");
+            }
+        }
+
+        renderQuiz();
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity Inglês | Mapa de Missões</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
+            --border: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo-text { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+        .if-brand { color: var(--if-green); }
+        .degrade { 
+            background: linear-gradient(45deg, var(--secondary), var(--if-green)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .status-bar {
+            background: var(--card-bg); 
+            padding: 12px 25px; 
+            border-radius: 50px;
+            margin-bottom: 40px; 
+            border: 1px solid var(--border); 
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
+            gap: 25px; 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 10px;
+        }
+
+        .mission-node {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: var(--text);
+            transition: 0.3s;
+        }
+
+        .node-circle {
+            width: 65px; 
+            height: 65px; 
+            border-radius: 50%; 
+            background: var(--card-bg); 
+            border: 3px solid var(--border);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            transition: 0.3s;
+            color: #94a3b8;
+        }
+
+        /* Efeito de Hover nas missões disponíveis */
+        .mission-node:hover .node-circle { 
+            border-color: var(--secondary); 
+            transform: translateY(-5px);
+            color: var(--secondary);
+        }
+
+        /* Missão Concluída (Estilo Verde InFinity) */
+        .completed .node-circle {
+            background: var(--if-green); 
+            color: white; 
+            border-color: #267d34;
+            box-shadow: 0 0 15px rgba(47, 158, 65, 0.3);
+        }
+
+        .mission-label { 
+            font-size: 0.7rem; 
+            margin-top: 10px; 
+            font-weight: 700; 
+            color: #64748b; 
+            text-transform: uppercase;
+        }
+
+        .completed .mission-label { color: var(--if-green); }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text">
+            <span class="if-brand">I</span><span class="degrade">n</span><span class="if-brand">F</span><span class="degrade">inity</span>
+        </div>
+        <p style="color: #64748b; font-weight: 500;">English Mission Map</p>
+    </div>
+
+    <div class="status-bar" id="status-text">
+        Carregando progresso...
+    </div>
+
+    <div class="mission-grid" id="grid">
+        </div>
+
+    <script>
+        const totalMissions = 15;
+        const grid = document.getElementById('grid');
+        let completedCount = 0;
+
+        for (let i = 1; i <= totalMissions; i++) {
+            // Cria o ID com dois dígitos (01, 02...)
+            const missionId = i.toString().padStart(2, '0'); 
+            
+            // Verifica se está marcado como completo no navegador
+            const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
+            
+            if(isCompleted) completedCount++;
+
+            // Cria o elemento de link
+            const node = document.createElement('a');
+            
+            // CONFIGURAÇÃO DOS ARQUIVOS EM MINÚSCULO:
+            node.href = `missao${missionId}.html`; 
+            
+            node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
+            
+            node.innerHTML = `
+                <div class="node-circle">${i}</div>
+                <div class="mission-label">Missão ${missionId}</div>
+            `;
+            
+            grid.appendChild(node);
+        }
+
+        // Atualiza a barra de status com o total de acertos
+        document.getElementById('status-text').innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
+    </script>
+</body>
+</html>

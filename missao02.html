@@ -7,54 +7,124 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
         
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* Espaço para sua Logo Horizontal Oficial */
-        .logo-container {
-            width: 100%;
-            max-width: 280px;
-            margin: 20px 0;
-            text-align: center;
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
         }
-        .logo-img {
-            width: 100%;
-            height: auto;
-            display: block;
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
         }
 
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 25px; 
+            width: 100%; 
+            max-width: 450px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
         
-        /* Container do Vídeo */
-        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid #2a5ff0; }
+        /* Container do Vídeo Corrigido */
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.78%; /* Proporção 9:16 para Shorts */
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000;
+            border: 2px solid var(--secondary);
+        }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--if-green); }
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin: 25px 0 15px 0; 
+            padding-left: 10px; 
+            border-left: 4px solid var(--if-green);
+            text-align: left;
+        }
 
-        .quiz-item { margin-bottom: 15px; background: #161d3a; padding: 12px; border-radius: 12px; }
-        .quiz-item label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--secondary); font-size: 0.9rem; }
+        .quiz-item { 
+            margin-bottom: 15px; 
+            background: #f1f5f9; 
+            padding: 15px; 
+            border-radius: 12px; 
+            text-align: left;
+        }
+        .quiz-item label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: var(--text); 
+            font-size: 0.95rem; 
+        }
 
-        select { width: 100%; padding: 10px; border-radius: 8px; background: #0a1025; color: white; border: 1px solid #1e293b; font-family: inherit; }
+        select { 
+            width: 100%; 
+            padding: 12px; 
+            border-radius: 8px; 
+            background: #ffffff; 
+            color: var(--text); 
+            border: 1px solid #cbd5e1; 
+            font-family: inherit; 
+            font-size: 1rem;
+        }
 
-        .btn { width: 100%; padding: 18px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+        .btn { 
+            width: 100%; 
+            padding: 20px; 
+            margin-top: 25px; 
+            border: none; 
+            border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: white; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(42, 95, 240, 0.2);
+        }
 
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            z-index: 1000; 
+            padding: 20px; 
+        }
     </style>
 </head>
 <body>
 
-    <div class="logo-container">
-        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
-    </div>
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
 
-    <div class="video-wrapper">
-    <iframe 
-        src="https://www.youtube-nocookie.com/embed/WJwNE45sN6k" 
-        title="Video Aula" 
-        allowfullscreen>
-    </iframe>
-</div>
+    <div class="card" id="main-card">
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube-nocookie.com/embed/WJwNE45sN6k" allowfullscreen></iframe>
+        </div>
+
+        <p style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">MISSÃO 02</p>
+        <h3 style="margin-top:0; color: var(--secondary);">FALSOS COGNATOS</h3>
 
         <div class="task-title">PARTE 1: SIGNIFICADOS</div>
         
@@ -108,55 +178,65 @@
             </select>
         </div>
 
-        <div class="task-title" style="margin-top:30px">PARTE 2: ASSOCIAÇÃO</div>
+        <div class="task-title">PARTE 2: ASSOCIAÇÃO</div>
+        
         <div class="quiz-item">
             <label>Mother and Father:</label>
-            <select id="a1"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+            <select id="a1">
+                <option value="">Selecionar...</option>
+                <option value="p">Parents</option>
+                <option value="l">Lunch</option>
+                <option value="r">Realize</option>
+                <option value="s">Sorry</option>
+                <option value="f">Push</option>
+            </select>
         </div>
+
         <div class="quiz-item">
             <label>Food you eat at 12h00:</label>
-            <select id="a2"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
-        </div>
-        <div class="quiz-item">
-            <label>Comprehend:</label>
-            <select id="a3"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
-        </div>
-        <div class="quiz-item">
-            <label>Lamentation:</label>
-            <select id="a4"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
-        </div>
-        <div class="quiz-item">
-            <label>Press / Force:</label>
-            <select id="a5"><option value="">Selecionar...</option><option value="p">Parents</option><option value="l">Lunch</option><option value="r">Realize</option><option value="s">Sorry</option><option value="f">Push</option></select>
+            <select id="a2">
+                <option value="">Selecionar...</option>
+                <option value="p">Parents</option>
+                <option value="l">Lunch</option>
+                <option value="r">Realize</option>
+                <option value="s">Sorry</option>
+                <option value="f">Push</option>
+            </select>
         </div>
 
         <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 02</button>
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 4rem;">✨</h1>
-        <h2 style="color:var(--primary)">Missão Cumprida!</h2>
-        <p>Você dominou os Falsos Cognatos.</p>
-        <button class="btn" style="width:200px" onclick="location.reload()">REFAZER</button>
+        <h1 style="font-size: 5rem; margin:0;">🏆</h1>
+        <h2 style="color:var(--secondary); font-size: 2rem;">MISSÃO CUMPRIDA!</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">Você dominou os Falsos Cognatos com sucesso.</p>
+        <button class="btn" style="max-width: 280px;" onclick="finishMission()">VOLTAR AO MAPA</button>
     </div>
 
     <script>
         function checkMission() {
-            const p1 = [document.getElementById('q1').value, document.getElementById('q2').value, document.getElementById('q3').value, document.getElementById('q4').value, document.getElementById('q5').value];
-            const p2 = [document.getElementById('a1').value, document.getElementById('a2').value, document.getElementById('a3').value, document.getElementById('a4').value, document.getElementById('a5').value];
+            const q1 = document.getElementById('q1').value;
+            const q2 = document.getElementById('q2').value;
+            const q3 = document.getElementById('q3').value;
+            const q4 = document.getElementById('q4').value;
+            const q5 = document.getElementById('q5').value;
+            const a1 = document.getElementById('a1').value;
+            const a2 = document.getElementById('a2').value;
 
-            const p1Correct = p1.every(v => v === 'right');
-            const p2Correct = (p2[0]==='p' && p2[1]==='l' && p2[2]==='r' && p2[3]==='s' && p2[4]==='f');
-
-            if(p1Correct && p2Correct) {
+            if(q1 === 'right' && q2 === 'right' && q3 === 'right' && q4 === 'right' && q5 === 'right' && a1 === 'p' && a2 === 'l') {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+                localStorage.setItem('m02_complete', 'true');
             } else {
                 alert("Algumas respostas estão incorretas. Revise o vídeo!");
             }
         }
+
+        function finishMission() {
+            window.location.href = 'index.html';
+        }
     </script>
 </body>
-
 </html>
-

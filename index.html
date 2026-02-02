@@ -1,42 +1,116 @@
-<script>
-    // 1. Verificação de Acesso
-    (function() {
-        const aluno = localStorage.getItem('aluno_infinity');
-        const visitante = sessionStorage.getItem('visitante');
-        if (!aluno && !visitante) {
-            window.location.href = "login.html";
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InFinity | Mapa de Missões</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --bg: #f8fafc; --text: #1e293b; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .header { text-align: center; margin-bottom: 30px; }
+        #status-text { font-weight: 600; color: var(--if-green); margin-bottom: 20px; }
+        
+        /* Container das Missões */
+        #grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
+            gap: 20px; 
+            width: 100%; 
+            max-width: 600px; 
         }
-    })();
 
-    // 2. Geração do Mapa
-    const totalMissions = 15;
-    const grid = document.getElementById('grid');
-    let completedCount = 0;
+        .mission-node { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            cursor: pointer; 
+        }
 
-    if (grid) {
-        for (let i = 1; i <= totalMissions; i++) {
-            const missionId = i.toString().padStart(2, '0'); 
-            const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
-            if(isCompleted) completedCount++;
+        .node-circle { 
+            width: 60px; 
+            height: 60px; 
+            border-radius: 50%; 
+            background: #e2e8f0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            transition: 0.3s;
+            border: 3px solid transparent;
+        }
 
-            const node = document.createElement('div');
-            node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
+        .completed .node-circle { 
+            background: var(--if-green); 
+            color: white; 
+        }
+
+        .mission-label { font-size: 0.75rem; margin-top: 8px; font-weight: 600; color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>InFinity Map</h1>
+        <div id="status-text">Carregando progresso...</div>
+    </div>
+
+    <div id="grid"></div>
+
+    <script>
+        // 1. Verificação de Acesso (Segurança)
+        (function() {
+            const aluno = localStorage.getItem('aluno_infinity');
+            const visitante = sessionStorage.getItem('visitante');
             
-            node.onclick = function() {
-                const hoje = new Date().toLocaleDateString();
-                const ultimaData = localStorage.getItem('ultima_conclusao');
+            // Se não for aluno E não for visitante, volta pro login
+            if (!aluno && !visitante) {
+                window.location.href = "login.html";
+            }
+        })();
 
-                if (isCompleted || ultimaData !== hoje) {
-                    window.location.href = `missao${missionId}.html`;
-                } else {
-                    alert("Uma missão por dia! Volte amanhã.");
-                }
-            };
+        // 2. Lógica do Mapa
+        const totalMissions = 15;
+        const grid = document.getElementById('grid');
+        let completedCount = 0;
 
-            node.innerHTML = `<div class="node-circle">${i}</div><div class="mission-label">Missão ${missionId}</div>`;
-            grid.appendChild(node);
+        // Só executa se a div 'grid' existir
+        if (grid) {
+            for (let i = 1; i <= totalMissions; i++) {
+                const missionId = i.toString().padStart(2, '0'); 
+                const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
+                
+                if(isCompleted) completedCount++;
+
+                const node = document.createElement('div');
+                node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
+                
+                node.onclick = function() {
+                    const hoje = new Date().toLocaleDateString();
+                    const ultimaData = localStorage.getItem('ultima_conclusao');
+
+                    // Regra: se já completou ou se ainda não fez nada hoje, pode entrar
+                    if (isCompleted || ultimaData !== hoje) {
+                        window.location.href = `missao${missionId}.html`;
+                    } else {
+                        alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã para o próximo desafio.");
+                    }
+                };
+
+                node.innerHTML = `
+                    <div class="node-circle">${i}</div>
+                    <div class="mission-label">Missão ${missionId}</div>
+                `;
+                
+                grid.appendChild(node);
+            }
+
+            const statusLabel = document.getElementById('status-text');
+            if (statusLabel) {
+                statusLabel.innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
+            }
         }
-        const statusText = document.getElementById('status-text');
-        if (statusText) statusText.innerText = `Progresso: ${completedCount} de ${totalMissions}`;
-    }
-</script>
+    </script>
+</body>
+</html>

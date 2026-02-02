@@ -18,7 +18,6 @@
 
         .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
-        /* Container do Vídeo do YouTube */
         .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; background: #000; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
@@ -68,7 +67,6 @@
         <button class="btn" onclick="finish()">CONCLUIR MISSÃO</button>
     </div>
 
-  
     <div id="success-screen">
         <h1 style="font-size: 4rem;">🎉</h1>
         <h2>Parabéns, Aluno!</h2>
@@ -77,11 +75,9 @@
     </div>
 
     <script>
-        // Texto original da Missão 001
         const raw = "In modern days, technology has become an essential part of education. Many students use digital platforms to organize their activities, communicate with teachers, and access important materials. However, the excessive use of electronic devices can also create problems, such as anxiety or lack of concentration.";
         const box = document.getElementById('text-container');
         let sel = new Set();
-        
         const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
 
         raw.split(" ").forEach(w => {
@@ -106,51 +102,37 @@
             } else { div.style.display = 'none'; }
         }
 
-       function finish() {
-    // 1. Só entra aqui se o aluno acertar os 23
-    if(document.getElementById('ans-count').value == 23) {
-        winSound.play();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        document.getElementById('success-screen').style.display = 'flex';
-        
-        // 2. SALVA A TRAVA DIÁRIA (Fora do fetch!)
-        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-        localStorage.setItem('m01_complete', 'true'); // Marca no mapa como verde
+        function finish() {
+            // Validação dos 23 cognatos
+            if(document.getElementById('ans-count').value == 23) {
+                winSound.play();
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+                
+                // Marcações de progresso e trava
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+                localStorage.setItem('m01_complete', 'true');
 
-        // 3. ENVIA PARA A PLANILHA
-        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        if (alunoData) {
-            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: alunoData.nome,
-                    turma: alunoData.turma,
-                    curso: alunoData.curso,
-                    email: alunoData.email,
-                    missao: document.title 
-                })
-            });
-        }
-    } else {
-        alert("Dica: São 23 cognatos únicos...");
-    }
-}
-        
-    } else {
-        // Se errar, avisa e não executa o envio nem a trava
-        alert("Dica: São 23 cognatos únicos. Revise o texto!");
-    }
-}
+                // Envio para a Planilha
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: document.title 
+                        })
+                    });
+                }
             } else {
                 alert("Dica: São 23 cognatos únicos. Revise o texto!");
-       
             }
         }
     </script>
 </body>
-
 </html>
-
-

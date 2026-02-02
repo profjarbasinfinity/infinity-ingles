@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 05</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00b880; 
+            --secondary: #1a4bc2; 
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-sub: #64748b; 
+            --border: #e2e8f0; 
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+        
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 24px; 
+            width: 100%; max-width: 480px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+        }
+        
+        .video-wrapper { 
+            position: relative; padding-bottom: 56.25%; height: 0; 
+            border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
+            border: 2px solid var(--border); background: #000; 
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            font-size: 1.2rem; 
+            display: flex; align-items: center; gap: 10px; 
+        }
+        .task-title::before { content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px; }
+
+        .instruction { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; }
+
+        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 4px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .quiz-item { 
+            margin-bottom: 12px; background: #f1f5f9; padding: 14px; 
+            border-radius: 12px; border: 1px solid var(--border); 
+        }
+        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.95rem; color: var(--secondary); }
+        
+        select { 
+            background: #ffffff; color: var(--secondary); 
+            border: 2px solid #cbd5e1; padding: 8px; 
+            border-radius: 8px; font-weight: 700; width: 100%; outline: none; 
+        }
+
+        .btn { 
+            width: 100%; padding: 20px; border: none; border-radius: 16px; 
+            background: linear-gradient(135deg, var(--secondary), #4f46e5); 
+            color: #ffffff; font-weight: 800; cursor: pointer; font-size: 1.1rem; 
+        }
+
+        #success-screen { 
+            display: none; position: fixed; inset: 0; background: #ffffff; 
+            flex-direction: column; align-items: center; justify-content: center; 
+            text-align: center; z-index: 1000; padding: 20px; 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtu.be/CRWIGab9QK8" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 05: PERSONAL PRONOUNS</div>
+        <p class="instruction">Identifique o pronome correto para cada pessoa do discurso:</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <p>1. O emissor (EU) em uma conversa:</p>
+                <select id="q1"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="he">HE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. O receptor (VOCÊ) da mensagem:</p>
+                <select id="q2"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="they">THEY</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. O assunto (ELE - masculino) de quem se fala:</p>
+                <select id="q3"><option value="">?</option><option value="she">SHE</option><option value="it">IT</option><option value="he">HE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. O assunto (ELA - feminino) de quem se fala:</p>
+                <select id="q4"><option value="">?</option><option value="she">SHE</option><option value="he">HE</option><option value="we">WE</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>5. Um substantivo NEUTRO de quem se fala:</p>
+                <select id="q5"><option value="">?</option><option value="you">YOU</option><option value="it">IT</option><option value="i">I</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>6. Os emissores (NÓS) no plural:</p>
+                <select id="q6"><option value="">?</option><option value="we">WE</option><option value="they">THEY</option><option value="you">YOU</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>7. Os receptores (VOCÊS) no plural:</p>
+                <select id="q7"><option value="">?</option><option value="they">THEY</option><option value="we">WE</option><option value="you">YOU</option></select>
+            </div>
+
+            <div class="quiz-item">
+                <p>8. Os assuntos (ELES/ELAS) de quem se fala:</p>
+                <select id="q8"><option value="">?</option><option value="it">IT</option><option value="they">THEY</option><option value="we">WE</option></select>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 05</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">👥</h1>
+        <h2 style="color: var(--secondary); font-size: 2rem;">Perfeito!</h2>
+        <p style="color: var(--text-sub);">Você identificou corretamente todas as pessoas do discurso e substantivos neutros.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const a = [
+                document.getElementById('q1').value === 'i',
+                document.getElementById('q2').value === 'you',
+                document.getElementById('q3').value === 'he',
+                document.getElementById('q4').value === 'she',
+                document.getElementById('q5').value === 'it',
+                document.getElementById('q6').value === 'we',
+                document.getElementById('q7').value === 'you',
+                document.getElementById('q8').value === 'they'
+            ];
+
+            if(a.every(v => v === true)) {
+                localStorage.setItem('m5_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma resposta está incorreta. Revise o vídeo e tente novamente!");
+            }
+        }
+    </script>
+</body>
+</html>

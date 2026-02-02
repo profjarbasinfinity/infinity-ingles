@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity Inglês | Mapa de Missões</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
+            --border: #e2e8f0;
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo-text { font-size: 2.5rem; font-weight: 800; line-height: 1; }
+        .if-brand { color: var(--if-green); }
+        .degrade { 
+            background: linear-gradient(45deg, var(--secondary), var(--if-green)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .status-bar {
+            background: var(--card-bg); 
+            padding: 12px 25px; 
+            border-radius: 50px;
+            margin-bottom: 40px; 
+            border: 1px solid var(--border); 
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
+            gap: 25px; 
+            width: 100%; 
+            max-width: 600px; 
+            padding: 10px;
+        }
+
+        .mission-node {
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: var(--text);
+            transition: 0.3s;
+        }
+
+        .node-circle {
+            width: 65px; 
+            height: 65px; 
+            border-radius: 50%; 
+            background: var(--card-bg); 
+            border: 3px solid var(--border);
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            transition: 0.3s;
+            color: #94a3b8;
+        }
+
+        /* Efeito de Hover nas missões disponíveis */
+        .mission-node:hover .node-circle { 
+            border-color: var(--secondary); 
+            transform: translateY(-5px);
+            color: var(--secondary);
+        }
+
+        /* Missão Concluída (Estilo Verde InFinity) */
+        .completed .node-circle {
+            background: var(--if-green); 
+            color: white; 
+            border-color: #267d34;
+            box-shadow: 0 0 15px rgba(47, 158, 65, 0.3);
+        }
+
+        .mission-label { 
+            font-size: 0.7rem; 
+            margin-top: 10px; 
+            font-weight: 700; 
+            color: #64748b; 
+            text-transform: uppercase;
+        }
+
+        .completed .mission-label { color: var(--if-green); }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text">
+            <span class="if-brand">I</span><span class="degrade">n</span><span class="if-brand">F</span><span class="degrade">inity</span>
+        </div>
+        <p style="color: #64748b; font-weight: 500;">English Mission Map</p>
+    </div>
+
+    <div class="status-bar" id="status-text">
+        Carregando progresso...
+    </div>
+
+    <div class="mission-grid" id="grid">
+        </div>
+
+    <script>
+        const totalMissions = 15;
+        const grid = document.getElementById('grid');
+        let completedCount = 0;
+
+        for (let i = 1; i <= totalMissions; i++) {
+            // Cria o ID com dois dígitos (01, 02...)
+            const missionId = i.toString().padStart(2, '0'); 
+            
+            // Verifica se está marcado como completo no navegador
+            const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
+            
+            if(isCompleted) completedCount++;
+
+            // Cria o elemento de link
+            const node = document.createElement('a');
+            
+            // CONFIGURAÇÃO DOS ARQUIVOS EM MINÚSCULO:
+            node.href = `missao${missionId}.html`; 
+            
+            node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
+            
+            node.innerHTML = `
+                <div class="node-circle">${i}</div>
+                <div class="mission-label">Missão ${missionId}</div>
+            `;
+            
+            grid.appendChild(node);
+        }
+
+        // Atualiza a barra de status com o total de acertos
+        document.getElementById('status-text').innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
+    </script>
+</body>
+</html>

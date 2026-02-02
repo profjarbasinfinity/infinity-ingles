@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 01</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        
+        .header { display: flex; align-items: center; margin-bottom: 20px; }
+        .logo-text { font-size: 2rem; font-weight: 800; }
+        .if-brand { color: var(--if-green); }
+        .degrade { background: linear-gradient(45deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 450px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Container do Vídeo do YouTube */
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .word-bank { line-height: 2.2; background: #0a1025; padding: 15px; border-radius: 12px; margin: 15px 0; text-align: justify; }
+        .word { cursor: pointer; padding: 0 4px; border-radius: 6px; border-bottom: 2px solid #1e293b; transition: 0.2s; display: inline-block; }
+        .selected { background: var(--if-green); color: white; border-bottom-color: transparent; }
+
+        input, textarea { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; background: #161d3a; border: 1px solid #1e293b; color: white; font-family: inherit; box-sizing: border-box; }
+        .btn { width: 100%; padding: 18px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-text">
+            <span class="if-brand">I</span><span class="degrade">n</span><span class="if-brand">F</span><span class="degrade">inity</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/nsmBAcnaji4" 
+                title="InFinity - Missão 01" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <h3 style="color:var(--primary); margin:0;">Missão 01: Cognatos</h3>
+        <p style="font-size: 0.9rem;">1. Toque nos cognatos enquanto assiste:</p>
+        <div id="text-container" class="word-bank"></div>
+
+        <p style="font-size: 0.9rem;">2. Total de cognatos identificados:</p>
+        <input type="number" id="ans-count" placeholder="Ex: 23">
+
+        <div id="trans-div" style="display:none">
+            <p style="font-size: 0.9rem;">3. Tradução dos termos:</p>
+            <div id="trans-list"></div>
+        </div>
+
+        <p style="font-size: 0.9rem;">4. Resumo da lição:</p>
+        <textarea id="summary"></textarea>
+
+        <button class="btn" onclick="finish()">CONCLUIR MISSÃO</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">🎉</h1>
+        <h2>Parabéns, Aluno!</h2>
+        <p>Você cumpriu a missão 01 com sucesso!</p>
+        <button class="btn" style="width:200px" onclick="location.reload()">REFAZER</button>
+    </div>
+
+    <script>
+        // Texto original da Missão 001
+        const raw = "In modern days, technology has become an essential part of education. Many students use digital platforms to organize their activities, communicate with teachers, and access important materials. However, the excessive use of electronic devices can also create problems, such as anxiety or lack of concentration.";
+        const box = document.getElementById('text-container');
+        let sel = new Set();
+        
+        const winSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2013/2013-preview.mp3');
+
+        raw.split(" ").forEach(w => {
+            const span = document.createElement('span');
+            span.className = 'word';
+            span.innerText = w + " ";
+            span.onclick = () => {
+                span.classList.toggle('selected');
+                const clean = w.replace(/[.,]/g, "").toLowerCase();
+                span.classList.contains('selected') ? sel.add(clean) : sel.delete(clean);
+                render();
+            };
+            box.appendChild(span);
+        });
+
+        function render() {
+            const div = document.getElementById('trans-div');
+            const list = document.getElementById('trans-list');
+            if(sel.size > 0) {
+                div.style.display = 'block';
+                list.innerHTML = Array.from(sel).map(w => `<div style="margin-bottom:8px"><small>${w}:</small><input type="text"></div>`).join('');
+            } else { div.style.display = 'none'; }
+        }
+
+        function finish() {
+            // Validação original baseada nos 23 cognatos do texto
+            if(document.getElementById('ans-count').value == 23) {
+                winSound.play();
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Dica: São 23 cognatos únicos. Revise o texto!");
+            }
+        }
+    </script>
+</body>
+</html>

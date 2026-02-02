@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 07</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 500px; border: 1px solid #1e293b; position: relative; overflow: hidden; }
+        
+        .timer-bar { position: absolute; top: 0; left: 0; height: 5px; background: var(--primary); width: 100%; transition: linear; }
+
+        .verb-box { font-size: 3rem; font-weight: 800; color: var(--primary); margin: 30px 0; text-align: center; text-transform: uppercase; }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-btn { 
+            background: #161d3a; border: 2px solid #2a5ff044; color: white; padding: 15px; 
+            border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;
+            transition: 0.2s;
+        }
+        .opt-btn:hover { border-color: var(--primary); background: #1f2937; }
+        .opt-btn.correct { background: var(--primary); color: #000; border-color: white; }
+        .opt-btn.wrong { background: #ff4b2b; border-color: white; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin-bottom: 20px;">
+
+    <div class="card" id="quiz-card">
+        <div class="timer-bar" id="timer"></div>
+        <h3 style="text-align: center; color: #94a3b8; font-size: 0.8rem; margin-top: 10px;">QUAL É A AÇÃO?</h3>
+        
+        <div class="verb-box" id="verb-display">WALK</div>
+        
+        <div class="options-grid" id="options">
+            </div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🏃‍♂️</h1>
+        <h2 style="color: var(--primary);">VOCABULÁRIO ATIVADO!</h2>
+        <p>Você domina as ações básicas do cotidiano.</p>
+        <button class="opt-btn" style="width: 250px; background: var(--primary); color: black;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const verbs = [
+            { eng: "Walk", options: ["Correr", "Andar", "Pular", "Dormir"], correct: "Andar" },
+            { eng: "Jump", options: ["Caminhar", "Gritar", "Pular", "Rir"], correct: "Pular" },
+            { eng: "Eat", options: ["Beber", "Comer", "Dormir", "Escrever"], correct: "Comer" },
+            { eng: "Sleep", options: ["Sonhar", "Escrever", "Andar", "Dormir"], correct: "Dormir" },
+            { eng: "Write", options: ["Ler", "Escrever", "Rir", "Correr"], correct: "Escrever" },
+            { eng: "Run", options: ["Pular", "Andar", "Correr", "Chorar"], correct: "Correr" },
+            { eng: "Laugh", options: ["Rir", "Chorar", "Comer", "Dormir"], correct: "Rir" },
+            { eng: "Cry", options: ["Rir", "Caminhar", "Dormir", "Chorar"], correct: "Chorar" }
+        ];
+
+        let current = 0;
+        let timerWidth = 100;
+        let timerInterval;
+
+        function startTimer() {
+            timerWidth = 100;
+            document.getElementById('timer').style.width = '100%';
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timerWidth -= 2;
+                document.getElementById('timer').style.width = timerWidth + '%';
+                if (timerWidth <= 0) {
+                    alert("Tempo esgotado! Tente ser mais rápido.");
+                    resetQuiz();
+                }
+            }, 100);
+        }
+
+        function loadVerb() {
+            if (current >= verbs.length) {
+                showSuccess();
+                return;
+            }
+            const v = verbs[current];
+            document.getElementById('verb-display').innerText = v.eng;
+            const optContainer = document.getElementById('options');
+            optContainer.innerHTML = '';
+            
+            v.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => check(opt, btn);
+                optContainer.appendChild(btn);
+            });
+            startTimer();
+        }
+
+        function check(choice, btn) {
+            clearInterval(timerInterval);
+            if (choice === verbs[current].correct) {
+                btn.classList.add('correct');
+                current++;
+                setTimeout(loadVerb, 600);
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => {
+                    alert("Ops! Vamos recomeçar o treino.");
+                    resetQuiz();
+                }, 400);
+            }
+        }
+
+        function resetQuiz() {
+            current = 0;
+            loadVerb();
+        }
+
+        function showSuccess() {
+            localStorage.setItem('m07_complete', 'true');
+            confetti({ particleCount: 150, spread: 70 });
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        loadVerb();
+    </script>
+</body>
+</html>

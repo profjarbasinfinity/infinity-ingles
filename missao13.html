@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 13</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;      /* Fundo Claro */
+            --card-bg: #ffffff; /* Card Branco */
+            --text: #1e293b;    /* Texto Escuro */
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 25px; 
+            width: 100%; 
+            max-width: 450px; 
+            border: 1px solid #e2e8f0; 
+            text-align: center; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        /* Container do Vídeo (Shorts) */
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.78%; 
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000;
+            border: 2px solid var(--secondary);
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .verb-display { 
+            font-size: 2.8rem; 
+            font-weight: 800; 
+            color: var(--secondary); 
+            margin: 20px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 3px; 
+        }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        
+        .opt-btn { 
+            background: #f1f5f9; 
+            border: 2px solid #e2e8f0; 
+            color: var(--text); 
+            padding: 18px 10px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            font-size: 1rem; 
+            font-weight: 600;
+        }
+        
+        .opt-btn:hover { border-color: var(--secondary); background: #fff; }
+        .opt-btn.correct { background: var(--if-green) !important; color: white !important; border-color: white !important; }
+        .opt-btn.wrong { background: #ff4b2b !important; color: white !important; border-color: white !important; animation: shake 0.4s; }
+
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+        .progress { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--if-green); width: 0%; transition: 0.4s; }
+
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            text-align: center; 
+            padding: 20px; 
+        }
+
+        .btn-finish {
+            width: 100%; padding: 20px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:160px; margin-bottom: 20px;">
+
+    <div class="card" id="quiz-card">
+        <div class="video-wrapper">
+            <iframe 
+                src="https://www.youtube-nocookie.com/embed/4NlbLTtyC-Y" 
+                title="Missão 13 - Verbos de Ação" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="progress"><div class="progress-bar" id="pb"></div></div>
+        <p style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin: 0;">MISSÃO 13: O PODER DA AÇÃO</p>
+        
+        <div class="verb-display" id="verb-text">PLAY</div>
+        
+        <div class="options-grid" id="options"></div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">⚡</h1>
+        <h2 style="color: var(--secondary); font-size: 2rem;">VOCABULÁRIO CONCLUÍDO!</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">Você dominou mais uma bateria de verbos essenciais.</p>
+        <button class="btn-finish" style="max-width: 300px;" onclick="location.href='index.html'">RETORNAR AO MAPA</button>
+    </div>
+
+    <script>
+        const missionData = [
+            { en: 'PLAY', pt: 'Brincar / Jogar', distractors: ['Trabalhar', 'Correr', 'Beber'] },
+            { en: 'READ', pt: 'Ler', distractors: ['Ouvir', 'Escrever', 'Limpar'] },
+            { en: 'DRINK', pt: 'Beber', distractors: ['Comer', 'Voar', 'Dirigir'] },
+            { en: 'BUY', pt: 'Comprar', distractors: ['Vender', 'Alugar', 'Pagar'] },
+            { en: 'LISTEN', pt: 'Ouvir / Escutar', distractors: ['Falar', 'Olhar', 'Sentir'] },
+            { en: 'DRIVE', pt: 'Dirigir', distractors: ['Caminhar', 'Voar', 'Navegar'] },
+            { en: 'FLY', pt: 'Voar', distractors: ['Pular', 'Correr', 'Cair'] },
+            { en: 'CLEAN', pt: 'Limpar', distractors: ['Sujar', 'Arrumar', 'Lavar'] }
+        ];
+
+        let step = 0;
+
+        function init() {
+            if (step >= missionData.length) {
+                finish();
+                return;
+            }
+            
+            const data = missionData[step];
+            document.getElementById('verb-text').innerText = data.en;
+            document.getElementById('pb').style.width = (step / missionData.length) * 100 + '%';
+            
+            const container = document.getElementById('options');
+            container.innerHTML = '';
+
+            let choices = [data.pt, ...data.distractors].sort(() => Math.random() - 0.5);
+
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = choice;
+                btn.onclick = () => check(choice, data.pt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function check(selected, correct, btn) {
+            if (selected === correct) {
+                btn.classList.add('correct');
+                confetti({ particleCount: 30, spread: 40, origin: { y: 0.8 } });
+                step++;
+                setTimeout(init, 700);
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 500);
+            }
+        }
+
+        function finish() {
+            localStorage.setItem('m13_complete', 'true');
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        init();
+    </script>
+</body>
+</html>

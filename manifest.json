@@ -1,0 +1,17 @@
+{
+  "name": "InFinity English Platform",
+  "short_name": "InFinity",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#050816",
+  "theme_color": "#050816",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo-horizontal.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}

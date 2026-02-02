@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 08</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00b880; --secondary: #1a4bc2; --bg: #f8fafc; --card-bg: #ffffff; --text-main: #1e293b; --border: #e2e8f0; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 24px; padding: 24px; width: 100%; max-width: 550px; border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--border); background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 8px; font-size: 1.1rem; }
+        .instruction { font-size: 0.85rem; color: #64748b; margin-bottom: 20px; border-left: 3px solid var(--if-green); padding-left: 10px; }
+
+        .quiz-scroll { max-height: 550px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 4px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 25px; background: #f8fafc; padding: 18px; border-radius: 15px; border: 1px solid var(--border); }
+        .eng-phrase { display: block; font-weight: 800; color: var(--secondary); margin-bottom: 5px; font-size: 1rem; }
+        .vocabulary { display: block; font-size: 0.75rem; color: #64748b; margin-bottom: 15px; font-style: italic; line-height: 1.3; }
+
+        /* Estilo para imagem ao lado do texto na letra B */
+        .flex-container { display: flex; align-items: flex-start; gap: 15px; }
+        .subway-img { width: 120px; border-radius: 8px; border: 1px solid #eee; }
+
+        .input-group { margin-bottom: 12px; width: 100%; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+        input[type="text"] { width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; outline: none; font-family: 'Poppins', sans-serif; box-sizing: border-box; }
+        input[type="text"]:focus { border-color: var(--secondary); }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 16px; background: linear-gradient(135deg, var(--secondary), #4f46e5); color: #ffffff; font-weight: 800; cursor: pointer; }
+        #success-screen { display: none; position: fixed; inset: 0; background: #ffffff; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/cM5gQeCESMw" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 08: TÉCNICA DE ADIÇÃO</div>
+        <p class="instruction">Utilizando adições, adapte as frases para que expressem o melhor sentido em português:</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <span class="eng-phrase">a) Start exercising!</span>
+                <span class="vocabulary">Start = começar; exercising = exercitar</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q1f" placeholder="Traduza com adaptação...">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q1a" placeholder="Quais palavras você inseriu?">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <div class="flex-container">
+                    <div style="flex: 1;">
+                        <span class="eng-phrase">b) Eat Fresh!</span>
+                        <span class="vocabulary">Eat = comer; fresh = fresco</span>
+                        <div class="input-group">
+                            <label>Frase em português:</label>
+                            <input type="text" id="q2f">
+                        </div>
+                        <div class="input-group">
+                            <label>O que foi adicionado?</label>
+                            <input type="text" id="q2a">
+                        </div>
+                    </div>
+                    <img src="Subway eat fresh.jpeg" alt="Subway Logo" class="subway-img">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">c) Students start university after turning 18 or 19.</span>
+                <span class="vocabulary">Students = estudantes, start = começar, university = universidade, after = após/depois, turning = completarem, or = ou</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q3f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q3a">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">d) I will fail you.</span>
+                <span class="vocabulary">I = eu, will = vou, fail = falhar, you = você</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q4f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q4a">
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <span class="eng-phrase">e) I bought crackers and pork.</span>
+                <span class="vocabulary">Assista ao vídeo para lembrar os termos culturais usados pelo professor.</span>
+                <div class="input-group">
+                    <label>Frase em português:</label>
+                    <input type="text" id="q5f">
+                </div>
+                <div class="input-group">
+                    <label>O que foi adicionado?</label>
+                    <input type="text" id="q5a">
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 08</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">➕</h1>
+        <h2 style="color: var(--secondary); font-size: 1.8rem;">Adaptação Concluída!</h2>
+        <p>Você dominou a arte de adicionar clareza aos textos.</p>
+        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const getV = (id) => document.getElementById(id).value.trim().toLowerCase();
+            
+            // Validação flexível
+            const c1 = (getV('q1f').includes("comece a se exercitar")) && (getV('q1a').includes('a') && getV('q1a').includes('se'));
+            const c2 = (getV('q2f').includes("coma comida fresca")) && (getV('q2a').includes("comida"));
+            const c3 = (getV('q3f').includes("estudantes começam a universidade")) && (getV('q3a').includes("a") || getV('q3a').includes("anos"));
+            const c4 = (getV('q4f').includes("vou falhar com você")) && (getV('q4a').includes("com"));
+            const c5 = (getV('q5f').includes("bolacha") && getV('q5f').includes("carne")) && (getV('q5a').includes("bolacha") || getV('q5a').includes("carne"));
+
+            if(c1 && c2 && c3 && c4 && c5) {
+                localStorage.setItem('m8_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin:

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 04</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
+        .logo-img { width: 100%; height: auto; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        
+        /* Scroll interno para as 10 questões não ocuparem a tela toda */
+        .quiz-scroll { max-height: 450px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
+        .quiz-scroll::-webkit-scrollbar { width: 5px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 12px; background: #161d3a; padding: 12px; border-radius: 12px; border: 1px solid #1e293b; }
+        .quiz-item p { margin: 0 0 8px 0; font-weight: 600; font-size: 0.9rem; color: var(--primary); letter-spacing: 1px; }
+
+        .row { display: flex; gap: 8px; align-items: center; }
+        select { flex: 1; background: #0a1025; color: white; border: 1px solid #2a5ff0; padding: 6px; border-radius: 6px; font-size: 0.85rem; }
+
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    </div>
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/Xf1qTokOAp0" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 04: JOBS & PLACES</div>
+        <p style="font-size:0.8rem; color:#94a3b8; margin-bottom:15px;">Assista e complete. Cuidado com os novos termos!</p>
+
+        <div class="quiz-scroll">
+            <div class="quiz-item">
+                <p>1. STUDENT</p>
+                <div class="row">
+                    <select id="art1"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <div style="flex:1; color:#64748b; font-size:0.8rem; text-align:center;">(Foco no artigo)</div>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>2. ARTIST</p>
+                <div class="row">
+                    <select id="art2"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl2"><option value="">Lugar...</option><option value="s">Studio</option><option value="h">Hospital</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>3. DOCTOR</p>
+                <div class="row">
+                    <select id="art3"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl3"><option value="">Lugar...</option><option value="h">Hospital</option><option value="r">Restaurant</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>4. AGRICULTURIST</p>
+                <div class="row">
+                    <select id="art4"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl4"><option value="">Lugar...</option><option value="f">Farm</option><option value="s">School</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>5. TEACHER</p>
+                <div class="row">
+                    <select id="art5"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl5"><option value="">Lugar...</option><option value="sc">School</option><option value="l">Lab</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>6. CHEF</p>
+                <div class="row">
+                    <select id="art6"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl6"><option value="">Lugar...</option><option value="r">Restaurant</option><option value="p">Police Station</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>7. CASHIER</p>
+                <div class="row">
+                    <select id="art7"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl7"><option value="">Lugar...</option><option value="sm">Supermarket</option><option value="a">Airplane</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>8. DENTIST</p>
+                <div class="row">
+                    <select id="art8"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl8"><option value="">Lugar...</option><option value="dc">Dental Clinic</option><option value="g">Garden</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>9. PILOT</p>
+                <div class="row">
+                    <select id="art9"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl9"><option value="">Lugar...</option><option value="ap">Airplane</option><option value="f">Farm</option></select>
+                </div>
+            </div>
+
+            <div class="quiz-item">
+                <p>10. SCIENTIST</p>
+                <div class="row">
+                    <select id="art10"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select>
+                    <select id="pl10"><option value="">Lugar...</option><option value="lab">Science Lab</option><option value="sm">Supermarket</option></select>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 04</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 4rem;">🎖️</h1>
+        <h2 style="color: var(--primary);">Vocabulário Dominado!</h2>
+        <p>Você completou o desafio das 10 profissões.</p>
+        <button class="btn" style="width:220px" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        function checkMission() {
+            const checks = [
+                document.getElementById('art1').value === 'a',
+                document.getElementById('art2').value === 'an' && document.getElementById('pl2').value === 's',
+                document.getElementById('art3').value === 'a' && document.getElementById('pl3').value === 'h',
+                document.getElementById('art4').value === 'an' && document.getElementById('pl4').value === 'f',
+                document.getElementById('art5').value === 'a' && document.getElementById('pl5').value === 'sc',
+                document.getElementById('art6').value === 'a' && document.getElementById('pl6').value === 'r',
+                document.getElementById('art7').value === 'a' && document.getElementById('pl7').value === 'sm',
+                document.getElementById('art8').value === 'a' && document.getElementById('pl8').value === 'dc',
+                document.getElementById('art9').value === 'a' && document.getElementById('pl9').value === 'ap',
+                document.getElementById('art10').value === 'a' && document.getElementById('pl10').value === 'lab'
+            ];
+
+            if(checks.every(c => c === true)) {
+                localStorage.setItem('m4_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma profissão está com o artigo ou o lugar errado. Verifique especialmente as novas palavras!");
+            }
+        }
+    </script>
+</body>
+</html>

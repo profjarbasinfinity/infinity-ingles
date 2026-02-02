@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 15</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .analysis-box { background: #161d3a; padding: 15px; border-radius: 15px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
+        .term-title { font-weight: 800; color: var(--primary); font-size: 1rem; display: block; margin-bottom: 10px; }
+        
+        .tech-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .tech-btn { 
+            background: #0a1025; border: 1px solid #4a5568; color: #94a3b8; padding: 10px; 
+            border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: 0.2s; text-align: center;
+        }
+        .tech-btn.selected { background: var(--secondary); color: white; border-color: white; font-weight: bold; }
+
+        .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; font-size: 1.1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/wyZJ5cK9AZE" allowfullscreen></iframe>
+        </div>
+
+        <h3 style="color: var(--primary); text-align: center; margin-bottom: 5px;">MISSÃO 15: O DESAFIO DO MESTRE</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; text-align: center; margin-bottom: 20px;">
+            A tradução final você já tem. Agora, identifique quais técnicas foram usadas em cada termo:
+        </p>
+
+        <div id="quiz-area"></div>
+
+        <button class="btn-check" onclick="verifyFinal()">CONCLUIR SÉRIE DE ADAPTAÇÕES</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🏆</h1>
+        <h2 style="color: var(--primary);">NÍVEL PROFISSIONAL ALCANÇADO!</h2>
+        <p>Você não apenas traduz, você entende o "porquê" de cada mudança. Joel Santana ficaria orgulhoso!</p>
+        <button class="btn-check" style="width: 250px;" onclick="location.href='index.html'">FINALIZAR MAPA</button>
+    </div>
+
+    <script>
+        const analysisData = [
+            {
+                term: "1. 'Modern-day Brazilian celebrities' para 'Celebridades brasileiras atuais'",
+                techs: ['Reordenação', 'Retextualização'] // Reordenou a posição e retextualizou modern-day para atuais
+            },
+            {
+                term: "2. 'Earn money on' para 'Ganham dinheiro com a'",
+                techs: ['Retextualização', 'Adição'] // on virou 'com' e adicionou 'a'
+            },
+            {
+                term: "3. 'Downfall' para 'Desgraça'",
+                techs: ['Retextualização'] // Troca de termo por contexto
+            },
+            {
+                term: "4. 'Promoting online casinos' para 'Promovendo cassinos online'",
+                techs: ['Reordenação'] // Inversão adjetivo/substantivo
+            },
+            {
+                term: "EXTRA: 'Sea Food' (Joel Santana) para 'Fruto do mar'",
+                techs: ['Omissão', 'Reordenação', 'Retextualização'] // Joel omitiu 'sea', inverteu e adaptou o sentido
+            }
+        ];
+
+        let userChoices = analysisData.map(() => new Set());
+
+        function renderQuiz() {
+            const area = document.getElementById('quiz-area');
+            area.innerHTML = analysisData.map((item, qIdx) => `
+                <div class="analysis-box">
+                    <span class="term-title">${item.term}</span>
+                    <div class="tech-options">
+                        ${['Adição', 'Omissão', 'Reordenação', 'Retextualização'].map(t => `
+                            <div class="tech-btn" id="btn-${qIdx}-${t}" onclick="selectTech(${qIdx}, '${t}')">${t}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectTech(qIdx, tech) {
+            const btn = document.getElementById(`btn-${qIdx}-${tech}`);
+            if(userChoices[qIdx].has(tech)) {
+                userChoices[qIdx].delete(tech);
+                btn.classList.remove('selected');
+            } else {
+                userChoices[qIdx].add(tech);
+                btn.classList.add('selected');
+            }
+        }
+
+        function verifyFinal() {
+            let allCorrect = true;
+            analysisData.forEach((item, idx) => {
+                const userSet = userChoices[idx];
+                const isCorrect = item.techs.every(t => userSet.has(t)) && userSet.size === item.techs.length;
+                if(!isCorrect) allCorrect = false;
+            });
+
+            if(allCorrect) {
+                localStorage.setItem('m15_complete', 'true');
+                confetti({ particleCount: 150, spread: 70 });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma análise técnica está incompleta ou incorreta. Assista ao vídeo novamente e veja onde o Professor aplicou cada mudança!");
+            }
+        }
+
+        renderQuiz();
+    </script>
+</body>
+</html>

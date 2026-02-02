@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 09</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .logo-img { width: 180px; margin: 20px 0; }
+
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 550px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); background: #000; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+
+        .quiz-item { margin-bottom: 30px; background: #161d3a; padding: 18px; border-radius: 12px; border: 1px solid #1e293b; }
+        .eng-phrase { display: block; font-weight: 800; color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; text-align: center; }
+
+        .word-pool, .answer-zone { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-height: 45px; padding: 10px; border-radius: 8px; }
+        .answer-zone { border: 2px dashed #2a5ff0; margin-bottom: 15px; background: #0a1025; }
+        
+        .word-btn { 
+            padding: 8px 15px; background: #ffffff; color: #000; border-radius: 8px; 
+            cursor: pointer; font-weight: 600; font-size: 0.9rem; user-select: none;
+            transition: 0.2s; border: none;
+        }
+        .word-btn:hover { background: #e2e8f0; }
+        .word-btn:active { transform: scale(0.95); }
+
+        .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://youtube.com/shorts/48qf5LEMc_U" allowfullscreen></iframe>
+        </div>
+
+        <div class="task-title">MISSÃO 10: REORDENAÇÃO</div>
+        <p class="instruction">As palavras estão embaralhadas! Clique nelas na ordem correta para montar a tradução natural:</p>
+
+        <div id="quiz-container"></div>
+
+        <button class="btn-check" onclick="verifyAll()">CONCLUIR MISSÃO 10</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem; margin: 0;">🔄</h1>
+        <h2 style="color: var(--primary); font-size: 1.8rem;">Desafio Vencido!</h2>
+        <p>Você provou que domina a estrutura do nosso idioma.</p>
+        <button class="btn-check" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const missions = [
+            { id: 'a', eng: 'a) A very important decision', words: ['Uma', 'muito', 'importante', 'decisão'], correct: 'Uma decisão muito importante' },
+            { id: 'b', eng: 'b) Gross Domestic Product', words: ['Produto', 'Interno', 'Bruto'], correct: 'Produto Interno Bruto' },
+            { id: 'c', eng: 'c) The school teacher saved the school system', words: ['O', 'professor', 'escolar', 'salvou', 'o', 'sistema', 'escolar'], correct: 'O professor escolar salvou o sistema escolar' },
+            { id: 'd', eng: 'd) His new car activated an advanced electric system', words: ['O', 'carro', 'novo', 'dele', 'ativou', 'um', 'sistema', 'elétrico', 'avançado'], correct: 'O carro novo dele ativou um sistema elétrico avançado' },
+            { id: 'e', eng: 'e) His younger brother had a better idea', words: ['O', 'irmão', 'mais', 'novo', 'dele', 'teve', 'uma', 'ideia', 'melhor'], correct: 'O irmão mais novo dele teve uma ideia melhor' },
+            { id: 'f', eng: 'f) Sergeant Pepper\'s lonely hearts club band', words: ['Banda', 'Clube', 'dos', 'corações', 'solitários', 'do', 'sargento', 'Pimenta'], correct: 'Banda Clube dos corações solitários do sargento Pimenta' }
+        ];
+
+        // Função para embaralhar o array (Fisher-Yates Shuffle)
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function initQuiz() {
+            const container = document.getElementById('quiz-container');
+            missions.forEach((m, idx) => {
+                const item = document.createElement('div');
+                item.className = 'quiz-item';
+                
+                // Criamos uma cópia das palavras e embaralhamos
+                const shuffledWords = shuffle([...m.words]);
+
+                item.innerHTML = `
+                    <span class="eng-phrase">${m.eng}</span>
+                    <div class="answer-zone" id="ans-${idx}"></div>
+                    <div class="word-pool" id="pool-${idx}">
+                        ${shuffledWords.map(w => `<button class="word-btn" onclick="moveWord(this, '${idx}')">${w}</button>`).join('')}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function moveWord(btn, idx) {
+            const answerZone = document.getElementById(`ans-${idx}`);
+            const pool = document.getElementById(`pool-${idx}`);
+            if (btn.parentElement === pool) {
+                answerZone.appendChild(btn);
+            } else {
+                pool.appendChild(btn);
+            }
+        }
+
+        function verifyAll() {
+            let allCorrect = true;
+            missions.forEach((m, idx) => {
+                const userWords = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText);
+                const userPhrase = userWords.join(' ');
+                if (userPhrase.toLowerCase() !== m.correct.toLowerCase()) {
+                    allCorrect = false;
+                }
+            });
+
+            if (allCorrect) {
+                localStorage.setItem('m10_complete', 'true');
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma frase ainda não está na ordem correta. Analise a posição dos adjetivos e tente novamente!");
+            }
+        }
+
+        initQuiz();
+    </script>
+</body>
+</html>

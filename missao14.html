@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 14</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; }
+        
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--secondary); }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .step-container { background: #161d3a; padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid #2a5ff044; }
+        .eng-text { color: var(--primary); font-weight: 800; font-size: 1.2rem; display: block; margin-bottom: 10px; text-align: center; }
+        
+        .tech-selector { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
+        .tech-tag { 
+            padding: 5px 12px; border: 1px solid #4a5568; border-radius: 20px; font-size: 0.75rem; 
+            cursor: pointer; transition: 0.3s; background: #0a1025;
+        }
+        .tech-tag.active { background: var(--secondary); border-color: white; font-weight: bold; }
+
+        .answer-zone { min-height: 50px; border: 2px dashed var(--secondary); border-radius: 10px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; margin: 15px 0; }
+        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .word-btn { padding: 8px 14px; background: white; color: black; border-radius: 6px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+
+        .btn-verify { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 10px; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
+
+    <div class="card">
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube.com/embed/aHVET_AjUdI" allowfullscreen></iframe>
+        </div>
+
+        <h3 style="color: var(--primary); text-align: center;">MISSÃO 14: ADAPTAÇÕES SIMULTÂNEAS</h3>
+        <p style="font-size: 0.85rem; color: #94a3b8; text-align: center; margin-bottom: 25px;">
+            Analise a manchete e aplique as múltiplas técnicas explicadas pelo Professor Jarbas.
+        </p>
+
+        <div id="quiz-box">
+            </div>
+
+        <button class="btn-verify" id="main-btn" onclick="checkStep()">PRÓXIMO</button>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🧠</h1>
+        <h2 style="color: var(--primary);">PENSAMENTO MULTINÍVEL!</h2>
+        <p>Você destrinchou a manchete como um profissional.</p>
+        <button class="btn-verify" style="width: 250px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const steps = [
+            {
+                eng: "Breaking News",
+                pool: ['Plantão', 'Quebrantes', 'Notícias', 'Urgente'],
+                correct: 'Plantão',
+                techs: ['Retextualização']
+            },
+            {
+                eng: "United Nations officials",
+                pool: ['oficiais', 'das', 'Nações', 'Unidas', 'unidas', 'nações'],
+                correct: 'oficiais das Nações Unidas',
+                techs: ['Reordenação', 'Adição']
+            },
+            {
+                eng: "long-term negotiations",
+                pool: ['negociações', 'de', 'longo', 'prazo', 'termo'],
+                correct: 'negociações de longo prazo',
+                techs: ['Reordenação', 'Adição', 'Retextualização']
+            }
+        ];
+
+        let currentStep = 0;
+        let selectedTechs = new Set();
+
+        function renderStep() {
+            const s = steps[currentStep];
+            const container = document.getElementById('quiz-box');
+            selectedTechs.clear();
+            
+            container.innerHTML = `
+                <div class="step-container">
+                    <span class="eng-text">"${s.eng}"</span>
+                    
+                    <p style="font-size: 0.7rem; color: #94a3b8; text-align: center; margin: 0;">Quais técnicas são necessárias aqui?</p>
+                    <div class="tech-selector">
+                        ${['Adição', 'Supressão', 'Reordenação', 'Retextualização'].map(t => 
+                            `<div class="tech-tag" onclick="toggleTech(this, '${t}')">${t}</div>`
+                        ).join('')}
+                    </div>
+
+                    <div class="answer-zone" id="ans-zone"></div>
+                    <div class="word-pool" id="pool-zone">
+                        ${s.pool.sort(() => Math.random() - 0.5).map(w => 
+                            `<button class="word-btn" onclick="moveWord(this)">${w}</button>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleTech(el, tech) {
+            el.classList.toggle('active');
+            if(selectedTechs.has(tech)) selectedTechs.delete(tech);
+            else selectedTechs.add(tech);
+        }
+
+        function moveWord(btn) {
+            const ans = document.getElementById('ans-zone');
+            const pool = document.getElementById('pool-zone');
+            if(btn.parentElement === pool) ans.appendChild(btn);
+            else pool.appendChild(btn);
+        }
+
+        function checkStep() {
+            const s = steps[currentStep];
+            const userPhrase = Array.from(document.getElementById('ans-zone').children).map(b => b.innerText).join(' ');
+            
+            // Valida se as técnicas selecionadas batem com o gabarito do vídeo
+            const techCorrect = s.techs.every(t => selectedTechs.has(t)) && selectedTechs.size === s.techs.length;
+            
+            if(userPhrase.toLowerCase() === s.correct.toLowerCase() && techCorrect) {
+                confetti({ particleCount: 50, spread: 40 });
+                currentStep++;
+                if(currentStep < steps.length) {
+                    renderStep();
+                } else {
+                    localStorage.setItem('m14_complete', 'true');
+                    document.getElementById('success-screen').style.display = 'flex';
+                }
+            } else {
+                alert("Algo está errado. Verifique se escolheu TODAS as técnicas corretas mencionadas no vídeo e se a frase está natural.");
+            }
+        }
+
+        renderStep();
+    </script>
+</body>
+</html>

@@ -103,17 +103,14 @@
         }
 
         function finish() {
-            // Validação dos 23 cognatos
             if(document.getElementById('ans-count').value == 23) {
                 winSound.play();
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('success-screen').style.display = 'flex';
                 
-                // Marcações de progresso e trava
                 localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
                 localStorage.setItem('m01_complete', 'true');
 
-                // Envio para a Planilha
                 const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
                 if (alunoData) {
                     fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
@@ -132,7 +129,8 @@
             } else {
                 alert("Dica: São 23 cognatos únicos. Revise o texto!");
             }
-        }
+        } // <--- Apenas UMA chave para fechar a função finish
     </script>
 </body>
 </html>
+

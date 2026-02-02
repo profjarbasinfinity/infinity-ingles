@@ -107,20 +107,18 @@
         }
 
        function finish() {
-    // 1. Validação: Verifica se o aluno acertou os 23
+    // 1. Só entra aqui se o aluno acertar os 23
     if(document.getElementById('ans-count').value == 23) {
-        
-        // Ações Visuais
         winSound.play();
         confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         document.getElementById('success-screen').style.display = 'flex';
         
-        // 2. Marcação da Trava Diária (O Carimbo de hoje)
+        // 2. SALVA A TRAVA DIÁRIA (Fora do fetch!)
         localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+        localStorage.setItem('m01_complete', 'true'); // Marca no mapa como verde
 
-        // 3. Envio para a Planilha do Professor
+        // 3. ENVIA PARA A PLANILHA
         const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        
         if (alunoData) {
             fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
                 method: 'POST',
@@ -135,6 +133,10 @@
                 })
             });
         }
+    } else {
+        alert("Dica: São 23 cognatos únicos...");
+    }
+}
         
     } else {
         // Se errar, avisa e não executa o envio nem a trava
@@ -150,4 +152,5 @@
 </body>
 
 </html>
+
 

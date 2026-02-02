@@ -3,84 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 05</title>
+    <title>InFinity | Missão 05 (Dark)</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         
         :root { 
             --if-green: #2f9e41; 
-            --primary: #00b880; 
-            --secondary: #1a4bc2; 
-            --bg: #f8fafc; 
-            --card-bg: #ffffff; 
-            --text-main: #1e293b; 
-            --text-sub: #64748b; 
-            --border: #e2e8f0; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #050816;      /* Fundo Escuro */
+            --card-bg: #101630; /* Card Escuro */
+            --text: #ffffff;    /* Texto Branco */
+            --border: #1e293b;
         }
         
         body { 
             font-family: 'Poppins', sans-serif; 
             background-color: var(--bg); 
-            color: var(--text-main); 
+            color: var(--text); 
             margin: 0; padding: 15px; 
             display: flex; flex-direction: column; align-items: center; 
         }
         
-        .logo-container { width: 100%; max-width: 250px; margin: 20px 0; }
-        .logo-img { width: 100%; height: auto; }
-
         .card { 
             background: var(--card-bg); 
             border-radius: 24px; 
             padding: 24px; 
             width: 100%; max-width: 480px; 
             border: 1px solid var(--border); 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
         }
         
         .video-wrapper { 
-            position: relative; padding-bottom: 56.25%; height: 0; 
+            position: relative; 
+            padding-bottom: 56.25%; /* Proporção 16:9 para este vídeo */
+            height: 0; 
             border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
-            border: 2px solid var(--border); background: #000; 
+            border: 2px solid var(--secondary);
+            background: #000;
         }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
         .task-title { 
-            color: var(--secondary); 
+            color: var(--primary); 
             font-weight: 800; 
             margin-bottom: 8px; 
-            font-size: 1.2rem; 
-            display: flex; align-items: center; gap: 10px; 
+            font-size: 1.2rem;
+            display: flex; align-items: center; gap: 10px;
         }
-        .task-title::before { content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px; }
+        .task-title::before {
+            content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px;
+        }
 
-        .instruction { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 20px; }
+        .instruction { font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; text-align: left; }
 
-        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll { 
+            max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; 
+            text-align: left;
+        }
         .quiz-scroll::-webkit-scrollbar { width: 4px; }
-        .quiz-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
 
         .quiz-item { 
-            margin-bottom: 12px; background: #f1f5f9; padding: 14px; 
+            margin-bottom: 12px; background: #161d3a; padding: 14px; 
             border-radius: 12px; border: 1px solid var(--border); 
         }
-        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.95rem; color: var(--secondary); }
+        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.95rem; color: var(--primary); }
         
         select { 
-            background: #ffffff; color: var(--secondary); 
-            border: 2px solid #cbd5e1; padding: 8px; 
+            background: #0a1025; color: white; 
+            border: 1px solid var(--secondary); padding: 8px; 
             border-radius: 8px; font-weight: 700; width: 100%; outline: none; 
         }
 
         .btn { 
             width: 100%; padding: 20px; border: none; border-radius: 16px; 
-            background: linear-gradient(135deg, var(--secondary), #4f46e5); 
-            color: #ffffff; font-weight: 800; cursor: pointer; font-size: 1.1rem; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: #000; font-weight: 800; cursor: pointer; font-size: 1.1rem;
         }
 
         #success-screen { 
-            display: none; position: fixed; inset: 0; background: #ffffff; 
+            display: none; position: fixed; inset: 0; background: var(--bg); 
             flex-direction: column; align-items: center; justify-content: center; 
             text-align: center; z-index: 1000; padding: 20px; 
         }
@@ -88,13 +92,11 @@
 </head>
 <body>
 
-    <div class="logo-container">
-        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
-    </div>
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
 
-    <div class="card">
+    <div class="card" id="main-card">
         <div class="video-wrapper">
-            <iframe src="https://youtu.be/CRWIGab9QK8" allowfullscreen></iframe>
+            <iframe src="https://www.youtube-nocookie.com/embed/CRWIGab9QK8" allowfullscreen></iframe>
         </div>
 
         <div class="task-title">MISSÃO 05: PERSONAL PRONOUNS</div>
@@ -147,9 +149,9 @@
 
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">👥</h1>
-        <h2 style="color: var(--secondary); font-size: 2rem;">Perfeito!</h2>
-        <p style="color: var(--text-sub);">Você identificou corretamente todas as pessoas do discurso e substantivos neutros.</p>
-        <button class="btn" style="width:240px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+        <h2 style="color: var(--primary); font-size: 2rem;">Perfeito!</h2>
+        <p style="color: #94a3b8;">Missão 05 concluída com sucesso no modo escuro.</p>
+        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
@@ -166,8 +168,10 @@
             ];
 
             if(a.every(v => v === true)) {
-                localStorage.setItem('m5_complete', 'true');
+                // Sincronizado com 'm05_complete'
+                localStorage.setItem('m05_complete', 'true');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
             } else {
                 alert("Alguma resposta está incorreta. Revise o vídeo e tente novamente!");

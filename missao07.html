@@ -9,19 +9,17 @@
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         
         :root { 
-            --if-green: #2f9e41;
             --primary: #00df9a; 
             --secondary: #2a5ff0; 
             --bg: #050816; 
             --card-bg: #101630; 
-            --text: #ffffff;
             --border: #1e293b;
         }
         
         body { 
             font-family: 'Poppins', sans-serif; 
             background-color: var(--bg); 
-            color: var(--text); 
+            color: white; 
             margin: 0; padding: 15px; 
             display: flex; flex-direction: column; align-items: center; 
         }
@@ -29,78 +27,81 @@
         .card { 
             background: var(--card-bg); 
             border-radius: 24px; 
-            padding: 24px; 
+            padding: 20px; 
             width: 100%; max-width: 480px; 
             border: 1px solid var(--border); 
             box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
             position: relative;
-            overflow: hidden;
         }
 
-        /* Container do Vídeo Corrigido */
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 56.25%; /* Proporção 16:9 */
-            height: 0; 
-            border-radius: 16px; overflow: hidden; margin-bottom: 20px; 
+        /* CONTAINER DE VÍDEO REFORÇADO */
+        .video-container {
+            width: 100%;
+            margin-bottom: 20px;
+            border-radius: 16px;
+            overflow: hidden;
             border: 2px solid var(--secondary);
             background: #000;
+            line-height: 0; /* Remove espaços fantasmas */
         }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .video-container iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9; /* Força a proporção correta */
+            border: none;
+        }
 
         .timer-bar { 
-            position: absolute; top: 0; left: 0; height: 6px; 
-            background: var(--primary); width: 100%; transition: linear; 
+            height: 6px; background: var(--primary); 
+            width: 100%; border-radius: 3px; margin-bottom: 20px;
         }
 
         .verb-box { 
-            font-size: 2.5rem; font-weight: 800; color: var(--primary); 
-            margin: 20px 0; text-align: center; text-transform: uppercase; 
-            text-shadow: 0 0 15px rgba(0, 223, 154, 0.3);
+            font-size: 2.2rem; font-weight: 800; color: var(--primary); 
+            margin: 15px 0; text-align: center; text-transform: uppercase; 
         }
         
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
         .opt-btn { 
-            background: #161d3a; border: 2px solid #2a5ff044; color: white; padding: 15px; 
-            border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 600;
-            transition: 0.2s; font-family: 'Poppins', sans-serif;
+            background: #161d3a; border: 1px solid var(--secondary); color: white; 
+            padding: 15px; border-radius: 12px; cursor: pointer; 
+            font-size: 0.9rem; font-weight: 600; font-family: 'Poppins', sans-serif;
         }
-        .opt-btn:active { transform: scale(0.95); }
+        
         .opt-btn.correct { background: var(--primary); color: #000; border-color: white; }
         .opt-btn.wrong { background: #ff4b2b; border-color: white; }
 
         #success-screen { 
             display: none; position: fixed; inset: 0; background: var(--bg); 
             flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 1000; text-align: center; padding: 20px; 
+            text-align: center; padding: 20px; z-index: 2000;
         }
-
-        .instruction-small { text-align: center; color: #94a3b8; font-size: 0.75rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom: 20px;">
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin-bottom: 20px;">
+
+    <div class="video-container">
+        <iframe 
+            src="https://www.youtube-nocookie.com/embed/gcY5clAia9g?rel=0" 
+            title="Aulas InFinity"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+        </iframe>
+    </div>
 
     <div class="card" id="quiz-card">
-        <div class="timer-bar" id="timer"></div>
-
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube-nocookie.com/embed/gcY5clAia9g" allowfullscreen></iframe>
-        </div>
-
-        <p class="instruction-small">Qual é a tradução da ação?</p>
+        <div id="timer" class="timer-bar"></div>
+        <h4 style="text-align: center; margin: 0; color: #94a3b8; font-weight: 300;">QUAL É A AÇÃO?</h4>
         <div class="verb-box" id="verb-display">WALK</div>
-        
-        <div class="options-grid" id="options">
-            </div>
+        <div class="options-grid" id="options"></div>
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 5rem; margin:0;">🏃‍♂️</h1>
-        <h2 style="color: var(--primary); font-size: 2rem;">VOCABULÁRIO ATIVADO!</h2>
-        <p style="color: #94a3b8;">Você domina as ações básicas do cotidiano.</p>
+        <h1 style="font-size: 5rem; margin: 0;">🏃‍♂️</h1>
+        <h2 style="color: var(--primary);">VOCABULÁRIO ATIVADO!</h2>
         <button class="opt-btn" style="width: 250px; background: var(--primary); color: black; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
@@ -122,18 +123,16 @@
 
         function startTimer() {
             timerWidth = 100;
-            document.getElementById('timer').style.width = '100%';
             clearInterval(timerInterval);
-            // Timer um pouco mais generoso (150ms por passo) para dar tempo de ver o vídeo e jogar
             timerInterval = setInterval(() => {
-                timerWidth -= 1.5;
+                timerWidth -= 1;
                 document.getElementById('timer').style.width = timerWidth + '%';
                 if (timerWidth <= 0) {
                     clearInterval(timerInterval);
-                    alert("Tempo esgotado! Tente ser mais rápido.");
+                    alert("O tempo acabou! Tente novamente.");
                     resetQuiz();
                 }
-            }, 150);
+            }, 100);
         }
 
         function loadVerb() {
@@ -146,10 +145,7 @@
             const optContainer = document.getElementById('options');
             optContainer.innerHTML = '';
             
-            // Embaralha as opções para não ficarem sempre na mesma ordem
-            const shuffledOptions = [...v.options].sort(() => Math.random() - 0.5);
-
-            shuffledOptions.forEach(opt => {
+            v.options.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn';
                 btn.innerText = opt;
@@ -167,10 +163,7 @@
                 setTimeout(loadVerb, 500);
             } else {
                 btn.classList.add('wrong');
-                setTimeout(() => {
-                    alert("Ops! Resposta errada. Vamos recomeçar o treino.");
-                    resetQuiz();
-                }, 300);
+                setTimeout(() => { resetQuiz(); }, 300);
             }
         }
 
@@ -183,6 +176,7 @@
             localStorage.setItem('m07_complete', 'true');
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             document.getElementById('quiz-card').style.display = 'none';
+            document.querySelector('.video-container').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
         }
 

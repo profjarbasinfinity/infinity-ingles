@@ -6,93 +6,28 @@
     <title>InFinity | Login</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        
         :root { 
             --if-green: #2f9e41; 
-            --primary: #00df9a; 
             --secondary: #2a5ff0; 
-            --bg: #f8fafc;      /* Fundo Claro igual ao mapa */
-            --card-bg: #ffffff; /* Card Branco */
-            --text: #1e293b;    /* Texto Escuro */
+            --bg: #f8fafc;      
+            --card-bg: #ffffff; 
+            --text: #1e293b;    
             --border: #e2e8f0;
         }
-
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px; 
-        }
-
-        .login-card { 
-            background: var(--card-bg); 
-            padding: 35px; 
-            border-radius: 20px; 
-            width: 100%; 
-            max-width: 400px; 
-            text-align: center; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-        }
-
-        input, select { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border-radius: 8px; 
-            border: 1px solid var(--border); 
-            background: #f1f5f9; 
-            color: var(--text); 
-            box-sizing: border-box; 
-            font-family: 'Poppins'; 
-            font-size: 0.9rem; 
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input:focus, select:focus {
-            border-color: var(--secondary);
-            background: #fff;
-        }
-
-        .btn-login { 
-            width: 100%; 
-            padding: 15px; 
-            border: none; 
-            border-radius: 12px; 
-            background: linear-gradient(45deg, var(--if-green), var(--secondary)); 
-            color: white; 
-            font-weight: 800; 
-            cursor: pointer; 
-            margin-top: 15px; 
-            font-size: 1rem; 
-            box-shadow: 0 4px 12px rgba(42, 95, 240, 0.2);
-        }
-
-        .guest-link { 
-            display: block; 
-            margin-top: 20px; 
-            color: #64748b; 
-            text-decoration: none; 
-            font-size: 0.85rem; 
-            font-weight: 500;
-        }
-
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .login-card { background: var(--card-bg); padding: 35px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: #f1f5f9; color: var(--text); box-sizing: border-box; font-family: 'Poppins'; font-size: 0.9rem; outline: none; }
+        .btn-login { width: 100%; padding: 15px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--if-green), var(--secondary)); color: white; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 1rem; }
+        .guest-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
         h2 { color: var(--if-green); margin-top: 0; font-weight: 800; }
         label { display: block; text-align: left; font-size: 0.75rem; color: #64748b; margin-top: 10px; margin-left: 5px; font-weight: 600; }
     </style>
 </head>
 <body>
-
     <div class="login-card">
         <img src="logo-horizontal.jpg" alt="InFinity" style="width: 160px; margin-bottom: 20px;">
         <h2>Portal do Aluno</h2>
-        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px; line-height: 1.4;">Identifique-se se você for aluno do Campus Patos</p>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">Identifique-se se você for aluno do Campus Patos</p>
         
         <input type="text" id="nome" placeholder="Nome Completo">
         
@@ -118,31 +53,27 @@
         </select>
 
         <input type="email" id="email" placeholder="Seu melhor e-mail">
-        
         <button class="btn-login" onclick="salvarAcesso()">COMEÇAR JORNADA</button>
-        
-        <a href="index.html" class="guest-link">Acessar como visitante ou ex-aluno</a>
+        <a href="index.html" class="guest-link" onclick="acessoVisitante()">Acessar como visitante ou ex-aluno</a>
     </div>
 
     <script>
         function salvarAcesso() {
-            const nome = document.getElementById('nome').value.trim();
-            const curso = document.getElementById('curso').value;
-            const turma = document.getElementById('turma').value;
-            const email = document.getElementById('email').value.trim();
-
-            if(!nome || !curso || !turma || !email) {
-                alert("Professor Jarbas avisa: Preencha todos os campos para garantir seu bônus de nota!");
+            const dados = {
+                nome: document.getElementById('nome').value,
+                curso: document.getElementById('curso').value,
+                turma: document.getElementById('turma').value,
+                email: document.getElementById('email').value
+            };
+            if(!dados.nome || !dados.curso || !dados.turma) {
+                alert("Preencha os campos para garantir seu bônus!");
                 return;
             }
-
-            const dados = { nome, curso, turma, email };
-
-            // Salva no navegador para usar nas missões
             localStorage.setItem('aluno_infinity', JSON.stringify(dados));
-            
-            // Redireciona para o mapa de missões
             window.location.href = "index.html";
+        }
+        function acessoVisitante() {
+            sessionStorage.setItem('visitante', 'true');
         }
     </script>
 </body>

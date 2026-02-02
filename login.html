@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InFinity | Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        body { font-family: 'Poppins', sans-serif; background: #050816; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .login-card { background: #101630; padding: 30px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #2a5ff0; background: #0a1025; color: white; box-sizing: border-box; font-family: 'Poppins'; }
+        .btn-login { width: 100%; padding: 15px; border: none; border-radius: 12px; background: linear-gradient(45deg, #00df9a, #2a5ff0); color: white; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 1rem; }
+        .guest-link { display: block; margin-top: 20px; color: #94a3b8; text-decoration: none; font-size: 0.85rem; }
+        h2 { color: #00df9a; margin-top: 0; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <img src="logo-horizontal.jpg" alt="InFinity" style="width: 160px; margin-bottom: 20px;">
+        <h2>Portal do Aluno</h2>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px;">Identifique-se para acumular seus bônus!</p>
+        
+        <input type="text" id="nome" placeholder="Nome Completo">
+        
+        <select id="curso">
+            <option value="">Selecione o Curso</option>
+            <option value="Inglês">Inglês Tradicional</option>
+            <option value="Técnico">Ensino Técnico</option>
+            <option value="Livre">Curso Livre</option>
+        </select>
+
+        <select id="turma">
+            <option value="">Selecione a Turma</option>
+            <option value="9A">9º Ano A</option>
+            <option value="9B">9º Ano B</option>
+            <option value="1EM">1º Ano Médio</option>
+            <option value="2EM">2º Ano Médio</option>
+        </select>
+
+        <input type="email" id="email" placeholder="Seu melhor e-mail">
+        
+        <button class="btn-login" onclick="salvarAcesso()">COMEÇAR JORNADA</button>
+        
+        <a href="index.html" class="guest-link">Acessar como Visitante (Sem Bônus)</a>
+    </div>
+
+    <script>
+        function salvarAcesso() {
+            const dados = {
+                nome: document.getElementById('nome').value.trim(),
+                curso: document.getElementById('curso').value,
+                turma: document.getElementById('turma').value,
+                email: document.getElementById('email').value.trim()
+            };
+
+            if(!dados.nome || !dados.curso || !dados.turma || !dados.email) {
+                alert("Professor Jarbas avisa: Preencha todos os campos para garantir sua nota!");
+                return;
+            }
+
+            // Salva no navegador para usar nas missões
+            localStorage.setItem('aluno_infinity', JSON.stringify(dados));
+            
+            // Redireciona para o mapa de missões
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>

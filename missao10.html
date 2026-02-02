@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 08</title>
+    <title>InFinity | Missão 10</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
@@ -45,7 +45,7 @@
             <iframe src="https://www.youtube.com/embed/S2R6M-M6Yv0" allowfullscreen></iframe>
         </div>
 
-        <div class="task-title">MISSÃO 08: TÉCNICA DE OMISSÃO</div>
+        <div class="task-title">MISSÃO 10: TÉCNICA DE SUPRESSÃO</div>
         <p class="instruction">Aplique a omissão para que a tradução fique natural. O que podemos "deixar de fora" sem perder o sentido?</p>
 
         <div class="quiz-scroll">
@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 08</button>
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 10</button>
     </div>
 
     <div id="success-screen">
@@ -121,11 +121,11 @@
             const c5 = (getV('q5f').includes("nós plugamos a tv na extensão"));
 
             if(c1 && c2 && c3 && c4 && c5) {
-                localStorage.setItem('m8_complete', 'true');
+                localStorage.setItem('m10_complete', 'true');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('success-screen').style.display = 'flex';
             } else {
-                alert("Alguma frase não está de acordo com a técnica de omissão. Lembre-se de deixar a frase o mais natural possível em português!");
+                alert("Alguma frase não está de acordo com a técnica de supressão. Lembre-se de deixar a frase o mais natural possível em português!");
             }
         }
     </script>

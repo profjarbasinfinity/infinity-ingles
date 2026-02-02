@@ -1,53 +1,42 @@
 <script>
-    // --- 1. TRAVA DE SEGURANÇA (Verifica se o aluno passou pelo login) ---
-    (function verificarAcesso() {
+    // 1. Verificação de Acesso
+    (function() {
         const aluno = localStorage.getItem('aluno_infinity');
-        // Se NÃO encontrar os dados e NÃO for um visitante, manda para o login
-        if (!aluno && !sessionStorage.getItem('visitante')) {
+        const visitante = sessionStorage.getItem('visitante');
+        if (!aluno && !visitante) {
             window.location.href = "login.html";
         }
     })();
 
+    // 2. Geração do Mapa
     const totalMissions = 15;
     const grid = document.getElementById('grid');
     let completedCount = 0;
 
-    for (let i = 1; i <= totalMissions; i++) {
-        const missionId = i.toString().padStart(2, '0'); 
-        const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
-        
-        if(isCompleted) completedCount++;
+    if (grid) {
+        for (let i = 1; i <= totalMissions; i++) {
+            const missionId = i.toString().padStart(2, '0'); 
+            const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
+            if(isCompleted) completedCount++;
 
-        const node = document.createElement('div');
-        node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
-        
-        // --- 2. REGRA DO PROFESSOR: SÓ UMA POR DIA (CADEADO) ---
-        node.onclick = function() {
-            const hoje = new Date().toLocaleDateString();
-            const ultimaData = localStorage.getItem('ultima_conclusao');
+            const node = document.createElement('div');
+            node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
+            
+            node.onclick = function() {
+                const hoje = new Date().toLocaleDateString();
+                const ultimaData = localStorage.getItem('ultima_conclusao');
 
-            // Se já completou, pode entrar sempre para revisar
-            if (isCompleted) {
-                window.location.href = `missao${missionId}.html`;
-                return;
-            }
+                if (isCompleted || ultimaData !== hoje) {
+                    window.location.href = `missao${missionId}.html`;
+                } else {
+                    alert("Uma missão por dia! Volte amanhã.");
+                }
+            };
 
-            // Se for nova e já fez uma hoje, trava
-            if (ultimaData === hoje) {
-                alert("Professor Jarbas avisa: Uma missão por dia é o ideal! Volte amanhã para o próximo desafio.");
-            } else {
-                window.location.href = `missao${missionId}.html`;
-            }
-        };
-
-        node.innerHTML = `
-            <div class="node-circle">${i}</div>
-            <div class="mission-label">Missão ${missionId}</div>
-        `;
-        
-        grid.appendChild(node);
+            node.innerHTML = `<div class="node-circle">${i}</div><div class="mission-label">Missão ${missionId}</div>`;
+            grid.appendChild(node);
+        }
+        const statusText = document.getElementById('status-text');
+        if (statusText) statusText.innerText = `Progresso: ${completedCount} de ${totalMissions}`;
     }
-
-    document.getElementById('status-text').innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
-</script> 
-
+</script>

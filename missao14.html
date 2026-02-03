@@ -37,7 +37,7 @@
 
     <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
 
-    <div class="card">
+    <div class="card" id="main-card">
         <div class="video-wrapper">
             <iframe src="https://www.youtube.com/embed/aHVET_AjUdI" allowfullscreen></iframe>
         </div>
@@ -47,8 +47,7 @@
             Analise a manchete e aplique as múltiplas técnicas explicadas pelo Professor Jarbas.
         </p>
 
-        <div id="quiz-box">
-            </div>
+        <div id="quiz-box"></div>
 
         <button class="btn-verify" id="main-btn" onclick="checkStep()">PRÓXIMO</button>
     </div>
@@ -61,6 +60,58 @@
     </div>
 
     <script>
+        // --- CONFIGURAÇÕES DE SEGURANÇA E INTEGRAÇÃO ---
+        const MISSION_ID = 14;
+        const PREVIOUS_MISSION_ID = 13;
+        const SCRIPT_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI'; // <--- INSIRA SUA URL AQUI
+
+        function checkAccess() {
+            const lastMissionDate = localStorage.getItem('last_mission_date');
+            const completedPrev = localStorage.getItem(`m${PREVIOUS_MISSION_ID}_complete`);
+            const now = new Date().getTime();
+
+            if (!completedPrev) {
+                alert(`Acesso bloqueado! Você precisa concluir a Missão ${PREVIOUS_MISSION_ID} primeiro.`);
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            if (lastMissionDate) {
+                const diff = now - parseInt(lastMissionDate);
+                const hours24 = 24 * 60 * 60 * 1000;
+                
+                if (diff < hours24 && !localStorage.getItem(`m${MISSION_ID}_complete`)) {
+                    const remaining = Math.ceil((hours24 - diff) / (60 * 60 * 1000));
+                    alert(`Foco total no processo! Seu cérebro está processando a última missão. Volte em ${remaining} horas.`);
+                    window.location.href = 'index.html';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function sendDataToSheet() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const data = {
+                nome: userData.nome || 'Usuário',
+                email: userData.email || 'Não informado',
+                missao: MISSION_ID,
+                status: 'Concluído',
+                data: new Date().toLocaleString('pt-BR')
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+            } catch (e) {
+                console.error('Erro ao salvar progresso:', e);
+            }
+        }
+
+        // --- LÓGICA DA MISSÃO ---
         const steps = [
             {
                 eng: "Breaking News",
@@ -127,8 +178,6 @@
         function checkStep() {
             const s = steps[currentStep];
             const userPhrase = Array.from(document.getElementById('ans-zone').children).map(b => b.innerText).join(' ');
-            
-            // Valida se as técnicas selecionadas batem com o gabarito do vídeo
             const techCorrect = s.techs.every(t => selectedTechs.has(t)) && selectedTechs.size === s.techs.length;
             
             if(userPhrase.toLowerCase() === s.correct.toLowerCase() && techCorrect) {
@@ -137,15 +186,23 @@
                 if(currentStep < steps.length) {
                     renderStep();
                 } else {
-                    localStorage.setItem('m14_complete', 'true');
-                    document.getElementById('success-screen').style.display = 'flex';
+                    finishMission();
                 }
             } else {
                 alert("Algo está errado. Verifique se escolheu TODAS as técnicas corretas mencionadas no vídeo e se a frase está natural.");
             }
         }
 
-        renderStep();
+        function finishMission() {
+            localStorage.setItem(`m${MISSION_ID}_complete`, 'true');
+            localStorage.setItem('last_mission_date', new Date().getTime().toString());
+            sendDataToSheet();
+            document.getElementById('main-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        // Inicialização
+        if (checkAccess()) renderStep();
     </script>
 </body>
 </html>

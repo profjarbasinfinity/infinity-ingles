@@ -180,8 +180,8 @@
             document.getElementById('success-screen').style.display = 'flex';
 
             function finish() {
-    // AJUSTE AQUI: Coloque o número total de acertos da Missão 02
-    const metaAcertos = 20; 
+    // AJUSTE AQUI: Coloque o número total de acertos da Missão 07
+    const metaAcertos = 07; 
 
     if(document.getElementById('ans-count').value == metaAcertos) {
         winSound.play();
@@ -192,7 +192,7 @@
         localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
         
         // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
-        localStorage.setItem('m02_complete', 'true'); 
+        localStorage.setItem('m07_complete', 'true'); 
 
         // 3. ENVIA PARA A PLANILHA
         const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
@@ -220,4 +220,5 @@
     </script>
 </body>
 </html>
+
 

@@ -178,9 +178,46 @@
             document.getElementById('quiz-card').style.display = 'none';
             document.querySelector('.video-container').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
+
+            function finish() {
+    // AJUSTE AQUI: Coloque o número total de acertos da Missão 02
+    const metaAcertos = 20; 
+
+    if(document.getElementById('ans-count').value == metaAcertos) {
+        winSound.play();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        document.getElementById('success-screen').style.display = 'flex';
+        
+        // 1. SALVA A TRAVA DIÁRIA (Impede outra missão hoje)
+        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+        
+        // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
+        localStorage.setItem('m02_complete', 'true'); 
+
+        // 3. ENVIA PARA A PLANILHA
+        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+        if (alunoData) {
+            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nome: alunoData.nome,
+                    turma: alunoData.turma,
+                    curso: alunoData.curso,
+                    email: alunoData.email,
+                    missao: document.title // Puxa o título da página automaticamente
+                })
+            });
+        }
+    } else {
+        alert("Ops! Verifique suas respostas para concluir a missão.");
+    }
+}
         }
 
         loadVerb();
     </script>
 </body>
 </html>
+

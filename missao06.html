@@ -227,10 +227,31 @@
             }
 
             if(allCorrect) {
+                // 1. MARCAÇÕES DE PROGRESSO E TRAVA
                 localStorage.setItem('m06_complete', 'true');
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+                // 2. EFEITOS VISUAIS E CONFETE
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+
+                // 3. ENVIO PARA A PLANILHA GOOGLE
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: document.title 
+                        })
+                    });
+                }
             } else {
                 alert("Alguma análise não está correta. Lembre-se: se refere a objeto ou situação abstrata (sem gênero biológico), use IT!");
             }

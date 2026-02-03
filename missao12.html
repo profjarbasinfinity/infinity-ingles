@@ -7,167 +7,69 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        
-        :root { 
-            --if-green: #2f9e41; 
-            --primary: #00df9a; 
-            --secondary: #2a5ff0; 
-            --bg: #f8fafc;      /* Fundo Claro */
-            --card-bg: #ffffff; /* Card Branco */
-            --text: #1e293b;    /* Texto Escuro */
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            text-align: center; 
-            padding: 20px; 
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 20px; 
-            padding: 30px; 
-            width: 100%;
-            max-width: 500px; 
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-        
-        /* Container do Vídeo (Shorts) */
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 177.78%; /* Proporção 9:16 */
-            height: 0; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            margin-bottom: 25px; 
-            background: #000;
-            border: 2px solid var(--secondary);
-        }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); text-align: center; padding: 20px; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; width: 100%; max-width: 500px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .word-display { 
-            font-size: 2.5rem; 
-            font-weight: 800; 
-            color: var(--secondary); 
-            margin: 20px 0; 
-            letter-spacing: 2px;
-            background: #f1f5f9;
-            padding: 15px;
-            border-radius: 12px;
-        }
-        
-        .mic-btn { 
-            width: 80px; height: 80px; border-radius: 50%; border: none; 
-            background: var(--primary); cursor: pointer; font-size: 2.2rem;
-            transition: 0.3s; box-shadow: 0 4px 15px rgba(0, 223, 154, 0.3);
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto;
-        }
+        .word-display { font-size: 2.5rem; font-weight: 800; color: var(--secondary); margin: 20px 0; background: #f1f5f9; padding: 15px; border-radius: 12px; }
+        .mic-btn { width: 80px; height: 80px; border-radius: 50%; border: none; background: var(--primary); cursor: pointer; font-size: 2.2rem; margin: 0 auto; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .mic-btn.recording { background: #ff4b2b; animation: pulse 1.5s infinite; }
-        
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        
-        .status { margin-top: 20px; min-height: 24px; color: #64748b; font-weight: 600; }
-        .transcript { font-style: italic; color: var(--secondary); margin-top: 10px; font-size: 1.2rem; }
-
-        .btn-finish {
-            display: none; /* Só aparece no final */
-            width: 100%; padding: 18px; border: none; border-radius: 12px; 
-            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: white; font-weight: 800; cursor: pointer; margin-top: 25px;
-            font-size: 1rem;
-        }
+        .status { margin-top: 20px; color: #64748b; font-weight: 600; }
+        .btn-finish { display: none; width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; font-weight: 800; cursor: pointer; margin-top: 25px; }
     </style>
 </head>
 <body>
-
     <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
-
     <div class="card">
-        <div class="video-wrapper">
-            <iframe 
-                src="https://www.youtube-nocookie.com/embed/n2VSL7V4wvQ" 
-                title="O Sopro do TH" 
-                allowfullscreen>
-            </iframe>
-        </div>
-
-        <h3 style="margin-top:0; color: var(--secondary);">MISSÃO 12: O SOPRO DO TH</h3>
-        <p style="font-size: 0.85rem; color: #64748b;">Assista ao vídeo e depois clique no microfone para pronunciar as palavras com a língua entre os dentes:</p>
-
+        <div class="video-wrapper"><iframe src="https://www.youtube-nocookie.com/embed/n2VSL7V4wvQ" allowfullscreen></iframe></div>
+        <h3 style="color: var(--secondary);">MISSÃO 12: O SOPRO DO TH</h3>
         <div id="target-word" class="word-display">THINK</div>
-        
         <button id="mic-btn" class="mic-btn" onclick="startSpeech()">🎤</button>
-        
         <div class="status" id="status">Aguardando microfone...</div>
         <div class="transcript" id="transcript"></div>
-
         <button id="finish-btn" class="btn-finish" onclick="completeMission()">ENCERRAR MISSÃO 12</button>
-
-        <p style="font-size: 0.7rem; margin-top: 30px; color: #94a3b8;">(Nota: Use o Google Chrome ou navegadores compatíveis com Speech Recognition)</p>
     </div>
 
     <script>
         const words = ["THINK", "THEY", "BIRTHDAY", "FATHER", "THROUGH"];
         let currentIdx = 0;
-
-        // Configuração de Reconhecimento de Voz
         const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.lang = 'en-US';
-        recognition.interimResults = false;
 
-        function startSpeech() {
-            recognition.start();
-            document.getElementById('mic-btn').classList.add('recording');
-            document.getElementById('status').innerText = "Ouvindo...";
-        }
+        function startSpeech() { recognition.start(); document.getElementById('mic-btn').classList.add('recording'); document.getElementById('status').innerText = "Ouvindo..."; }
 
         recognition.onresult = (event) => {
             const result = event.results[0][0].transcript.toUpperCase();
             const target = words[currentIdx];
-            document.getElementById('transcript').innerText = `Você disse: "${result}"`;
             document.getElementById('mic-btn').classList.remove('recording');
-
             if (result.includes(target)) {
-                document.getElementById('status').innerText = "✔️ Excelente pronúncia!";
-                document.getElementById('status').style.color = "#2f9e41";
                 confetti({ particleCount: 50, spread: 50 });
-                
-                setTimeout(() => {
-                    currentIdx++;
-                    if (currentIdx < words.length) {
-                        document.getElementById('target-word').innerText = words[currentIdx];
-                        document.getElementById('status').innerText = "Próxima palavra...";
-                        document.getElementById('status').style.color = "#64748b";
-                        document.getElementById('transcript').innerText = "";
-                    } else {
-                        document.getElementById('target-word').innerText = "CONCLUÍDO!";
-                        document.getElementById('status').innerText = "Missão cumprida!";
-                        document.getElementById('mic-btn').style.display = "none";
-                        document.getElementById('finish-btn').style.display = "block";
-                    }
-                }, 2000);
-            } else {
-                document.getElementById('status').innerText = "❌ Tente novamente. Sopre mais!";
-                document.getElementById('status').style.color = "#ff4b2b";
-            }
-        };
-
-        recognition.onerror = () => {
-            document.getElementById('mic-btn').classList.remove('recording');
-            document.getElementById('status').innerText = "Erro no microfone. Verifique as permissões.";
+                currentIdx++;
+                if (currentIdx < words.length) {
+                    document.getElementById('target-word').innerText = words[currentIdx];
+                    document.getElementById('status').innerText = "✔️ Excelente! Próxima...";
+                } else {
+                    document.getElementById('target-word').innerText = "CONCLUÍDO!";
+                    document.getElementById('mic-btn').style.display = "none";
+                    document.getElementById('finish-btn').style.display = "block";
+                }
+            } else { document.getElementById('status').innerText = "❌ Tente novamente."; }
         };
 
         function completeMission() {
             localStorage.setItem('m12_complete', 'true');
-            location.href = 'index.html';
+            localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+            
+            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+            if (alunoData) {
+                fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                    method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: alunoData.nome, turma: alunoData.turma, curso: alunoData.curso, email: alunoData.email, missao: "InFinity | Missão 12" })
+                });
+            }
+            setTimeout(() => { location.href = 'index.html'; }, 500);
         }
     </script>
 </body>

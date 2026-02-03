@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 07 (Dark)</title>
+    <title>InFinity | Missão 07</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
@@ -34,7 +34,6 @@
             position: relative;
         }
 
-        /* CONTAINER DE VÍDEO REFORÇADO */
         .video-container {
             width: 100%;
             margin-bottom: 20px;
@@ -42,18 +41,19 @@
             overflow: hidden;
             border: 2px solid var(--secondary);
             background: #000;
-            line-height: 0; /* Remove espaços fantasmas */
+            line-height: 0;
         }
 
         .video-container iframe {
             width: 100%;
-            aspect-ratio: 16 / 9; /* Força a proporção correta */
+            aspect-ratio: 16 / 9;
             border: none;
         }
 
         .timer-bar { 
             height: 6px; background: var(--primary); 
             width: 100%; border-radius: 3px; margin-bottom: 20px;
+            transition: width 0.1s linear;
         }
 
         .verb-box { 
@@ -67,6 +67,7 @@
             background: #161d3a; border: 1px solid var(--secondary); color: white; 
             padding: 15px; border-radius: 12px; cursor: pointer; 
             font-size: 0.9rem; font-weight: 600; font-family: 'Poppins', sans-serif;
+            transition: 0.2s;
         }
         
         .opt-btn.correct { background: var(--primary); color: #000; border-color: white; }
@@ -102,6 +103,7 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">🏃‍♂️</h1>
         <h2 style="color: var(--primary);">VOCABULÁRIO ATIVADO!</h2>
+        <p>Progresso salvo com sucesso.</p>
         <button class="opt-btn" style="width: 250px; background: var(--primary); color: black; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
@@ -173,52 +175,35 @@
         }
 
         function showSuccess() {
+            // 1. MARCAÇÕES DE PROGRESSO LOCAL
             localStorage.setItem('m07_complete', 'true');
+            localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+            // 2. EFEITOS VISUAIS
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
             document.getElementById('quiz-card').style.display = 'none';
             document.querySelector('.video-container').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
 
-            function finish() {
-    // AJUSTE AQUI: Coloque o número total de acertos da Missão 07
-    const metaAcertos = 07; 
-
-    if(document.getElementById('ans-count').value == metaAcertos) {
-        winSound.play();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        document.getElementById('success-screen').style.display = 'flex';
-        
-        // 1. SALVA A TRAVA DIÁRIA (Impede outra missão hoje)
-        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-        
-        // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
-        localStorage.setItem('m07_complete', 'true'); 
-
-        // 3. ENVIA PARA A PLANILHA
-        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        if (alunoData) {
-            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: alunoData.nome,
-                    turma: alunoData.turma,
-                    curso: alunoData.curso,
-                    email: alunoData.email,
-                    missao: document.title // Puxa o título da página automaticamente
-                })
-            });
-        }
-    } else {
-        alert("Ops! Verifique suas respostas para concluir a missão.");
-    }
-}
+            // 3. ENVIO AUTOMÁTICO PARA A PLANILHA
+            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+            if (alunoData) {
+                fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: alunoData.nome,
+                        turma: alunoData.turma,
+                        curso: alunoData.curso,
+                        email: alunoData.email,
+                        missao: "InFinity | Missão 07"
+                    })
+                });
+            }
         }
 
         loadVerb();
     </script>
 </body>
 </html>
-
-

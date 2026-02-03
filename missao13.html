@@ -39,7 +39,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
         }
 
-        /* Container do Vídeo (Shorts) */
         .video-wrapper { 
             position: relative; 
             padding-bottom: 177.78%; 
@@ -133,6 +132,61 @@
     </div>
 
     <script>
+        // --- CONFIGURAÇÕES DE SEGURANÇA E INTEGRAÇÃO ---
+        const MISSION_ID = 13;
+        const PREVIOUS_MISSION_ID = 12;
+        const SCRIPT_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI'; // <--- INSIRA SUA URL AQUI
+
+        function checkAccess() {
+            const lastMissionDate = localStorage.getItem('last_mission_date');
+            const completedPrev = localStorage.getItem(`m${PREVIOUS_MISSION_ID}_complete`);
+            const now = new Date().getTime();
+
+            // Verifica se fez a missão anterior
+            if (!completedPrev) {
+                alert(`Acesso bloqueado! Conclua a Missão ${PREVIOUS_MISSION_ID} primeiro.`);
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            // Trava de 24 horas
+            if (lastMissionDate) {
+                const diff = now - parseInt(lastMissionDate);
+                const hours24 = 24 * 60 * 60 * 1000;
+                
+                // Se ainda não completou esta missão hoje e tentou entrar antes de 24h
+                if (diff < hours24 && !localStorage.getItem(`m${MISSION_ID}_complete`)) {
+                    const remaining = Math.ceil((hours24 - diff) / (60 * 60 * 1000));
+                    alert(`Calma lá, mestre! O cérebro precisa de descanso. Volte em ${remaining} horas para a próxima missão.`);
+                    window.location.href = 'index.html';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function sendDataToSheet() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const data = {
+                nome: userData.nome || 'Usuário',
+                email: userData.email || 'Não informado',
+                missao: MISSION_ID,
+                status: 'Concluído',
+                data: new Date().toLocaleString('pt-BR')
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+            } catch (e) {
+                console.error('Erro ao enviar dados para a planilha:', e);
+            }
+        }
+
+        // --- LÓGICA DO QUIZ ---
         const missionData = [
             { en: 'PLAY', pt: 'Brincar / Jogar', distractors: ['Trabalhar', 'Correr', 'Beber'] },
             { en: 'READ', pt: 'Ler', distractors: ['Ouvir', 'Escrever', 'Limpar'] },
@@ -147,6 +201,9 @@
         let step = 0;
 
         function init() {
+            // Executa trava de segurança ao iniciar
+            if (!checkAccess()) return;
+
             if (step >= missionData.length) {
                 finish();
                 return;
@@ -183,11 +240,16 @@
         }
 
         function finish() {
-            localStorage.setItem('m13_complete', 'true');
+            // Salva conclusão, data para trava de 24h e envia para planilha
+            localStorage.setItem(`m${MISSION_ID}_complete`, 'true');
+            localStorage.setItem('last_mission_date', new Date().getTime().toString());
+            sendDataToSheet();
+
             document.getElementById('quiz-card').style.display = 'none';
             document.getElementById('success-screen').style.display = 'flex';
         }
 
+        // Inicializa a página
         init();
     </script>
 </body>

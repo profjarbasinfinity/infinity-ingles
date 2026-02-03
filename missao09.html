@@ -19,7 +19,6 @@
         .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; text-transform: uppercase; }
         .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
 
-        /* Área de scroll para as questões */
         .quiz-scroll-area { max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
         .quiz-scroll-area::-webkit-scrollbar { width: 5px; }
         .quiz-scroll-area::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
@@ -35,9 +34,6 @@
             cursor: pointer; font-weight: 600; font-size: 0.85rem; user-select: none;
             transition: 0.2s; border: none; box-shadow: 0 4px 0 #cbd5e1;
         }
-        .word-btn:hover { background: #e2e8f0; transform: translateY(-2px); }
-        .word-btn:active { transform: translateY(2px); box-shadow: none; }
-
         .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; }
         
         #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; text-align: center; }
@@ -55,8 +51,7 @@
         <div class="task-title">MISSÃO 09: REORDENAÇÃO</div>
         <p class="instruction">Toque nas palavras na ordem correta para montar a tradução natural (lembre-se da regra dos adjetivos!):</p>
 
-        <div class="quiz-scroll-area" id="quiz-container">
-            </div>
+        <div class="quiz-scroll-area" id="quiz-container"></div>
 
         <button class="btn-check" onclick="verifyAll()">CONCLUIR MISSÃO 09</button>
     </div>
@@ -64,7 +59,7 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">🔄</h1>
         <h2 style="color: var(--primary); font-size: 2rem;">ESTRUTURA DOMINADA!</h2>
-        <p>Você provou que entende a ordem natural do nosso idioma.</p>
+        <p>Progresso salvo automaticamente na sua trilha.</p>
         <button class="btn-check" style="width:260px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
@@ -127,12 +122,33 @@
             });
 
             if (allCorrect) {
+                // 1. MARCAR LOCALMENTE
                 localStorage.setItem('m09_complete', 'true');
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+                // 2. EFEITOS VISUAIS
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('quiz-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+
+                // 3. ENVIO PARA PLANILHA
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: "InFinity | Missão 09"
+                        })
+                    });
+                }
             } else {
-                alert("Alguma frase ainda não está na ordem correta. Revise a posição dos adjetivos e tente novamente!");
+                alert("Alguma frase ainda não está na ordem correta. Revise a posição dos adjetivos!");
             }
         }
 

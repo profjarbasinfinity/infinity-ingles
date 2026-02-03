@@ -81,14 +81,14 @@
 
             <div class="quiz-item">
                 <span class="eng-phrase">d) I will fail you.</span>
-                <div class="input-group"><label>Sua tradução:</label><input type="text" id="q4f" placeholder="Traduza aqui..."></div>
-                <div class="input-group"><label>O que adicionou?</label><input type="text" id="q4a" placeholder="Explique a adição..."></div>
+                <div class="input-group"><label>Sua tradução:</label><input type="text" id="text_q4f" placeholder="Traduza aqui..."></div>
+                <div class="input-group"><label>O que adicionou?</label><input type="text" id="text_q4a" placeholder="Explique a adição..."></div>
             </div>
 
             <div class="quiz-item">
                 <span class="eng-phrase">e) I bought crackers and pork.</span>
-                <div class="input-group"><label>Sua tradução:</label><input type="text" id="q5f" placeholder="Traduza aqui..."></div>
-                <div class="input-group"><label>O que adicionou?</label><input type="text" id="q5a" placeholder="Explique a adição..."></div>
+                <div class="input-group"><label>Sua tradução:</label><input type="text" id="text_q5f" placeholder="Traduza aqui..."></div>
+                <div class="input-group"><label>O que adicionou?</label><input type="text" id="text_q5a" placeholder="Explique a adição..."></div>
             </div>
         </div>
 
@@ -104,59 +104,48 @@
 
     <script>
         function checkMission() {
-            const getV = (id) => document.getElementById(id).value.trim().toLowerCase();
+            const getV = (id) => {
+                const el = document.getElementById(id);
+                return el ? el.value.trim().toLowerCase() : "";
+            };
             
-            // Validações de preenchimento mínimo para garantir que o aluno pensou
-            const c1 = getV('q1f').length > 5 && getV('q1a').length > 1;
-            const c2 = getV('q2f').length > 5 && getV('q2a').length > 1;
-            const c3 = getV('q3f').length > 5 && getV('q3a').length > 1;
-            const c4 = getV('q4f').length > 5 && getV('q4a').length > 1;
-            const c5 = getV('q5f').length > 5 && getV('q5a').length > 1;
+            // Validações simplificadas para garantir preenchimento
+            const c1 = getV('q1f').length > 3 && getV('q1a').length > 1;
+            const c2 = getV('q2f').length > 3 && getV('q2a').length > 1;
+            const c3 = getV('q3f').length > 3 && getV('q3a').length > 1;
+            const c4 = getV('text_q4f').length > 3 && getV('text_q4a').length > 1;
+            const c5 = getV('text_q5f').length > 3 && getV('text_q5a').length > 1;
 
             if(c1 && c2 && c3 && c4 && c5) {
+                // 1. SALVAR LOCALMENTE
                 localStorage.setItem('m08_complete', 'true');
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+                // 2. EFEITOS VISUAIS
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+
+                // 3. ENVIAR PARA PLANILHA
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: "InFinity | Missão 08"
+                        })
+                    });
+                }
             } else {
-                alert("Por favor, preencha todas as traduções e explique o que você adicionou em cada uma para dar mais sentido!");
+                alert("Professor Jarbas avisa: Por favor, preencha todas as traduções e explique o que você adicionou em cada uma para concluir!");
             }
-function finish() {
-    // AJUSTE AQUI: Coloque o número total de acertos da Missão 08
-    const metaAcertos = 10; 
-
-    if(document.getElementById('ans-count').value == metaAcertos) {
-        winSound.play();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        document.getElementById('success-screen').style.display = 'flex';
-        
-        // 1. SALVA A TRAVA DIÁRIA (Impede outra missão hoje)
-        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-        
-        // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
-        localStorage.setItem('m08_complete', 'true'); 
-
-        // 3. ENVIA PARA A PLANILHA
-        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        if (alunoData) {
-            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: alunoData.nome,
-                    turma: alunoData.turma,
-                    curso: alunoData.curso,
-                    email: alunoData.email,
-                    missao: document.title // Puxa o título da página automaticamente
-                })
-            });
         }
-    } else {
-        alert("Ops! Verifique suas respostas para concluir a missão.");
-    }
-}        }
     </script>
 </body>
 </html>
-

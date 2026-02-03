@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InFinity | Mapa de Missões</title>
+    <link rel="manifest" href="manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         :root { --if-green: #2f9e41; --bg: #f8fafc; --text: #1e293b; }
@@ -64,7 +65,6 @@
             const aluno = localStorage.getItem('aluno_infinity');
             const visitante = sessionStorage.getItem('visitante');
             
-            // Se não for aluno E não for visitante, volta pro login
             if (!aluno && !visitante) {
                 window.location.href = "login.html";
             }
@@ -75,7 +75,6 @@
         const grid = document.getElementById('grid');
         let completedCount = 0;
 
-        // Só executa se a div 'grid' existir
         if (grid) {
             for (let i = 1; i <= totalMissions; i++) {
                 const missionId = i.toString().padStart(2, '0'); 
@@ -90,7 +89,6 @@
                     const hoje = new Date().toLocaleDateString();
                     const ultimaData = localStorage.getItem('ultima_conclusao');
 
-                    // Regra: se já completou ou se ainda não fez nada hoje, pode entrar
                     if (isCompleted || ultimaData !== hoje) {
                         window.location.href = `missao${missionId}.html`;
                     } else {
@@ -111,6 +109,34 @@
                 statusLabel.innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
             }
         }
+
+        // --- LÓGICA DE INSTALAÇÃO DO APP (PWA) ---
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previne que o convite padrão apareça para qualquer um
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Verifica se quem está acessando é um ALUNO logado
+            const dadosAluno = localStorage.getItem('aluno_infinity');
+
+            if (dadosAluno) {
+                // Se for aluno, pergunta se quer instalar após 3 segundos
+                setTimeout(() => {
+                    const instalar = confirm("Olá, aluno InFinity! Deseja instalar o aplicativo na sua tela inicial para facilitar seu acesso?");
+                    if (instalar) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then((choiceResult) => {
+                            if (choiceResult.outcome === 'accepted') {
+                                console.log('Aluno aceitou a instalação');
+                            }
+                            deferredPrompt = null;
+                        });
+                    }
+                }, 3000);
+            }
+        });
     </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 05 (Dark)</title>
+    <title>InFinity | Missão 05</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
@@ -37,7 +37,7 @@
         
         .video-wrapper { 
             position: relative; 
-            padding-bottom: 56.25%; /* Proporção 16:9 para este vídeo */
+            padding-bottom: 56.25%; 
             height: 0; 
             border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
             border: 2px solid var(--secondary);
@@ -150,7 +150,7 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">👥</h1>
         <h2 style="color: var(--primary); font-size: 2rem;">Perfeito!</h2>
-        <p style="color: #94a3b8;">Missão 05 concluída com sucesso no modo escuro.</p>
+        <p style="color: #94a3b8;">Missão 05 concluída com sucesso!</p>
         <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
@@ -168,11 +168,31 @@
             ];
 
             if(a.every(v => v === true)) {
-                // Sincronizado com 'm05_complete'
+                // 1. MARCAÇÕES DE PROGRESSO E TRAVA
                 localStorage.setItem('m05_complete', 'true');
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+                // 2. EFEITOS VISUAIS
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+
+                // 3. ENVIO PARA A PLANILHA (Mecanismo InFinity)
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: document.title 
+                        })
+                    });
+                }
             } else {
                 alert("Alguma resposta está incorreta. Revise o vídeo e tente novamente!");
             }

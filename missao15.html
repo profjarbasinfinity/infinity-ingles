@@ -33,7 +33,7 @@
 
     <img src="logo-horizontal.jpg" alt="Logo" style="width:180px; margin: 20px;">
 
-    <div class="card">
+    <div class="card" id="main-card">
         <div class="video-wrapper">
             <iframe src="https://www.youtube.com/embed/wyZJ5cK9AZE" allowfullscreen></iframe>
         </div>
@@ -56,26 +56,80 @@
     </div>
 
     <script>
+        // --- CONFIGURAÇÕES DE SEGURANÇA E INTEGRAÇÃO ---
+        const MISSION_ID = 15;
+        const PREVIOUS_MISSION_ID = 14;
+        const SCRIPT_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI'; // <--- INSIRA SUA URL AQUI
+
+        function checkAccess() {
+            const lastMissionDate = localStorage.getItem('last_mission_date');
+            const completedPrev = localStorage.getItem(`m${PREVIOUS_MISSION_ID}_complete`);
+            const now = new Date().getTime();
+
+            // Verifica se completou a missão anterior
+            if (!completedPrev) {
+                alert(`Acesso negado! Você precisa concluir a Missão ${PREVIOUS_MISSION_ID} para acessar o Desafio Final.`);
+                window.location.href = 'index.html';
+                return false;
+            }
+
+            // Trava de 24 horas
+            if (lastMissionDate) {
+                const diff = now - parseInt(lastMissionDate);
+                const hours24 = 24 * 60 * 60 * 1000;
+                
+                if (diff < hours24 && !localStorage.getItem(`m${MISSION_ID}_complete`)) {
+                    const remaining = Math.ceil((hours24 - diff) / (60 * 60 * 1000));
+                    alert(`O Mestre Joel diz: "Don't rush!". Você poderá finalizar o desafio em ${remaining} horas.`);
+                    window.location.href = 'index.html';
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        async function sendDataToSheet() {
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            const data = {
+                nome: userData.nome || 'Usuário',
+                email: userData.email || 'Não informado',
+                missao: MISSION_ID,
+                status: 'Concluído',
+                data: new Date().toLocaleString('pt-BR')
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+            } catch (e) {
+                console.error('Erro ao registrar conclusão:', e);
+            }
+        }
+
+        // --- LÓGICA DA MISSÃO ---
         const analysisData = [
             {
                 term: "1. 'Modern-day Brazilian celebrities' para 'Celebridades brasileiras atuais'",
-                techs: ['Reordenação', 'Retextualização'] // Reordenou a posição e retextualizou modern-day para atuais
+                techs: ['Reordenação', 'Retextualização']
             },
             {
                 term: "2. 'Earn money on' para 'Ganham dinheiro com a'",
-                techs: ['Retextualização', 'Adição'] // on virou 'com' e adicionou 'a'
+                techs: ['Retextualização', 'Adição']
             },
             {
                 term: "3. 'Downfall' para 'Desgraça'",
-                techs: ['Retextualização'] // Troca de termo por contexto
+                techs: ['Retextualização']
             },
             {
                 term: "4. 'Promoting online casinos' para 'Promovendo cassinos online'",
-                techs: ['Reordenação'] // Inversão adjetivo/substantivo
+                techs: ['Reordenação']
             },
             {
                 term: "EXTRA: 'Sea Food' (Joel Santana) para 'Fruto do mar'",
-                techs: ['Omissão', 'Reordenação', 'Retextualização'] // Joel omitiu 'sea', inverteu e adaptou o sentido
+                techs: ['Omissão', 'Reordenação', 'Retextualização']
             }
         ];
 
@@ -115,15 +169,21 @@
             });
 
             if(allCorrect) {
-                localStorage.setItem('m15_complete', 'true');
+                // Registro Final
+                localStorage.setItem(`m${MISSION_ID}_complete`, 'true');
+                localStorage.setItem('last_mission_date', new Date().getTime().toString());
+                sendDataToSheet();
+
                 confetti({ particleCount: 150, spread: 70 });
+                document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
             } else {
                 alert("Alguma análise técnica está incompleta ou incorreta. Assista ao vídeo novamente e veja onde o Professor aplicou cada mudança!");
             }
         }
 
-        renderQuiz();
+        // Inicialização com trava
+        if (checkAccess()) renderQuiz();
     </script>
 </body>
 </html>

@@ -12,9 +12,9 @@
             --if-green: #2f9e41; 
             --primary: #00df9a; 
             --secondary: #2a5ff0; 
-            --bg: #f8fafc;      /* Fundo Claro */
-            --card-bg: #ffffff; /* Card Branco */
-            --text: #1e293b;    /* Texto Escuro */
+            --bg: #f8fafc;      
+            --card-bg: #ffffff; 
+            --text: #1e293b;    
             --border: #e2e8f0;
         }
         
@@ -41,7 +41,7 @@
         
         .video-wrapper { 
             position: relative; 
-            padding-bottom: 177.77%; /* Proporção Shorts */
+            padding-bottom: 177.77%; 
             height: 0; 
             border-radius: 12px; 
             overflow: hidden; 
@@ -238,11 +238,31 @@
             ];
 
             if(checks.every(c => c === true)) {
-                // Sincronizado com o padrão 'm04_complete' do index.html
+                // 1. MARCAÇÕES DE PROGRESSO E TRAVA
                 localStorage.setItem('m04_complete', 'true');
+                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+
+                // 2. EFEITOS VISUAIS
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+
+                // 3. ENVIO PARA A PLANILHA (Mecanismo InFinity)
+                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
+                if (alunoData) {
+                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: alunoData.nome,
+                            turma: alunoData.turma,
+                            curso: alunoData.curso,
+                            email: alunoData.email,
+                            missao: document.title 
+                        })
+                    });
+                }
             } else {
                 alert("Alguma profissão está com o artigo ou o lugar errado. Verifique novamente!");
             }
@@ -250,3 +270,4 @@
     </script>
 </body>
 </html>
+

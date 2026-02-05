@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>InFinity | Missão 17</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
+        
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .progress-container { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); transition: 0.3s; }
+
+        .sentence-box { min-height: 120px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 1.2rem; font-weight: 600; margin-bottom: 30px; line-height: 1.6; }
+        .highlight { color: var(--primary); border-bottom: 2px dashed var(--secondary); padding: 0 5px; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .opt-btn { padding: 20px; border-radius: 12px; border: 2px solid #1e293b; background: #161d3a; color: white; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .opt-btn:hover { border-color: var(--secondary); background: #1c2545; }
+        .opt-btn.correct { background: var(--primary) !important; color: #050816 !important; border-color: white !important; }
+        .opt-btn.wrong { background: #ff4757 !important; color: white !important; border-color: white !important; }
+
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+        .btn-final { width: 100%; max-width: 300px; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; }
+        
+        .video-mini { width: 100%; border-radius: 12px; margin-bottom: 15px; border: 1px solid #2a5ff044; }
+    </style>
+</head>
+<body>
+
+    <img src="logo-horizontal.jpg" alt="Logo" style="width:160px; margin: 15px;">
+
+    <div class="card" id="quiz-card">
+        <div class="progress-container"><div id="progress-bar"></div></div>
+        
+        <p style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Questão <span id="current-idx">1</span> de 16</p>
+        
+        <div class="sentence-box" id="sentence-display">
+            </div>
+
+        <div class="options-grid" id="options-display">
+            </div>
+    </div>
+
+    <div id="success-screen">
+        <h1 style="font-size: 5rem;">🎮</h1>
+        <h2 style="color: var(--primary);">CONJUGAÇÃO LEVEL UP!</h2>
+        <p>Você dominou as variações de 3ª pessoa e os sujeitos do Present Simple.</p>
+        <button class="btn-final" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const MISSION_ID = 17;
+        const PREVIOUS_MISSION_ID = 16;
+        const SCRIPT_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI';
+
+        const questions = [
+            { s: "Social media platforms ___ algorithms to show content you like.", opts: ["use", "uses"], ans: "use" },
+            { s: "A typical teenager ___ photos on Instagram every week.", opts: ["publish", "publishes"], ans: "publishes" },
+            { s: "Modern technology ___ a central role in our education.", opts: ["plays", "play"], ans: "plays" },
+            { s: "I ___ videos to my YouTube channel about my favorite games.", opts: ["uploads", "upload"], ans: "upload" },
+            { s: "He ___ for the exam using digital flashcards.", opts: ["studies", "study"], ans: "studies" },
+            { s: "Teenage boys ___ watching animes over reading mangas.", opts: ["prefer", "prefers"], ans: "prefer" },
+            { s: "This new game ___ incredible graphics and sound effects.", opts: ["possesses", "possess"], ans: "possesses" },
+            { s: "You ___ the importance of cybersecurity in the digital age.", opts: ["understand", "understands"], ans: "understand" },
+            { s: "She ___ the latest fashion trends on TikTok.", opts: ["follows", "follow"], ans: "follows" },
+            { s: "Our group ___ complex problems using collaborative apps.", opts: ["solves", "solve"], ans: "solves" },
+            { s: "They ___ to music while they do their homework.", opts: ["listen", "listens"], ans: "listen" },
+            { s: "The scientist ___ human behavior in digital environments.", opts: ["observes", "observe"], ans: "observes" },
+            { s: "It ___ a lot of energy to run these AI models.", opts: ["require", "requires"], ans: "requires" },
+            { s: "My brother ___ to the gym every afternoon.", opts: ["go", "goes"], ans: "goes" },
+            { s: "Students ___ classes from Mondays to Fridays.", opts: ["have", "has"], ans: "have" },
+            { s: "A good movie ___ me relax after a long day.", opts: ["help", "helps"], ans: "helps" }
+        ];
+
+        let currentQ = 0;
+        let canClick = true;
+
+        function checkAccess() {
+            const lastDate = localStorage.getItem('last_mission_date');
+            const prevComplete = localStorage.getItem(`m${PREVIOUS_MISSION_ID}_complete`);
+            const now = new Date().getTime();
+
+            if (!prevComplete) {
+                alert(`Acesso bloqueado! Conclua a Missão ${PREVIOUS_MISSION_ID} primeiro.`);
+                window.location.href = 'index.html'; return false;
+            }
+
+            if (lastDate && !localStorage.getItem(`m${MISSION_ID}_complete`)) {
+                const diff = now - parseInt(lastDate);
+                if (diff < 24 * 60 * 60 * 1000) {
+                    const hours = Math.ceil((24 * 60 * 60 * 1000 - diff) / (3600000));
+                    alert(`Descanse a mente! Volte em ${hours} horas para o próximo desafio.`);
+                    window.location.href = 'index.html'; return false;
+                }
+            }
+            return true;
+        }
+
+        function loadQuestion() {
+            canClick = true;
+            const q = questions[currentQ];
+            document.getElementById('current-idx').innerText = currentQ + 1;
+            document.getElementById('progress-bar').style.width = `${((currentQ) / questions.length) * 100}%`;
+            
+            // Renderiza a sentença com o espaço vazio
+            document.getElementById('sentence-display').innerHTML = q.s.replace("___", "<span class='highlight'>_______</span>");
+            
+            // Renderiza as opções
+            const optArea = document.getElementById('options-display');
+            optArea.innerHTML = '';
+            q.opts.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = opt;
+                btn.onclick = () => handleChoice(btn, opt);
+                optArea.appendChild(btn);
+            });
+        }
+
+        function handleChoice(btn, choice) {
+            if (!canClick) return;
+            const q = questions[currentQ];
+            
+            if (choice === q.ans) {
+                canClick = false;
+                btn.classList.add('correct');
+                confetti({ particleCount: 30, origin: { y: 0.7 } });
+                
+                setTimeout(() => {
+                    currentQ++;
+                    if (currentQ < questions.length) {
+                        loadQuestion();
+                    } else {
+                        finishMission();
+                    }
+                }, 1000);
+            } else {
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 500);
+            }
+        }
+
+        async function finishMission() {
+            document.getElementById('progress-bar').style.width = '100%';
+            localStorage.setItem(`m${MISSION_ID}_complete`, 'true');
+            localStorage.setItem('last_mission_date', new Date().getTime().toString());
+            
+            // Envio Sheet
+            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
+            fetch(SCRIPT_URL, { 
+                method: 'POST', mode: 'no-cors', 
+                body: JSON.stringify({ nome: userData.nome, email: userData.email, missao: MISSION_ID, status: 'Concluído' }) 
+            });
+
+            confetti({ particleCount: 200, spread: 100 });
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+        }
+
+        if (checkAccess()) loadQuestion();
+    </script>
+</body>
+</html>

@@ -6,112 +6,19 @@
     <title>InFinity | Missão 02</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
+        /* MANTENHA SEU CSS ORIGINAL AQUI */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        
-        :root { 
-            --if-green: #2f9e41; 
-            --primary: #00df9a; 
-            --secondary: #2a5ff0; 
-            --bg: #f8fafc;      /* Fundo Claro */
-            --card-bg: #ffffff; /* Card Branco */
-            --text: #1e293b;    /* Texto Escuro */
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-        }
-
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 20px; 
-            padding: 25px; 
-            width: 100%; 
-            max-width: 450px; 
-            border: 1px solid #e2e8f0; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
-        }
-        
-        /* Container do Vídeo Corrigido */
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 177.78%; /* Proporção 9:16 para Shorts */
-            height: 0; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            margin-bottom: 25px; 
-            background: #000;
-            border: 2px solid var(--secondary);
-        }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .task-title { 
-            color: var(--secondary); 
-            font-weight: 800; 
-            margin: 25px 0 15px 0; 
-            padding-left: 10px; 
-            border-left: 4px solid var(--if-green);
-            text-align: left;
-        }
-
-        .quiz-item { 
-            margin-bottom: 15px; 
-            background: #f1f5f9; 
-            padding: 15px; 
-            border-radius: 12px; 
-            text-align: left;
-        }
-        .quiz-item label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: 600; 
-            color: var(--text); 
-            font-size: 0.95rem; 
-        }
-
-        select { 
-            width: 100%; 
-            padding: 12px; 
-            border-radius: 8px; 
-            background: #ffffff; 
-            color: var(--text); 
-            border: 1px solid #cbd5e1; 
-            font-family: inherit; 
-            font-size: 1rem;
-        }
-
-        .btn { 
-            width: 100%; 
-            padding: 20px; 
-            margin-top: 25px; 
-            border: none; 
-            border-radius: 12px; 
-            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: white; 
-            font-weight: 800; 
-            cursor: pointer; 
-            font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(42, 95, 240, 0.2);
-        }
-
-        #success-screen { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: var(--bg); 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center; 
-            z-index: 1000; 
-            padding: 20px; 
-        }
+        .task-title { color: var(--secondary); font-weight: 800; margin: 25px 0 15px 0; padding-left: 10px; border-left: 4px solid var(--if-green); text-align: left; }
+        .quiz-item { margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 12px; text-align: left; }
+        .quiz-item label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text); font-size: 0.95rem; }
+        select { width: 100%; padding: 12px; border-radius: 8px; background: #ffffff; color: var(--text); border: 1px solid #cbd5e1; font-family: inherit; font-size: 1rem; }
+        .btn { width: 100%; padding: 20px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(42, 95, 240, 0.2); }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
     </style>
 </head>
 <body>
@@ -211,10 +118,26 @@
         <h1 style="font-size: 5rem; margin:0;">🏆</h1>
         <h2 style="color:var(--secondary); font-size: 2rem;">MISSÃO CUMPRIDA!</h2>
         <p style="color: #64748b; margin-bottom: 30px;">Você dominou os Falsos Cognatos com sucesso.</p>
-        <button class="btn" style="max-width: 280px;" onclick="finishMission()">VOLTAR AO MAPA</button>
+        <button class="btn" style="max-width: 280px;" onclick="window.location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
+        // --- CONFIGURAÇÃO ---
+        const MISSION_ID = '02';
+        const PREVIOUS_MISSION_ID = '01';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
+
+        // --- TRAVA DE ENTRADA ---
+        function checkAccess() {
+            const completedPrev = localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete');
+            if (!completedPrev) {
+                alert("Acesso negado! Conclua a Missão " + PREVIOUS_MISSION_ID + " primeiro.");
+                window.location.href = 'index.html';
+            }
+        }
+        checkAccess();
+
+        // --- VALIDAÇÃO E ENVIO ---
         function checkMission() {
             const q1 = document.getElementById('q1').value;
             const q2 = document.getElementById('q2').value;
@@ -224,49 +147,44 @@
             const a1 = document.getElementById('a1').value;
             const a2 = document.getElementById('a2').value;
 
+            // Verifica se todas as respostas estão corretas
             if(q1 === 'right' && q2 === 'right' && q3 === 'right' && q4 === 'right' && q5 === 'right' && a1 === 'p' && a2 === 'l') {
+                
+                // 1. Mostrar Sucesso
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
-                localStorage.setItem('m02_complete', 'true');
+
+                // 2. Salvar Localmente
+                localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
+                localStorage.setItem('last_mission_date', new Date().getTime().toString());
+
+                // 3. Enviar para Planilha
+                sendToSheet();
+
             } else {
                 alert("Algumas respostas estão incorretas. Revise o vídeo!");
             }
         }
 
-        function finish() {
-    // AJUSTE AQUI: Coloque o número total de acertos da Missão 02
-    const metaAcertos = 7; 
-
-    if(document.getElementById('ans-count').value == metaAcertos) {
-        winSound.play();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        document.getElementById('success-screen').style.display = 'flex';
-        
-        // 1. SALVA A TRAVA DIÁRIA (Impede outra missão hoje)
-        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-        
-        // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
-        localStorage.setItem('m02_complete', 'true'); 
-
-        // 3. ENVIA PARA A PLANILHA
-        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        if (alunoData) {
-            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: alunoData.nome,
-                    turma: alunoData.turma,
-                    curso: alunoData.curso,
-                    email: alunoData.email,
-                    missao: document.title // Puxa o título da página automaticamente
-                })
-            });
+        function sendToSheet() {
+            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
+            
+            if (alunoData) {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nome: alunoData.nome,
+                        turma: alunoData.turma || "Não informada",
+                        curso: alunoData.curso || "Não informado",
+                        email: alunoData.email,
+                        missao: "Missão 02 - Falsos Cognatos"
+                    })
+                });
+            }
         }
-    } else {
-        alert("Ops! Verifique suas respostas para concluir a missão.");
-    }
-}
-
+    </script>
+</body>
+</html>

@@ -3,88 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 03 (Dark)</title>
+    <title>InFinity | Missão 03</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
+        /* MANTENHA SEU CSS ORIGINAL (DARK MODE) AQUI */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        
-        :root { 
-            --if-green: #2f9e41; 
-            --primary: #00df9a; 
-            --secondary: #2a5ff0; 
-            --bg: #050816;      /* Fundo Escuro */
-            --card-bg: #101630; /* Card Escuro */
-            --text: #ffffff;    /* Texto Branco */
-            --border: #1e293b;
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; padding: 15px; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
-        
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 24px; 
-            padding: 24px; 
-            width: 100%; max-width: 480px; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-        
-        .video-wrapper { 
-            position: relative; padding-bottom: 177.77%; height: 0; 
-            border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
-            border: 2px solid var(--secondary);
-            background: #000;
-        }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; --border: #1e293b; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 24px; padding: 24px; width: 100%; max-width: 480px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--secondary); background: #000; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .task-title { 
-            color: var(--primary); 
-            font-weight: 800; 
-            margin-bottom: 8px; 
-            font-size: 1.2rem;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .task-title::before {
-            content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px;
-        }
-
+        .task-title { color: var(--primary); font-weight: 800; margin-bottom: 8px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .task-title::before { content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px; }
         .instruction { font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; text-align: left; }
-
-        .quiz-scroll { 
-            max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; 
-        }
+        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
         .quiz-scroll::-webkit-scrollbar { width: 4px; }
         .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
-
-        .quiz-item { 
-            margin-bottom: 12px; background: #161d3a; padding: 14px; 
-            border-radius: 12px; border: 1px solid var(--border); 
-            font-size: 1rem; color: #ffffff; text-align: left;
-        }
-        
-        select { 
-            background: #0a1025; color: var(--primary); 
-            border: 1px solid var(--secondary); padding: 4px 8px; 
-            border-radius: 8px; font-weight: 700; cursor: pointer; outline: none;
-        }
-
-        .btn { 
-            width: 100%; padding: 20px; border: none; border-radius: 16px; 
-            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: #000; font-weight: 800; cursor: pointer; font-size: 1.1rem;
-        }
-
-        #success-screen { 
-            display: none; position: fixed; inset: 0; background: var(--bg); 
-            flex-direction: column; align-items: center; justify-content: center; 
-            text-align: center; z-index: 1000; padding: 20px; 
-        }
+        .quiz-item { margin-bottom: 12px; background: #161d3a; padding: 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 1rem; color: #ffffff; text-align: left; }
+        select { background: #0a1025; color: var(--primary); border: 1px solid var(--secondary); padding: 4px 8px; border-radius: 8px; font-weight: 700; cursor: pointer; outline: none; }
+        .btn { width: 100%; padding: 20px; border: none; border-radius: 16px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
     </style>
 </head>
 <body>
@@ -107,11 +45,25 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">🎯</h1>
         <h2 style="color: var(--primary); font-size: 2rem;">Perfeito!</h2>
-        <p style="color: #94a3b8;">Missão cumprida no modo escuro.</p>
+        <p style="color: #94a3b8;">Missão cumprida com sucesso.</p>
         <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
+        // --- 1. CONFIGURAÇÕES E TRAVA DE ENTRADA ---
+        const MISSION_ID = '03';
+        const PREVIOUS_MISSION_ID = '02';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
+
+        function checkAccess() {
+            if (!localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete')) {
+                alert("Acesso negado! Conclua a Missão " + PREVIOUS_MISSION_ID + " primeiro.");
+                window.location.href = 'index.html';
+            }
+        }
+        checkAccess();
+
+        // --- 2. GERAÇÃO DO QUIZ ---
         const questions = [
             { t: "Mary used ___ calculator.", a: "a" },
             { t: "Carlos was involved in ___ accident.", a: "an" },
@@ -139,39 +91,48 @@
             container.appendChild(div);
         });
 
-       function finish() {
-    // AJUSTE AQUI: Coloque o número total de acertos da Missão 03
-    const metaAcertos = 15; 
+        // --- 3. VALIDAÇÃO E ENVIO ---
+        function checkMission() {
+            let correctCount = 0;
 
-    if(document.getElementById('ans-count').value == metaAcertos) {
-        winSound.play();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        document.getElementById('success-screen').style.display = 'flex';
-        
-        // 1. SALVA A TRAVA DIÁRIA (Impede outra missão hoje)
-        localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-        
-        // 2. MARCA COMO CONCLUÍDA (Para ficar verde no mapa)
-        localStorage.setItem('m03_complete', 'true'); 
-
-        // 3. ENVIA PARA A PLANILHA
-        const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-        if (alunoData) {
-            fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nome: alunoData.nome,
-                    turma: alunoData.turma,
-                    curso: alunoData.curso,
-                    email: alunoData.email,
-                    missao: document.title // Puxa o título da página automaticamente
-                })
+            questions.forEach((q, i) => {
+                const userAns = document.getElementById('ans' + i).value;
+                if (userAns === q.a) correctCount++;
             });
-        }
-    } else {
-        alert("Ops! Verifique suas respostas para concluir a missão.");
-    }
-}
 
+            if (correctCount === questions.length) {
+                // Sucesso Visual
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('main-card').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'flex';
+
+                // Salva Progresso
+                localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
+                localStorage.setItem('last_mission_date', new Date().getTime().toString());
+
+                // Envia para Planilha
+                sendToSheet();
+            } else {
+                alert(`Você acertou ${correctCount} de ${questions.length}. Verifique suas respostas!`);
+            }
+        }
+
+        function sendToSheet() {
+            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
+            if (alunoData) {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        nome: alunoData.nome,
+                        turma: alunoData.turma || "Não informada",
+                        curso: alunoData.curso || "Não informado",
+                        email: alunoData.email,
+                        missao: "Missão 03 - Artigos (A/An)"
+                    })
+                });
+            }
+        }
+    </script>
+</body>
+</html>

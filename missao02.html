@@ -6,183 +6,78 @@
     <title>InFinity | Missão 02</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        /* MANTENHA SEU CSS ORIGINAL AQUI */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --border: #e2e8f0; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 480px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .task-title { color: var(--secondary); font-weight: 800; margin: 25px 0 15px 0; padding-left: 10px; border-left: 4px solid var(--if-green); text-align: left; }
-        .quiz-item { margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 12px; text-align: left; }
-        .quiz-item label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text); font-size: 0.95rem; }
-        select { width: 100%; padding: 12px; border-radius: 8px; background: #ffffff; color: var(--text); border: 1px solid #cbd5e1; font-family: inherit; font-size: 1rem; }
-        .btn { width: 100%; padding: 20px; margin-top: 25px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(42, 95, 240, 0.2); }
+        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .quiz-item { margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.9rem; }
+        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; }
+        .btn { width: 100%; padding: 20px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--secondary), #4f46e5); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
         #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
     </style>
 </head>
 <body>
-
     <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
-
     <div class="card" id="main-card">
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube-nocookie.com/embed/WJwNE45sN6k" allowfullscreen></iframe>
+        <div class="video-wrapper"><iframe src="https://www.youtube-nocookie.com/embed/S2Y8I_yS6fM" allowfullscreen></iframe></div>
+        <div class="task-title">MISSÃO 02: FALSE COGNATES</div>
+        <div class="quiz-item"><p>1. "Actually" significa:</p><select id="q1"><option value="">Selecione...</option><option value="wrong">Atualmente</option><option value="right">Na verdade</option></select></div>
+        <div class="quiz-item"><p>2. "Library" significa:</p><select id="q2"><option value="">Selecione...</option><option value="right">Biblioteca</option><option value="wrong">Livraria</option></select></div>
+        <div class="quiz-item"><p>3. "Parents" significa:</p><select id="q3"><option value="">Selecione...</option><option value="right">Pais</option><option value="wrong">Parentes</option></select></div>
+        <div class="quiz-item"><p>4. "Push" significa:</p><select id="q4"><option value="">Selecione...</option><option value="right">Empurrar</option><option value="wrong">Puxar</option></select></div>
+        <div class="quiz-item"><p>5. "Pretend" significa:</p><select id="q5"><option value="">Selecione...</option><option value="right">Fingir</option><option value="wrong">Pretender</option></select></div>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <select id="a1"><option value="">Artigo P...</option><option value="p">A</option><option value="l">AN</option></select>
+            <select id="a2"><option value="">Artigo L...</option><option value="p">A</option><option value="l">AN</option></select>
         </div>
-
-        <p style="font-size: 0.8rem; color: #64748b; font-weight: 600; margin-bottom: 5px;">MISSÃO 02</p>
-        <h3 style="margin-top:0; color: var(--secondary);">FALSOS COGNATOS</h3>
-
-        <div class="task-title">PARTE 1: SIGNIFICADOS</div>
-        
-        <div class="quiz-item">
-            <label>1. LUNCH</label>
-            <select id="q1">
-                <option value="">Escolha...</option>
-                <option value="right">Almoço</option>
-                <option value="w1">Lançar</option>
-                <option value="w2">Horário de lanche</option>
-            </select>
-        </div>
-
-        <div class="quiz-item">
-            <label>2. PARENTS</label>
-            <select id="q2">
-                <option value="">Escolha...</option>
-                <option value="w1">Parêntesis</option>
-                <option value="right">Pais</option>
-                <option value="w2">Aparente</option>
-            </select>
-        </div>
-
-        <div class="quiz-item">
-            <label>3. PUSH</label>
-            <select id="q3">
-                <option value="">Escolha...</option>
-                <option value="right">Empurrar</option>
-                <option value="w1">Soltar</option>
-                <option value="w2">Puxar</option>
-            </select>
-        </div>
-
-        <div class="quiz-item">
-            <label>4. SORRY</label>
-            <select id="q4">
-                <option value="">Escolha...</option>
-                <option value="w1">Sorrir</option>
-                <option value="right">Me desculpe</option>
-                <option value="w2">Serrar</option>
-            </select>
-        </div>
-
-        <div class="quiz-item">
-            <label>5. REALIZE</label>
-            <select id="q5">
-                <option value="">Escolha...</option>
-                <option value="w1">Realizar</option>
-                <option value="w2">Pedir</option>
-                <option value="right">Perceber</option>
-            </select>
-        </div>
-
-        <div class="task-title">PARTE 2: ASSOCIAÇÃO</div>
-        
-        <div class="quiz-item">
-            <label>Mother and Father:</label>
-            <select id="a1">
-                <option value="">Selecionar...</option>
-                <option value="p">Parents</option>
-                <option value="l">Lunch</option>
-                <option value="r">Realize</option>
-                <option value="s">Sorry</option>
-                <option value="f">Push</option>
-            </select>
-        </div>
-
-        <div class="quiz-item">
-            <label>Food you eat at 12h00:</label>
-            <select id="a2">
-                <option value="">Selecionar...</option>
-                <option value="p">Parents</option>
-                <option value="l">Lunch</option>
-                <option value="r">Realize</option>
-                <option value="s">Sorry</option>
-                <option value="f">Push</option>
-            </select>
-        </div>
-
-        <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 02</button>
+        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 02</button>
     </div>
-
-    <div id="success-screen">
-        <h1 style="font-size: 5rem; margin:0;">🏆</h1>
-        <h2 style="color:var(--secondary); font-size: 2rem;">MISSÃO CUMPRIDA!</h2>
-        <p style="color: #64748b; margin-bottom: 30px;">Você dominou os Falsos Cognatos com sucesso.</p>
-        <button class="btn" style="max-width: 280px;" onclick="window.location.href='index.html'">VOLTAR AO MAPA</button>
-    </div>
+    <div id="success-screen"><h1>🎯</h1><h2 style="color: var(--secondary);">Incrível!</h2><p>Missão 02 concluída.</p><button class="btn" style="max-width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button></div>
 
     <script>
-        // --- CONFIGURAÇÃO ---
         const MISSION_ID = '02';
         const PREVIOUS_MISSION_ID = '01';
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
 
-        // --- TRAVA DE ENTRADA ---
         function checkAccess() {
             const completedPrev = localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete');
-            if (!completedPrev) {
-                alert("Acesso negado! Conclua a Missão " + PREVIOUS_MISSION_ID + " primeiro.");
-                window.location.href = 'index.html';
+            const lastMissionDate = localStorage.getItem('last_mission_date');
+            const now = new Date().getTime();
+            if (!completedPrev) { alert("Acesso negado! Conclua a Missão 01 primeiro."); window.location.href = 'index.html'; return; }
+            if (lastMissionDate && !localStorage.getItem('m' + MISSION_ID + '_complete')) {
+                const diff = now - parseInt(lastMissionDate);
+                const waitTime = 24 * 60 * 60 * 1000;
+                if (diff < waitTime) {
+                    const hours = Math.floor((waitTime - diff) / (1000 * 60 * 60));
+                    const mins = Math.floor(((waitTime - diff) % (1000 * 60 * 60)) / (1000 * 60));
+                    alert(`Aguarde! A Missão 02 libera em ${hours}h ${mins}min.`);
+                    window.location.href = 'index.html';
+                }
             }
         }
         checkAccess();
 
-        // --- VALIDAÇÃO E ENVIO ---
         function checkMission() {
-            const q1 = document.getElementById('q1').value;
-            const q2 = document.getElementById('q2').value;
-            const q3 = document.getElementById('q3').value;
-            const q4 = document.getElementById('q4').value;
-            const q5 = document.getElementById('q5').value;
-            const a1 = document.getElementById('a1').value;
-            const a2 = document.getElementById('a2').value;
-
-            // Verifica se todas as respostas estão corretas
-            if(q1 === 'right' && q2 === 'right' && q3 === 'right' && q4 === 'right' && q5 === 'right' && a1 === 'p' && a2 === 'l') {
-                
-                // 1. Mostrar Sucesso
+            if(document.getElementById('q1').value==='right' && document.getElementById('q2').value==='right' && document.getElementById('q3').value==='right' && document.getElementById('q4').value==='right' && document.getElementById('q5').value==='right' && document.getElementById('a1').value==='p' && document.getElementById('a2').value==='l') {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
-
-                // 2. Salvar Localmente
                 localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
                 localStorage.setItem('last_mission_date', new Date().getTime().toString());
-
-                // 3. Enviar para Planilha
                 sendToSheet();
-
-            } else {
-                alert("Algumas respostas estão incorretas. Revise o vídeo!");
-            }
+            } else { alert("Verifique suas respostas!"); }
         }
 
         function sendToSheet() {
             const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
-            
             if (alunoData) {
-                fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nome: alunoData.nome,
-                        turma: alunoData.turma || "Não informada",
-                        curso: alunoData.curso || "Não informado",
-                        email: alunoData.email,
-                        missao: "Missão 02 - Falsos Cognatos"
-                    })
-                });
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({
+                    nome: alunoData.nome, turma: alunoData.turma, curso: alunoData.curso, email: alunoData.email, missao: "Missão 02 - Falsos Cognatos"
+                })});
             }
         }
     </script>

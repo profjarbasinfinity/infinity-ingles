@@ -3,198 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 05</title>
+    <title>InFinity | Missão 04</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        
-        :root { 
-            --if-green: #2f9e41; 
-            --primary: #00df9a; 
-            --secondary: #2a5ff0; 
-            --bg: #050816;      /* Fundo Escuro */
-            --card-bg: #101630; /* Card Escuro */
-            --text: #ffffff;    /* Texto Branco */
-            --border: #1e293b;
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; padding: 15px; 
-            display: flex; flex-direction: column; align-items: center; 
-        }
-        
-        .card { 
-            background: var(--card-bg); 
-            border-radius: 24px; 
-            padding: 24px; 
-            width: 100%; max-width: 480px; 
-            border: 1px solid var(--border); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-        }
-        
-        .video-wrapper { 
-            position: relative; 
-            padding-bottom: 56.25%; 
-            height: 0; 
-            border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
-            border: 2px solid var(--secondary);
-            background: #000;
-        }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --border: #e2e8f0; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .task-title { 
-            color: var(--primary); 
-            font-weight: 800; 
-            margin-bottom: 8px; 
-            font-size: 1.2rem;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .task-title::before {
-            content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px;
-        }
-
-        .instruction { font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px; text-align: left; }
-
-        .quiz-scroll { 
-            max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; 
-            text-align: left;
-        }
-        .quiz-scroll::-webkit-scrollbar { width: 4px; }
-        .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
-
-        .quiz-item { 
-            margin-bottom: 12px; background: #161d3a; padding: 14px; 
-            border-radius: 12px; border: 1px solid var(--border); 
-        }
-        .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.95rem; color: var(--primary); }
-        
-        select { 
-            background: #0a1025; color: white; 
-            border: 1px solid var(--secondary); padding: 8px; 
-            border-radius: 8px; font-weight: 700; width: 100%; outline: none; 
-        }
-
-        .btn { 
-            width: 100%; padding: 20px; border: none; border-radius: 16px; 
-            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: #000; font-weight: 800; cursor: pointer; font-size: 1.1rem;
-        }
-
-        #success-screen { 
-            display: none; position: fixed; inset: 0; background: var(--bg); 
-            flex-direction: column; align-items: center; justify-content: center; 
-            text-align: center; z-index: 1000; padding: 20px; 
-        }
+        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
+        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; }
+        .quiz-item { margin-bottom: 12px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        .quiz-item p { margin: 0 0 10px 0; font-weight: 800; font-size: 0.95rem; }
+        .row { display: flex; gap: 8px; }
+        select { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; }
+        .btn { width: 100%; padding: 20px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--secondary), #4f46e5); color: white; font-weight: 800; cursor: pointer; }
+        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
     </style>
 </head>
 <body>
-
     <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
-
     <div class="card" id="main-card">
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube-nocookie.com/embed/CRWIGab9QK8" allowfullscreen></iframe>
-        </div>
-
-        <div class="task-title">MISSÃO 05: PERSONAL PRONOUNS</div>
-        <p class="instruction">Identifique o pronome correto para cada pessoa do discurso:</p>
-
+        <div class="video-wrapper"><iframe src="https://www.youtube-nocookie.com/embed/Xf1qTokOAp0" allowfullscreen></iframe></div>
+        <div class="task-title">MISSÃO 04: JOBS & PLACES</div>
         <div class="quiz-scroll">
-            <div class="quiz-item">
-                <p>1. O emissor (EU) em uma conversa:</p>
-                <select id="q1"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="he">HE</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>2. O receptor (VOCÊ) da mensagem:</p>
-                <select id="q2"><option value="">?</option><option value="i">I</option><option value="you">YOU</option><option value="they">THEY</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>3. O assunto (ELE - masculino) de quem se fala:</p>
-                <select id="q3"><option value="">?</option><option value="she">SHE</option><option value="it">IT</option><option value="he">HE</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>4. O assunto (ELA - feminino) de quem se fala:</p>
-                <select id="q4"><option value="">?</option><option value="she">SHE</option><option value="he">HE</option><option value="we">WE</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>5. Um substantivo NEUTRO de quem se fala:</p>
-                <select id="q5"><option value="">?</option><option value="you">YOU</option><option value="it">IT</option><option value="i">I</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>6. Os emissores (NÓS) no plural:</p>
-                <select id="q6"><option value="">?</option><option value="we">WE</option><option value="they">THEY</option><option value="you">YOU</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>7. Os receptores (VOCÊS) no plural:</p>
-                <select id="q7"><option value="">?</option><option value="they">THEY</option><option value="we">WE</option><option value="you">YOU</option></select>
-            </div>
-
-            <div class="quiz-item">
-                <p>8. Os assuntos (ELES/ELAS) de quem se fala:</p>
-                <select id="q8"><option value="">?</option><option value="it">IT</option><option value="they">THEY</option><option value="we">WE</option></select>
-            </div>
+            <div class="quiz-item"><p>1. STUDENT</p><div class="row"><select id="art1"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select></div></div>
+            <div class="quiz-item"><p>2. ARTIST</p><div class="row"><select id="art2"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl2"><option value="">Lugar...</option><option value="s">Studio</option><option value="h">Hospital</option></select></div></div>
+            <div class="quiz-item"><p>3. DOCTOR</p><div class="row"><select id="art3"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl3"><option value="">Lugar...</option><option value="h">Hospital</option><option value="r">Restaurant</option></select></div></div>
+            <div class="quiz-item"><p>4. AGRICULTURIST</p><div class="row"><select id="art4"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl4"><option value="">Lugar...</option><option value="f">Farm</option><option value="s">School</option></select></div></div>
+            <div class="quiz-item"><p>5. TEACHER</p><div class="row"><select id="art5"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl5"><option value="">Lugar...</option><option value="sc">School</option><option value="l">Lab</option></select></div></div>
+            <div class="quiz-item"><p>6. CHEF</p><div class="row"><select id="art6"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl6"><option value="">Lugar...</option><option value="r">Restaurant</option><option value="p">Police Station</option></select></div></div>
+            <div class="quiz-item"><p>7. CASHIER</p><div class="row"><select id="art7"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl7"><option value="">Lugar...</option><option value="sm">Supermarket</option><option value="a">Airplane</option></select></div></div>
+            <div class="quiz-item"><p>8. DENTIST</p><div class="row"><select id="art8"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl8"><option value="">Lugar...</option><option value="dc">Dental Clinic</option><option value="g">Garden</option></select></div></div>
+            <div class="quiz-item"><p>9. PILOT</p><div class="row"><select id="art9"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl9"><option value="">Lugar...</option><option value="ap">Airplane</option><option value="f">Farm</option></select></div></div>
+            <div class="quiz-item"><p>10. SCIENTIST</p><div class="row"><select id="art10"><option value="">Artigo...</option><option value="a">A</option><option value="an">AN</option></select><select id="pl10"><option value="">Lugar...</option><option value="lab">Science Lab</option><option value="sm">Supermarket</option></select></div></div>
         </div>
-
-        <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 05</button>
+        <button class="btn" onclick="checkMission()">FINALIZAR MISSÃO 04</button>
     </div>
-
-    <div id="success-screen">
-        <h1 style="font-size: 5rem; margin: 0;">👥</h1>
-        <h2 style="color: var(--primary); font-size: 2rem;">Perfeito!</h2>
-        <p style="color: #94a3b8;">Missão 05 concluída com sucesso!</p>
-        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
-    </div>
+    <div id="success-screen"><h1>🎖️</h1><h2 style="color: var(--secondary);">Excelente!</h2><p>Jobs & Places dominados.</p><button class="btn" style="max-width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button></div>
 
     <script>
+        const MISSION_ID = '04';
+        const PREVIOUS_MISSION_ID = '03';
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
+
+        function checkAccess() {
+            const completedPrev = localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete');
+            const lastMissionDate = localStorage.getItem('last_mission_date');
+            const now = new Date().getTime();
+            if (!completedPrev) { alert("Conclua a Missão 03 primeiro!"); window.location.href = 'index.html'; return; }
+            if (lastMissionDate && !localStorage.getItem('m' + MISSION_ID + '_complete')) {
+                const diff = now - parseInt(lastMissionDate);
+                const waitTime = 24 * 60 * 60 * 1000;
+                if (diff < waitTime) {
+                    const hours = Math.floor((waitTime - diff) / (1000 * 60 * 60));
+                    alert(`Aguarde! A Missão 04 libera em ${hours}h.`);
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+        checkAccess();
+
         function checkMission() {
-            const a = [
-                document.getElementById('q1').value === 'i',
-                document.getElementById('q2').value === 'you',
-                document.getElementById('q3').value === 'he',
-                document.getElementById('q4').value === 'she',
-                document.getElementById('q5').value === 'it',
-                document.getElementById('q6').value === 'we',
-                document.getElementById('q7').value === 'you',
-                document.getElementById('q8').value === 'they'
+            const c = [
+                document.getElementById('art1').value==='a',
+                document.getElementById('art2').value==='an' && document.getElementById('pl2').value==='s',
+                document.getElementById('art3').value==='a' && document.getElementById('pl3').value==='h',
+                document.getElementById('art4').value==='an' && document.getElementById('pl4').value==='f',
+                document.getElementById('art5').value==='a' && document.getElementById('pl5').value==='sc',
+                document.getElementById('art6').value==='a' && document.getElementById('pl6').value==='r',
+                document.getElementById('art7').value==='a' && document.getElementById('pl7').value==='sm',
+                document.getElementById('art8').value==='a' && document.getElementById('pl8').value==='dc',
+                document.getElementById('art9').value==='a' && document.getElementById('pl9').value==='ap',
+                document.getElementById('art10').value==='a' && document.getElementById('pl10').value==='lab'
             ];
-
-            if(a.every(v => v === true)) {
-                // 1. MARCAÇÕES DE PROGRESSO E TRAVA
-                localStorage.setItem('m05_complete', 'true');
-                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-
-                // 2. EFEITOS VISUAIS
+            if(c.every(v => v === true)) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
+                localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
+                localStorage.setItem('last_mission_date', new Date().getTime().toString());
+                sendToSheet();
+            } else { alert("Revise os artigos e lugares!"); }
+        }
 
-                // 3. ENVIO PARA A PLANILHA (Mecanismo InFinity)
-                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-                if (alunoData) {
-                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: alunoData.nome,
-                            turma: alunoData.turma,
-                            curso: alunoData.curso,
-                            email: alunoData.email,
-                            missao: document.title 
-                        })
-                    });
-                }
-            } else {
-                alert("Alguma resposta está incorreta. Revise o vídeo e tente novamente!");
+        function sendToSheet() {
+            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
+            if (alunoData) {
+                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({
+                    nome: alunoData.nome, email: alunoData.email, missao: "Missão 04 - Jobs and Places"
+                })});
             }
         }
     </script>

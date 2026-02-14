@@ -11,7 +11,7 @@
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
         .header { text-align: center; margin-bottom: 30px; }
-        .logo-main { width: 180px; margin-bottom: 15px; } /* Ajuste de tamanho da logo */
+        .logo-main { width: 180px; margin-bottom: 15px; }
         
         #status-text { font-weight: 600; color: var(--if-green); margin-bottom: 20px; }
         
@@ -63,14 +63,14 @@
     <div id="grid"></div>
 
     <script>
-        // --- REGISTRO DO SERVICE WORKER (Necessário para Instalar App) ---
+        // --- REGISTRO DO SERVICE WORKER ---
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
             .then(() => console.log("Service Worker Ativo"))
             .catch(err => console.log("Erro no SW:", err));
         }
 
-        // 1. Verificação de Acesso (Segurança)
+        // 1. Verificação de Acesso
         (function() {
             const aluno = localStorage.getItem('aluno_infinity');
             const visitante = sessionStorage.getItem('visitante');
@@ -80,8 +80,8 @@
             }
         })();
 
-        // 2. Lógica do Mapa
-        const totalMissions = 15;
+        // 2. Lógica do Mapa Atualizada para 17 Missões
+        const totalMissions = 17; // AQUI ESTÁ A ATUALIZAÇÃO
         const grid = document.getElementById('grid');
         let completedCount = 0;
 
@@ -96,9 +96,11 @@
                 node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
                 
                 node.onclick = function() {
+                    // Lógica de trava por dia (24h)
                     const hoje = new Date().toLocaleDateString();
                     const ultimaData = localStorage.getItem('ultima_conclusao');
 
+                    // Permitimos entrar se: já completou (revisão) OU se a última conclusão não foi hoje
                     if (isCompleted || ultimaData !== hoje) {
                         window.location.href = `missao${missionId}.html`;
                     } else {
@@ -122,24 +124,17 @@
 
         // --- LÓGICA DE INSTALAÇÃO DO APP (PWA) ---
         let deferredPrompt;
-
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-
             const dadosAluno = localStorage.getItem('aluno_infinity');
 
             if (dadosAluno) {
                 setTimeout(() => {
-                    const instalar = confirm("Olá, aluno InFinity! Deseja instalar o aplicativo na sua tela inicial para facilitar seu acesso?");
+                    const instalar = confirm("Olá, aluno InFinity! Deseja instalar o aplicativo na sua tela inicial?");
                     if (instalar) {
                         deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('Aluno aceitou a instalação');
-                            }
-                            deferredPrompt = null;
-                        });
+                        deferredPrompt = null;
                     }
                 }, 3000);
             }

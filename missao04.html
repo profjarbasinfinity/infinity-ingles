@@ -4,25 +4,140 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InFinity | Missão 04</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
-        /* MANTENHA SEU CSS ORIGINAL AQUI */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --border: #e2e8f0; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 500px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; text-align: left; }
-        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 8px; margin-bottom: 20px; text-align: left; }
+        
+        /* TEMA CLARO PARA MISSÕES PARES */
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text: #1e293b; 
+            --border: #e2e8f0; 
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 20px; 
+            width: 100%; 
+            max-width: 500px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.77%; 
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000; 
+            border: 2px solid var(--secondary); 
+        }
+
+        .video-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+            border-left: 4px solid var(--if-green); 
+            padding-left: 10px; 
+            text-align: left; 
+        }
+
+        .quiz-scroll { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            padding-right: 8px; 
+            margin-bottom: 20px; 
+            text-align: left; 
+        }
+
         .quiz-scroll::-webkit-scrollbar { width: 5px; }
         .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
-        .quiz-item { margin-bottom: 12px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-        .quiz-item p { margin: 0 0 10px 0; font-weight: 800; font-size: 0.95rem; color: var(--text); }
+
+        .quiz-item { 
+            margin-bottom: 12px; 
+            background: #f1f5f9; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+        }
+
+        .quiz-item p { 
+            margin: 0 0 10px 0; 
+            font-weight: 800; 
+            font-size: 0.95rem; 
+            color: var(--text); 
+        }
+
         .row { display: flex; gap: 8px; align-items: center; }
-        select { flex: 1; background: #ffffff; color: var(--text); border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; font-size: 0.85rem; font-family: inherit; }
-        .btn { width: 100%; padding: 20px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--secondary), #4f46e5); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+
+        select { 
+            flex: 1; 
+            background: #ffffff; 
+            color: var(--text); 
+            border: 1px solid #cbd5e1; 
+            padding: 10px; 
+            border-radius: 8px; 
+            font-size: 0.85rem; 
+            font-family: inherit; 
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 20px; 
+            border: none; 
+            border-radius: 12px; 
+            background: linear-gradient(45deg, var(--secondary), #4f46e5); 
+            color: white; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+        }
+
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            z-index: 1000; 
+            padding: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -61,21 +176,43 @@
     </div>
 
     <script>
-        // --- 1. CONFIGURAÇÕES E TRAVA DE ENTRADA ---
-        const MISSION_ID = '04';
-        const PREVIOUS_MISSION_ID = '03';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
+        // CONFIGURAÇÃO FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
+            measurementId: "G-3EKYW8RVBQ"
+        };
 
-        function checkAccess() {
-            if (!localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete')) {
-                alert("Acesso negado! Conclua a Missão " + PREVIOUS_MISSION_ID + " primeiro.");
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        // 1. Verificação de Acesso (Segurança)
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Verifica se concluiu a missão anterior no Firestore
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m03").get();
+            if (!prevDoc.exists) {
+                alert("Acesso negado! Conclua a Missão 03 primeiro.");
                 window.location.href = 'index.html';
             }
-        }
-        checkAccess();
+            analytics.logEvent('mission_start', { id: '04' });
+        });
 
-        // --- 2. VALIDAÇÃO ---
-        function checkMission() {
+        // 2. Validação e Salvamento
+        async function checkMission() {
+            const user = auth.currentUser;
+            if (!user) return;
+
             const checks = [
                 document.getElementById('art1').value === 'a',
                 document.getElementById('art2').value === 'an' && document.getElementById('pl2').value === 's',
@@ -90,39 +227,25 @@
             ];
 
             if(checks.every(c => c === true)) {
-                // Sucesso Visual
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                document.getElementById('main-card').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'flex';
+                try {
+                    // Salva no Firestore
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m04").set({
+                        concluido: true,
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString()
+                    });
 
-                // Salva Progresso
-                localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
-                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-
-                // Envia para Planilha
-                sendToSheet();
+                    analytics.logEvent('mission_complete', { id: '04' });
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    document.getElementById('main-card').style.display = 'none';
+                    document.getElementById('success-screen').style.display = 'flex';
+                } catch (error) {
+                    console.error("Erro ao salvar:", error);
+                    alert("Erro ao salvar progresso. Tente novamente.");
+                }
             } else {
+                analytics.logEvent('mission_error', { id: '04' });
                 alert("Alguma profissão está com o artigo ou o lugar errado. Verifique novamente!");
-            }
-        }
-
-        // --- 3. ENVIO PARA PLANILHA ---
-        function sendToSheet() {
-            // Tenta pegar de 'aluno_infinity' ou 'user_data' (compatibilidade)
-            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
-            
-            if (alunoData) {
-                fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({
-                        nome: alunoData.nome,
-                        turma: alunoData.turma || "Não informada",
-                        curso: alunoData.curso || "Não informado",
-                        email: alunoData.email,
-                        missao: "Missão 04 - Jobs and Places"
-                    })
-                });
             }
         }
     </script>

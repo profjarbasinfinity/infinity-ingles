@@ -4,43 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InFinity | Missão 11</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
+        
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .logo-img { width: 180px; margin: 20px 0; }
+
         .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 600px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
         .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
-        .quiz-item { margin-bottom: 40px; background: #161d3a; padding: 20px; border-radius: 15px; border: 1px solid #2a5ff044; }
-        .eng-phrase { display: block; font-weight: 800; color: #fff; margin-bottom: 15px; font-size: 1.1rem; text-align: center; background: #0a1025; padding: 10px; border-radius: 8px; }
-        .answer-zone { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 50px; padding: 12px; border: 2px solid var(--secondary); border-radius: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); }
-        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-        .word-btn { padding: 8px 14px; background: #ffffff; color: #000; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; border: none; transition: 0.2s; }
-        .btn-verify { width: 100%; padding: 20px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; font-size: 1.1rem; }
+
+        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; text-transform: uppercase; }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+
+        .quiz-item { margin-bottom: 30px; background: #161d3a; padding: 20px; border-radius: 15px; border: 1px solid #2a5ff044; }
+        .eng-phrase { display: block; font-weight: 800; color: #fff; margin-bottom: 15px; font-size: 1.1rem; text-align: center; background: #0a1025; padding: 10px; border-radius: 8px; border: 1px solid #1e293b; }
+
+        .answer-zone { 
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; 
+            min-height: 55px; padding: 12px; border: 2px dashed var(--secondary); 
+            border-radius: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3);
+        }
+        
+        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; }
+        
+        .word-btn { 
+            padding: 8px 14px; background: #ffffff; color: #000; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; font-size: 0.85rem; border: none;
+            transition: all 0.2s; box-shadow: 0 4px 0 #cbd5e1;
+        }
+        .word-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cbd5e1; }
+
+        .btn-verify { 
+            width: 100%; padding: 20px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: #000; font-weight: 800; cursor: pointer; margin-top: 10px; font-size: 1.1rem;
+        }
+
         #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; text-align: center; }
     </style>
 </head>
 <body>
+
     <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+
     <div class="card" id="quiz-card">
         <div class="video-wrapper">
             <iframe src="https://www.youtube-nocookie.com/embed/B88YDENvsxk" allowfullscreen></iframe>
         </div>
+
         <div class="task-title">MISSÃO 11: RETEXTUALIZAÇÃO</div>
-        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px;">Escolha apenas os termos que formam uma adaptação natural:</p>
+        <p class="instruction">Evite a tradução literal! Escolha apenas as palavras que formam uma adaptação natural para o português:</p>
+
         <div id="quiz-container"></div>
+
         <button class="btn-verify" onclick="verifyFinalMission()">FINALIZAR MISSÃO 11</button>
     </div>
+
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">🎓</h1>
         <h2 style="color: var(--primary); font-size: 2.2rem;">MISSÃO CONCLUÍDA!</h2>
+        <p style="max-width: 400px; color: #94a3b8;">Você provou que não é um robô. Suas adaptações foram naturais e profissionais.</p>
         <button class="btn-verify" style="width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         const missions = [
             { eng: "The old man lost his earpiece", pool: ['O', 'idoso', 'perdeu', 'seu', 'ponto', 'eletrônico', 'velho', 'homem', 'pedaço', 'de', 'orelha'], correct: 'O idoso perdeu seu ponto eletrônico' },
             { eng: "She is so free-spirited!", pool: ['Ela', 'é', 'tão', 'independente', 'livre', 'de', 'espírito'], correct: 'Ela é tão independente' },
@@ -49,6 +98,17 @@
             { eng: "The delivery guy bought his spare tire at the city market", pool: ['O', 'entregador', 'comprou', 'seu', 'estepe', 'na', 'feira', 'rapaz', 'entregas', 'pneu', 'sobressalente', 'mercado', 'cidade'], correct: 'O entregador comprou seu estepe na feira' }
         ];
 
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m10").get();
+            if (!prevDoc.exists) {
+                alert("Conclua a Missão 10 antes de acessar a 11!");
+                window.location.href = 'index.html';
+            } else {
+                init();
+            }
+        });
+
         function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
         function init() {
@@ -56,7 +116,14 @@
             missions.forEach((m, idx) => {
                 const div = document.createElement('div');
                 div.className = 'quiz-item';
-                div.innerHTML = `<span class="eng-phrase">${m.eng}</span><div class="answer-zone" id="ans-${idx}"></div><div class="word-pool" id="pool-${idx}">${shuffle([...m.pool]).map(w => `<button class="word-btn" onclick="toggleWord(this, ${idx})">${w}</button>`).join('')}</div>`;
+                const shuffledPool = shuffle([...m.pool]);
+                div.innerHTML = `
+                    <span class="eng-phrase">${m.eng}</span>
+                    <div class="answer-zone" id="ans-${idx}"></div>
+                    <div class="word-pool" id="pool-${idx}">
+                        ${shuffledPool.map(w => `<button class="word-btn" onclick="toggleWord(this, ${idx})">${w}</button>`).join('')}
+                    </div>
+                `;
                 container.appendChild(div);
             });
         }
@@ -64,35 +131,30 @@
         function toggleWord(btn, idx) {
             const ans = document.getElementById(`ans-${idx}`);
             const pool = document.getElementById(`pool-${idx}`);
-            if (btn.parentElement === pool) ans.appendChild(btn); else pool.appendChild(btn);
+            if (btn.parentElement === pool) ans.appendChild(btn);
+            else pool.appendChild(btn);
         }
 
-        function verifyFinalMission() {
+        async function verifyFinalMission() {
+            const user = auth.currentUser;
             let win = true;
             missions.forEach((m, idx) => {
                 const userText = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText).join(' ').toLowerCase();
                 if (userText !== m.correct.toLowerCase()) win = false;
             });
 
-            if (win) {
-                localStorage.setItem('m11_complete', 'true');
-                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
+            if (win && user) {
+                await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").set({
+                    concluido: true,
+                    data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
                 document.getElementById('quiz-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
-
-                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-                if (alunoData) {
-                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ nome: alunoData.nome, turma: alunoData.turma, curso: alunoData.curso, email: alunoData.email, missao: "InFinity | Missão 11" })
-                    });
-                }
             } else {
-                alert("Verifique se as traduções estão naturais e completas!");
+                alert("Atenção! Algumas traduções ainda contêm termos literais ou estão incompletas. Pense como um tradutor profissional!");
             }
         }
-        init();
     </script>
 </body>
 </html>

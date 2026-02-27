@@ -3,79 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InFinity | Login</title>
+    <title>InFinity | Login Educacional</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { 
-            --if-green: #2f9e41; 
-            --secondary: #2a5ff0; 
-            --bg: #f8fafc;      
-            --card-bg: #ffffff; 
-            --text: #1e293b;    
-            --border: #e2e8f0;
-        }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
-        .login-card { background: var(--card-bg); padding: 35px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; border: 1px solid var(--border); box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); background: #f1f5f9; color: var(--text); box-sizing: border-box; font-family: 'Poppins'; font-size: 0.9rem; outline: none; }
-        .btn-login { width: 100%; padding: 15px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--if-green), var(--secondary)); color: white; font-weight: 800; cursor: pointer; margin-top: 15px; font-size: 1rem; }
-        .guest-link { display: block; margin-top: 20px; color: #64748b; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
-        h2 { color: var(--if-green); margin-top: 0; font-weight: 800; }
-        label { display: block; text-align: left; font-size: 0.75rem; color: #64748b; margin-top: 10px; margin-left: 5px; font-weight: 600; }
+        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .logo { width: 180px; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 12px; box-sizing: border-box; font-family: inherit; }
+        .btn-login { width: 100%; padding: 15px; background: linear-gradient(45deg, var(--secondary), #4f46e5); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; transition: 0.3s; }
+        .btn-login:hover { opacity: 0.9; transform: translateY(-2px); }
+        .info { font-size: 0.8rem; color: #64748b; margin-top: 15px; }
     </style>
 </head>
 <body>
+
     <div class="login-card">
-        <img src="logo-horizontal.jpg" alt="InFinity" style="width: 160px; margin-bottom: 20px;">
-        <h2>Portal do Aluno</h2>
-        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">Identifique-se se você for aluno do Campus Patos</p>
+        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo">
+        <h2 style="color: var(--secondary);">Bem-vindo!</h2>
+        <p style="color: #64748b;">Acesse com seu e-mail de aluno.</p>
         
-        <input type="text" id="nome" placeholder="Nome Completo">
+        <input type="email" id="email" placeholder="Seu e-mail">
+        <input type="password" id="password" placeholder="Sua senha (mínimo 6 dígitos)">
         
-        <label>Seu curso:</label>
-        <select id="curso">
-            <option value="">Selecione o Curso</option>
-            <option value="Edificações">Edificações</option>
-            <option value="Eletrotécnica">Eletrotécnica</option>
-            <option value="Informática">Informática</option>
-            <option value="Segurança no Trabalho">Segurança no Trabalho</option>
-            <option value="Engenharia Civil">Engenharia Civil</option>
-        </select>
-
-        <label>Sua turma:</label>
-        <select id="turma">
-            <option value="">Selecione a Turma</option>
-            <option value="1° ano Integrado">1° ano Integrado</option>
-            <option value="2° ano Integrado">2° ano Integrado</option>
-            <option value="3° ano Integrado">3° ano Integrado</option>
-            <option value="Edif Subsequente">Edif Subsequente</option>
-            <option value="Info Subsequente">Info Subsequente</option>
-            <option value="Eletro Subsequente">Eletro Subsequente</option>
-        </select>
-
-        <input type="email" id="email" placeholder="Seu melhor e-mail">
-        <button class="btn-login" onclick="salvarAcesso()">COMEÇAR JORNADA</button>
-        <a href="index.html" class="guest-link" onclick="acessoVisitante()">Acessar como visitante ou ex-aluno</a>
+        <button class="btn-login" onclick="handleAuth()">ENTRAR NA PLATAFORMA</button>
+        
+        <p class="info">Seu progresso será salvo automaticamente na nuvem, permitindo que você estude em qualquer dispositivo.</p>
     </div>
 
     <script>
-        function salvarAcesso() {
-            const dados = {
-                nome: document.getElementById('nome').value,
-                curso: document.getElementById('curso').value,
-                turma: document.getElementById('turma').value,
-                email: document.getElementById('email').value
-            };
-            if(!dados.nome || !dados.curso || !dados.turma) {
-                alert("Preencha os campos para garantir seu bônus!");
+        // Configuração do seu Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
+            measurementId: "G-3EKYW8RVBQ"
+        };
+
+        // Inicializar
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const analytics = firebase.analytics();
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert("Por favor, preencha todos os campos.");
                 return;
             }
-            localStorage.setItem('aluno_infinity', JSON.stringify(dados));
-            window.location.href = "index.html";
-        }
-        function acessoVisitante() {
-            sessionStorage.setItem('visitante', 'true');
+
+            try {
+                // Tenta fazer login
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                console.log("Login realizado!");
+                analytics.logEvent('login', { method: 'email' });
+                window.location.href = "index.html";
+            } catch (error) {
+                // Se o usuário não existir, cria um novo (Cadastro automático)
+                if (error.code === 'auth/user-not-found') {
+                    try {
+                        await auth.createUserWithEmailAndPassword(email, password);
+                        analytics.logEvent('sign_up', { method: 'email' });
+                        alert("Conta criada com sucesso! Bem-vindo à InFinity.");
+                        window.location.href = "index.html";
+                    } catch (createError) {
+                        alert("Erro ao criar conta: " + createError.message);
+                    }
+                } else {
+                    alert("Erro no acesso: " + error.message);
+                }
+            }
         }
     </script>
 </body>
 </html>
-

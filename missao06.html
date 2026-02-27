@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InFinity | Missão 06</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         
@@ -12,12 +18,12 @@
             --if-green: #2f9e41; 
             --primary: #00df9a; 
             --secondary: #2a5ff0; 
-            --bg: #f8fafc;      /* Tema Claro */
-            --card-bg: #ffffff; /* Tema Claro */
-            --text: #1e293b;    /* Tema Claro */
-            --border: #e2e8f0;
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text: #1e293b; 
+            --border: #e2e8f0; 
         }
-        
+
         body { 
             font-family: 'Poppins', sans-serif; 
             background-color: var(--bg); 
@@ -37,7 +43,7 @@
 
         .video-wrapper { 
             position: relative; 
-            padding-bottom: 177.77%; /* Proporção vertical para Shorts */
+            padding-bottom: 177.77%; 
             height: 0; 
             border-radius: 16px; overflow: hidden; margin-bottom: 25px; 
             border: 2px solid var(--secondary);
@@ -117,7 +123,7 @@
         </div>
 
         <div class="task-title">MISSÃO 06: ELE OU ELA?</div>
-        <p class="instruction">Observe o pronome em destaque e determine o equivalente em inglês (He, She ou It):</p>
+        <p class="instruction">Determine o equivalente em inglês (He, She ou It) para o termo em destaque:</p>
 
         <div class="quiz-scroll">
             <div class="quiz-item">
@@ -171,7 +177,7 @@
             </div>
 
             <div class="quiz-item">
-                <p>f) A lua iluminou a casa onde a mulher estava e podíamos ouvi-<span class="highlight">la</span> de muito longe.</p>
+                <p>f) A lua iluminou a casa onde a mulher estava e podíamos ouvi-<span class="highlight">la</span> de longe.</p>
                 <select id="q6">
                     <option value="">Escolha...</option>
                     <option value="he">HE</option>
@@ -191,7 +197,7 @@
             </div>
 
             <div class="quiz-item">
-                <p>h) O homem pegou a chave para consertar o rádio mas <span class="highlight">ele</span> estava perdido sem saber o que fazer.</p>
+                <p>h) O homem pegou a chave para consertar o rádio mas <span class="highlight">ele</span> estava perdido.</p>
                 <select id="q8">
                     <option value="">Escolha...</option>
                     <option value="he">HE</option>
@@ -207,55 +213,5 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin:0;">🧠</h1>
         <h2 style="color: var(--secondary); font-size: 2rem;">Análise Perfeita!</h2>
-        <p style="color: #64748b;">Você dominou a regra do substantivo neutro (IT).</p>
-        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
-    </div>
-
-    <script>
-        function checkMission() {
-            const answers = {
-                q1: 'it', q2: 'it', q3: 'she', q4: 'she',
-                q5: 'it', q6: 'it', q7: 'it', q8: 'he'
-            };
-
-            let allCorrect = true;
-            for (let i = 1; i <= 8; i++) {
-                if (document.getElementById(`q${i}`).value !== answers[`q${i}`]) {
-                    allCorrect = false;
-                    break;
-                }
-            }
-
-            if(allCorrect) {
-                // 1. MARCAÇÕES DE PROGRESSO E TRAVA
-                localStorage.setItem('m06_complete', 'true');
-                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-
-                // 2. EFEITOS VISUAIS E CONFETE
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                document.getElementById('main-card').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'flex';
-
-                // 3. ENVIO PARA A PLANILHA GOOGLE
-                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-                if (alunoData) {
-                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: alunoData.nome,
-                            turma: alunoData.turma,
-                            curso: alunoData.curso,
-                            email: alunoData.email,
-                            missao: document.title 
-                        })
-                    });
-                }
-            } else {
-                alert("Alguma análise não está correta. Lembre-se: se refere a objeto ou situação abstrata (sem gênero biológico), use IT!");
-            }
-        }
-    </script>
-</body>
-</html>
+        <p style="color: #64748b;">Você dominou a regra do pronome neutro.</p>
+        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">

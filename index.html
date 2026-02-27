@@ -4,17 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InFinity | Mapa de Missões</title>
-    <link rel="manifest" href="manifest.json">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --bg: #f8fafc; --text: #1e293b; }
+        :root { --if-green: #2f9e41; --bg: #f8fafc; --text: #1e293b; --secondary: #2a5ff0; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
         
         .header { text-align: center; margin-bottom: 30px; }
-        .logo-main { width: 180px; margin-bottom: 15px; }
-        
-        #status-text { font-weight: 600; color: var(--if-green); margin-bottom: 20px; }
-        
+        .logo-main { width: 150px; margin-bottom: 10px; }
+        #status-text { font-weight: 600; color: var(--if-green); margin-bottom: 10px; }
+        #user-email { font-size: 0.8rem; color: #64748b; margin-bottom: 20px; }
+
         #grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); 
@@ -27,8 +32,12 @@
             display: flex; 
             flex-direction: column; 
             align-items: center; 
-            cursor: pointer; 
+            cursor: pointer;
+            opacity: 0.7; /* Missões não feitas ficam levemente apagadas */
+            transition: 0.3s;
         }
+
+        .mission-node.unlocked { opacity: 1; }
 
         .node-circle { 
             width: 60px; 
@@ -47,9 +56,12 @@
         .completed .node-circle { 
             background: var(--if-green); 
             color: white; 
+            box-shadow: 0 4px 15px rgba(47, 158, 65, 0.3);
         }
 
         .mission-label { font-size: 0.75rem; margin-top: 8px; font-weight: 600; color: #64748b; }
+        
+        .btn-logout { margin-top: 40px; background: none; border: none; color: #94a3b8; cursor: pointer; text-decoration: underline; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -57,88 +69,97 @@
     <div class="header">
         <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-main">
         <h1>InFinity Map</h1>
-        <div id="status-text">Carregando progresso...</div>
+        <div id="user-email">Carregando aluno...</div>
+        <div id="status-text">Sincronizando progresso...</div>
     </div>
 
     <div id="grid"></div>
 
-    <script>
-        // --- REGISTRO DO SERVICE WORKER ---
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Service Worker Ativo"))
-            .catch(err => console.log("Erro no SW:", err));
-        }
+    <button class="btn-logout" onclick="logout()">Sair da conta</button>
 
-        // 1. Verificação de Acesso
-        (function() {
-            const aluno = localStorage.getItem('aluno_infinity');
-            const visitante = sessionStorage.getItem('visitante');
-            
-            if (!aluno && !visitante) {
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
+            measurementId: "G-3EKYW8RVBQ"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
+
+        const totalMissions = 17; // Atualizado para 17 conforme solicitado
+        const grid = document.getElementById('grid');
+
+        // Monitor de Autenticação
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('user-email').innerText = `Aluno: ${user.email}`;
+                analytics.logEvent('page_view', { page_title: 'Mapa Principal' });
+                carregarMapa(user.uid);
+            } else {
                 window.location.href = "login.html";
             }
-        })();
+        });
 
-        // 2. Lógica do Mapa Atualizada para 17 Missões
-        const totalMissions = 17; // AQUI ESTÁ A ATUALIZAÇÃO
-        const grid = document.getElementById('grid');
-        let completedCount = 0;
+        async function carregarMapa(uid) {
+            grid.innerHTML = ""; // Limpa o grid para carregar
+            let completedCount = 0;
+            let ultimaDataConclusao = "";
 
-        if (grid) {
-            for (let i = 1; i <= totalMissions; i++) {
-                const missionId = i.toString().padStart(2, '0'); 
-                const isCompleted = localStorage.getItem(`m${missionId}_complete`) === 'true';
+            try {
+                // Busca todas as missões concluídas do aluno no Firestore
+                const querySnapshot = await db.collection("progresso").doc(uid).collection("concluidas").get();
+                const concluidas = {};
                 
-                if(isCompleted) completedCount++;
+                querySnapshot.forEach(doc => {
+                    concluidas[doc.id] = doc.data();
+                    completedCount++;
+                    // Pegar a data da última missão feita para a trava de 24h
+                    if(doc.data().data_formatada) ultimaDataConclusao = doc.data().data_formatada;
+                });
 
-                const node = document.createElement('div');
-                node.className = `mission-node ${isCompleted ? 'completed' : ''}`;
-                
-                node.onclick = function() {
-                    // Lógica de trava por dia (24h)
-                    const hoje = new Date().toLocaleDateString();
-                    const ultimaData = localStorage.getItem('ultima_conclusao');
+                for (let i = 1; i <= totalMissions; i++) {
+                    const mId = i.toString().padStart(2, '0');
+                    const missionKey = `m${mId}`;
+                    const isDone = concluidas[missionKey] ? true : false;
+                    
+                    const node = document.createElement('div');
+                    node.className = `mission-node unlocked ${isDone ? 'completed' : ''}`;
+                    
+                    node.onclick = () => {
+                        const hoje = new Date().toLocaleDateString();
+                        // Trava de 24h: Se já fez uma missão HOJE e esta não é uma missão já concluída (revisão)
+                        if (!isDone && ultimaDataConclusao === hoje) {
+                            alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã.");
+                        } else {
+                            window.location.href = `missao${mId}.html`;
+                        }
+                    };
 
-                    // Permitimos entrar se: já completou (revisão) OU se a última conclusão não foi hoje
-                    if (isCompleted || ultimaData !== hoje) {
-                        window.location.href = `missao${missionId}.html`;
-                    } else {
-                        alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã para o próximo desafio.");
-                    }
-                };
+                    node.innerHTML = `
+                        <div class="node-circle">${i}</div>
+                        <div class="mission-label">Missão ${mId}</div>
+                    `;
+                    grid.appendChild(node);
+                }
 
-                node.innerHTML = `
-                    <div class="node-circle">${i}</div>
-                    <div class="mission-label">Missão ${missionId}</div>
-                `;
-                
-                grid.appendChild(node);
-            }
+                document.getElementById('status-text').innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
 
-            const statusLabel = document.getElementById('status-text');
-            if (statusLabel) {
-                statusLabel.innerText = `Progresso: ${completedCount} de ${totalMissions} Missões`;
+            } catch (error) {
+                console.error("Erro ao carregar mapa:", error);
+                alert("Erro ao sincronizar dados.");
             }
         }
 
-        // --- LÓGICA DE INSTALAÇÃO DO APP (PWA) ---
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const dadosAluno = localStorage.getItem('aluno_infinity');
-
-            if (dadosAluno) {
-                setTimeout(() => {
-                    const instalar = confirm("Olá, aluno InFinity! Deseja instalar o aplicativo na sua tela inicial?");
-                    if (instalar) {
-                        deferredPrompt.prompt();
-                        deferredPrompt = null;
-                    }
-                }, 3000);
-            }
-        });
+        function logout() {
+            auth.signOut().then(() => window.location.href = "login.html");
+        }
     </script>
 </body>
 </html>

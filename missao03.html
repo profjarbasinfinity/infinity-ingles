@@ -4,57 +4,183 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InFinity | Missão 03</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; --border: #1e293b; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--card-bg); border-radius: 24px; padding: 24px; width: 100%; max-width: 480px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 2px solid var(--secondary); background: #000; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .task-title { color: var(--primary); font-weight: 800; margin-bottom: 8px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
-        .task-title::before { content: ''; width: 6px; height: 24px; background: var(--if-green); border-radius: 3px; }
-        .quiz-scroll { max-height: 400px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        
+        /* TEMA ESCURO PARA MISSÕES ÍMPARES */
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #050816; 
+            --card-bg: #101630; 
+            --text: #ffffff; 
+            --border: #1e293b; 
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 24px; 
+            width: 100%; 
+            max-width: 480px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.77%; 
+            height: 0; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            border: 2px solid var(--secondary); 
+            background: #000; 
+        }
+
+        .video-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+        .task-title { 
+            color: var(--primary); 
+            font-weight: 800; 
+            margin-bottom: 8px; 
+            font-size: 1.2rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .task-title::before { 
+            content: ''; 
+            width: 6px; 
+            height: 24px; 
+            background: var(--if-green); 
+            border-radius: 3px; 
+        }
+
+        .quiz-scroll { 
+            max-height: 400px; 
+            overflow-y: auto; 
+            padding-right: 10px; 
+            margin-bottom: 20px; 
+        }
+
         .quiz-scroll::-webkit-scrollbar { width: 4px; }
         .quiz-scroll::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
-        .quiz-item { margin-bottom: 12px; background: #161d3a; padding: 14px; border-radius: 12px; border: 1px solid var(--border); font-size: 1rem; color: #ffffff; text-align: left; }
-        select { background: #0a1025; color: var(--primary); border: 1px solid var(--secondary); padding: 4px 8px; border-radius: 8px; font-weight: 700; outline: none; }
-        .btn { width: 100%; padding: 20px; border: none; border-radius: 16px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+
+        .quiz-item { 
+            margin-bottom: 12px; 
+            background: #161d3a; 
+            padding: 14px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+            font-size: 1rem; 
+            color: #ffffff; 
+            text-align: left; 
+        }
+
+        select { 
+            background: #0a1025; 
+            color: var(--primary); 
+            border: 1px solid var(--secondary); 
+            padding: 4px 8px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            outline: none; 
+            font-family: inherit;
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 20px; 
+            border: none; 
+            border-radius: 16px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: #000; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+        }
+
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            z-index: 1000; 
+            padding: 20px; 
+        }
     </style>
 </head>
 <body>
+
     <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width:180px; margin-bottom:20px;">
+    
     <div class="card" id="main-card">
-        <div class="video-wrapper"><iframe src="https://www.youtube-nocookie.com/embed/inHUvOsSeXU" allowfullscreen></iframe></div>
+        <div class="video-wrapper">
+            <iframe src="https://www.youtube-nocookie.com/embed/inHUvOsSeXU" allowfullscreen></iframe>
+        </div>
+        
         <div class="task-title">MISSÃO 03: ARTIGOS</div>
         <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 20px;">Complete com <b>A</b> ou <b>AN</b>:</p>
+        
         <div class="quiz-scroll" id="quiz-list"></div>
+        
         <button class="btn" onclick="checkMission()">CONCLUIR MISSÃO 03</button>
     </div>
-    <div id="success-screen"><h1>🎯</h1><h2 style="color: var(--primary);">Perfeito!</h2><p>Missão 03 completa.</p><button class="btn" style="max-width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button></div>
+
+    <div id="success-screen">
+        <h1>🎯</h1>
+        <h2 style="color: var(--primary);">Perfeito!</h2>
+        <p>Seu progresso na Missão 03 foi salvo com sucesso.</p>
+        <button class="btn" style="max-width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
 
     <script>
-        const MISSION_ID = '03';
-        const PREVIOUS_MISSION_ID = '02';
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
+            measurementId: "G-3EKYW8RVBQ"
+        };
 
-        function checkAccess() {
-            const completedPrev = localStorage.getItem('m' + PREVIOUS_MISSION_ID + '_complete');
-            const lastMissionDate = localStorage.getItem('last_mission_date');
-            const now = new Date().getTime();
-            if (!completedPrev) { alert("Conclua a Missão 02 primeiro!"); window.location.href = 'index.html'; return; }
-            if (lastMissionDate && !localStorage.getItem('m' + MISSION_ID + '_complete')) {
-                const diff = now - parseInt(lastMissionDate);
-                const waitTime = 24 * 60 * 60 * 1000;
-                if (diff < waitTime) {
-                    const hours = Math.floor((waitTime - diff) / (1000 * 60 * 60));
-                    alert(`Don't rush! A Missão 03 abre em ${hours} horas.`);
-                    window.location.href = 'index.html';
-                }
-            }
-        }
-        checkAccess();
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const analytics = firebase.analytics();
 
         const questions = [
             { t: "Mary used ___ calculator.", a: "a" }, { t: "Carlos was involved in ___ accident.", a: "an" },
@@ -67,34 +193,53 @@
             { t: "I ate ___ exotic fruit.", a: "an" }
         ];
 
-        const container = document.getElementById('quiz-list');
-        questions.forEach((q, i) => {
-            const div = document.createElement('div');
-            div.className = 'quiz-item';
-            const part = q.t.split("___");
-            div.innerHTML = `${i+1}. ${part[0]} <select id="ans${i}"><option value="">?</option><option value="a">A</option><option value="an">AN</option></select> ${part[1]}`;
-            container.appendChild(div);
+        // Proteção e Inicialização
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                analytics.logEvent('mission_start', { id: '03' });
+                renderQuiz();
+            }
         });
 
-        function checkMission() {
-            let correct = 0;
-            questions.forEach((q, i) => { if(document.getElementById('ans'+i).value === q.a) correct++; });
-            if (correct === questions.length) {
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                document.getElementById('main-card').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'flex';
-                localStorage.setItem('m' + MISSION_ID + '_complete', 'true');
-                localStorage.setItem('last_mission_date', new Date().getTime().toString());
-                sendToSheet();
-            } else { alert("Revise suas respostas!"); }
+        function renderQuiz() {
+            const container = document.getElementById('quiz-list');
+            container.innerHTML = "";
+            questions.forEach((q, i) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-item';
+                const part = q.t.split("___");
+                div.innerHTML = `${i+1}. ${part[0]} <select id="ans${i}"><option value="">?</option><option value="a">A</option><option value="an">AN</option></select> ${part[1]}`;
+                container.appendChild(div);
+            });
         }
 
-        function sendToSheet() {
-            const alunoData = JSON.parse(localStorage.getItem('aluno_infinity')) || JSON.parse(localStorage.getItem('user_data'));
-            if (alunoData) {
-                fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({
-                    nome: alunoData.nome, email: alunoData.email, missao: "Missão 03 - Artigos (A/An)"
-                })});
+        async function checkMission() {
+            const user = auth.currentUser;
+            let correct = 0;
+            questions.forEach((q, i) => { 
+                if(document.getElementById('ans'+i).value === q.a) correct++; 
+            });
+
+            if (correct === questions.length) {
+                try {
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m03").set({
+                        concluido: true,
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString()
+                    });
+
+                    analytics.logEvent('mission_complete', { id: '03' });
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    document.getElementById('main-card').style.display = 'none';
+                    document.getElementById('success-screen').style.display = 'flex';
+                } catch (error) {
+                    alert("Erro ao salvar progresso.");
+                }
+            } else {
+                analytics.logEvent('mission_error', { id: '03', score: correct });
+                alert("Don't give up! Revise as respostas. Faltam alguns artigos corretamente preenchidos.");
             }
         }
     </script>

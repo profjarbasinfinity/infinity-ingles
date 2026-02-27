@@ -13,17 +13,111 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #f8fafc; --card-bg: #ffffff; --text: #1e293b; --border: #e2e8f0; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 480px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .video-wrapper { position: relative; padding-bottom: 177.77%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .task-title { color: var(--secondary); font-weight: 800; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; }
-        .quiz-item { margin-bottom: 15px; background: #f1f5f9; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+        
+        /* TEMA CLARO PARA MISSÕES PARES */
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #f8fafc;        /* Fundo Claro */
+            --card-bg: #ffffff;   /* Card Branco */
+            --text: #1e293b;      /* Texto Escuro */
+            --border: #e2e8f0; 
+        }
+
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 20px; 
+            width: 100%; 
+            max-width: 480px; 
+            border: 1px solid var(--border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 177.77%; /* Formato Vertical Shorts/Reels */
+            height: 0; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            margin-bottom: 25px; 
+            background: #000; 
+            border: 2px solid var(--secondary); 
+        }
+
+        .video-wrapper iframe { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+
+        .task-title { 
+            color: var(--secondary); 
+            font-weight: 800; 
+            margin-bottom: 10px; 
+            border-left: 4px solid var(--if-green); 
+            padding-left: 10px; 
+        }
+
+        .quiz-item { 
+            margin-bottom: 15px; 
+            background: #f1f5f9; 
+            padding: 15px; 
+            border-radius: 12px; 
+            border: 1px solid var(--border); 
+        }
+
         .quiz-item p { margin: 0 0 10px 0; font-weight: 600; font-size: 0.9rem; }
-        select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-family: inherit; }
-        .btn { width: 100%; padding: 20px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--secondary), #4f46e5); color: white; font-weight: 800; cursor: pointer; font-size: 1.1rem; }
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1000; padding: 20px; }
+
+        select { 
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 8px; 
+            border: 1px solid #cbd5e1; 
+            font-family: inherit; 
+            background: white;
+            color: var(--text);
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 20px; 
+            border: none; 
+            border-radius: 12px; 
+            background: linear-gradient(45deg, var(--secondary), #4f46e5); 
+            color: white; 
+            font-weight: 800; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+        }
+
+        #success-screen { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            z-index: 1000; 
+            padding: 20px; 
+        }
     </style>
 </head>
 <body>
@@ -85,40 +179,28 @@
         const db = firebase.firestore();
         const analytics = firebase.analytics();
 
-        // 1. Verificação de Acesso (Segurança)
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
-
-            // Verifica se concluiu a missão anterior no banco de dados
-            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m01").get();
-            if (!prevDoc.exists) {
-                alert("Opa! Você precisa concluir a Missão 01 antes desta.");
-                window.location.href = 'index.html';
-            }
+            // Log de início de missão no Analytics
             analytics.logEvent('mission_start', { id: '02' });
         });
 
         async function checkMission() {
             const user = auth.currentUser;
-            const answers = {
-                q1: document.getElementById('q1').value,
-                q2: document.getElementById('q2').value,
-                q3: document.getElementById('q3').value,
-                q4: document.getElementById('q4').value,
-                q5: document.getElementById('q5').value,
-                a1: document.getElementById('a1').value,
-                a2: document.getElementById('a2').value
-            };
+            if (!user) return;
 
-            const isCorrect = answers.q1 === 'r' && answers.q2 === 'r' && 
-                              answers.q3 === 'r' && answers.q4 === 'r' && 
-                              answers.q5 === 'r' && answers.a1 === 'p' && 
-                              answers.a2 === 'l';
+            const q1 = document.getElementById('q1').value;
+            const q2 = document.getElementById('q2').value;
+            const q3 = document.getElementById('q3').value;
+            const q4 = document.getElementById('q4').value;
+            const q5 = document.getElementById('q5').value;
+            const a1 = document.getElementById('a1').value;
+            const a2 = document.getElementById('a2').value;
 
-            if (isCorrect) {
+            if (q1 === 'r' && q2 === 'r' && q3 === 'r' && q4 === 'r' && q5 === 'r' && a1 === 'p' && a2 === 'l') {
                 try {
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m02").set({
                         concluido: true,
@@ -131,12 +213,11 @@
                     document.getElementById('main-card').style.display = 'none';
                     document.getElementById('success-screen').style.display = 'flex';
                 } catch (error) {
-                    console.error("Erro ao salvar:", error);
-                    alert("Erro de conexão. Tente novamente.");
+                    alert("Erro ao salvar progresso. Tente novamente.");
                 }
             } else {
-                analytics.logEvent('mission_error', { id: '02', error_type: 'wrong_answer' });
-                alert("Alguma resposta está incorreta. Revise o vídeo!");
+                analytics.logEvent('mission_error', { id: '02' });
+                alert("Ops! Alguma resposta está incorreta. Revise o vídeo!");
             }
         }
     </script>

@@ -4,19 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>InFinity | Missão 09</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
         
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .logo-img { width: 180px; margin: 20px 0; }
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #050816; 
+            --card-bg: #101630; 
+            --text: #ffffff; 
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
 
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 550px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--secondary); background: #000; }
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 20px; 
+            width: 100%; max-width: 550px; 
+            border: 1px solid #1e293b; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            border-radius: 12px; overflow: hidden; margin-bottom: 25px; 
+            border: 1px solid var(--secondary); background: #000; 
+        }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; text-transform: uppercase; }
+        .task-title { 
+            color: var(--primary); font-weight: 600; margin-bottom: 10px; 
+            border-left: 4px solid var(--if-green); padding-left: 10px; 
+            text-transform: uppercase; 
+        }
         .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
 
         .quiz-scroll-area { max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
@@ -34,14 +70,24 @@
             cursor: pointer; font-weight: 600; font-size: 0.85rem; user-select: none;
             transition: 0.2s; border: none; box-shadow: 0 4px 0 #cbd5e1;
         }
-        .btn-check { width: 100%; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; }
+        .word-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cbd5e1; }
+
+        .btn-check { 
+            width: 100%; padding: 18px; border: none; border-radius: 12px; 
+            background: linear-gradient(45deg, var(--primary), var(--secondary)); 
+            color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; 
+        }
         
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; text-align: center; }
+        #success-screen { 
+            display: none; position: fixed; inset: 0; background: var(--bg); 
+            flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 1000; padding: 20px; text-align: center; 
+        }
     </style>
 </head>
 <body>
 
-    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width: 180px; margin: 20px 0;">
 
     <div class="card" id="quiz-card">
         <div class="video-wrapper">
@@ -49,7 +95,7 @@
         </div>
 
         <div class="task-title">MISSÃO 09: REORDENAÇÃO</div>
-        <p class="instruction">Toque nas palavras na ordem correta para montar a tradução natural (lembre-se da regra dos adjetivos!):</p>
+        <p class="instruction">Toque nas palavras para montar a tradução natural (lembre-se da regra dos adjetivos!):</p>
 
         <div class="quiz-scroll-area" id="quiz-container"></div>
 
@@ -59,11 +105,24 @@
     <div id="success-screen">
         <h1 style="font-size: 5rem; margin: 0;">🔄</h1>
         <h2 style="color: var(--primary); font-size: 2rem;">ESTRUTURA DOMINADA!</h2>
-        <p>Progresso salvo automaticamente na sua trilha.</p>
+        <p>Sua análise sintática está ficando afiada.</p>
         <button class="btn-check" style="width:260px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         const missions = [
             { id: 'a', eng: 'a) A very important decision', words: ['Uma', 'decisão', 'muito', 'importante'], correct: 'Uma decisão muito importante' },
             { id: 'b', eng: 'b) Gross Domestic Product', words: ['Produto', 'Interno', 'Bruto'], correct: 'Produto Interno Bruto' },
@@ -73,14 +132,23 @@
             { id: 'f', eng: "f) Sergeant Pepper's lonely hearts club band", words: ['Banda', 'Clube', 'dos', 'corações', 'solitários', 'do', 'sargento', 'Pimenta'], correct: 'Banda Clube dos corações solitários do sargento Pimenta' }
         ];
 
-        function shuffle(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        // Verificação de Acesso
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
             }
-            return array;
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m08").get();
+            if (!prevDoc.exists) {
+                alert("Conclua a Missão 08 primeiro!");
+                window.location.href = 'index.html';
+            } else {
+                initQuiz();
+            }
+        });
+
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
         }
 
         function initQuiz() {
@@ -111,7 +179,10 @@
             }
         }
 
-        function verifyAll() {
+        async function verifyAll() {
+            const user = auth.currentUser;
+            if (!user) return;
+
             let allCorrect = true;
             missions.forEach((m, idx) => {
                 const userWords = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText);
@@ -122,37 +193,22 @@
             });
 
             if (allCorrect) {
-                // 1. MARCAR LOCALMENTE
-                localStorage.setItem('m09_complete', 'true');
-                localStorage.setItem('ultima_conclusao', new Date().toLocaleDateString());
-
-                // 2. EFEITOS VISUAIS
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-                document.getElementById('quiz-card').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'flex';
-
-                // 3. ENVIO PARA PLANILHA
-                const alunoData = JSON.parse(localStorage.getItem('aluno_infinity'));
-                if (alunoData) {
-                    fetch("https://script.google.com/macros/s/AKfycbziLkmSI-S9wRb2lb8PTjyU0L4naMQfbtor0a3MGdkHaULM_CvwTxkQDq3ojgrqAnDX/exec", {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            nome: alunoData.nome,
-                            turma: alunoData.turma,
-                            curso: alunoData.curso,
-                            email: alunoData.email,
-                            missao: "InFinity | Missão 09"
-                        })
+                try {
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m09").set({
+                        concluido: true,
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
                     });
+
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                    document.getElementById('quiz-card').style.display = 'none';
+                    document.getElementById('success-screen').style.display = 'flex';
+                } catch (e) {
+                    alert("Erro ao salvar progresso.");
                 }
             } else {
-                alert("Alguma frase ainda não está na ordem correta. Revise a posição dos adjetivos!");
+                alert("Alguma frase está incorreta. Lembre-se: em português dizemos 'Carro Azul', mas em inglês a estrutura mental é 'Azul Carro'!");
             }
         }
-
-        initQuiz();
     </script>
 </body>
 </html>

@@ -21,12 +21,13 @@
 
         .input-group { text-align: left; margin-bottom: 15px; }
         label { font-size: 0.7rem; font-weight: 700; color: var(--secondary); margin-left: 5px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: 'Poppins'; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: 'Poppins'; background: #f8fafc; }
 
         #registration-fields { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .btn-auth { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; }
+        .btn-auth { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; transition: 0.3s; }
+        .btn-auth:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .toggle-link { margin-top: 15px; display: block; font-size: 0.8rem; color: var(--secondary); cursor: pointer; text-decoration: underline; }
     </style>
 </head>
@@ -48,31 +49,27 @@
             <div class="input-group">
                 <input type="text" id="nomeCompleto" placeholder="Nome Completo">
             </div>
+            
             <div class="input-group">
-                <label>Modalidade</label>
-                <select id="modalidade">
-                    <option value="Integrado">Integrado</option>
-                    <option value="Subsequente">Subsequente</option>
-                    <option value="Superior">Superior</option>
-                    <option value="Externo">Visitante</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label>Curso</label>
+                <label>Curso / Vínculo</label>
                 <select id="curso">
                     <option value="Informática">Informática</option>
-                    <option value="Eletrotécnica">Eletrotécnica</option>
                     <option value="Edificações">Edificações</option>
-                    <option value="Segurança">Segurança no Trabalho</option>
-                    <option value="Engenharia">Engenharia Civil</option>
+                    <option value="Eletrotécnica">Eletrotécnica</option>
+                    <option value="Segurança no Trabalho">Segurança no Trabalho</option>
+                    <option value="Engenharia Civil">Engenharia Civil</option>
+                    <option value="Usuário Externo">Usuário Externo (Visitante)</option>
                 </select>
             </div>
+
             <div class="input-group">
-                <label>Ano/Período</label>
+                <label>Ano ou Período / Turma</label>
                 <select id="periodo">
-                    <option value="1">1º Ano / Período</option>
-                    <option value="2">2º Ano / Período</option>
-                    <option value="3">3º Ano / Período</option>
+                    <option value="1º Ano A">1º Ano A</option>
+                    <option value="1º Ano B">1º Ano B</option>
+                    <option value="2º Ano">2º Ano</option>
+                    <option value="1º Período">1º Período</option>
+                    <option value="Turma Única">Turma Única</option>
                 </select>
             </div>
         </div>
@@ -109,27 +106,36 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
+            if (!email || password.length < 6) {
+                alert("Por favor, insira um e-mail válido e uma senha de pelo menos 6 caracteres.");
+                return;
+            }
+
             if (!isRegistering) {
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
                     window.location.href = "index.html";
-                } catch (e) { alert("Erro: Usuário não encontrado ou senha incorreta."); }
+                } catch (e) { 
+                    alert("Erro: E-mail ou senha incorretos. Se ainda não tem conta, clique em 'Cadastre-se'."); 
+                }
             } else {
-                const nome = document.getElementById('nomeCompleto').value;
-                if (!nome) { alert("Preencha seu nome!"); return; }
+                const nome = document.getElementById('nomeCompleto').value.trim();
+                if (!nome) { alert("Por favor, preencha seu nome completo."); return; }
                 
                 try {
                     const res = await auth.createUserWithEmailAndPassword(email, password);
                     await db.collection("usuarios").doc(res.user.uid).set({
                         nome: nome,
                         email: email,
-                        modalidade: document.getElementById('modalidade').value,
                         curso: document.getElementById('curso').value,
                         periodo: document.getElementById('periodo').value,
-                        isAdmin: email === "jarbas.lima@ifpb.edu.br"
+                        isAdmin: email === "jarbas.lima@ifpb.edu.br",
+                        dataCadastro: firebase.firestore.FieldValue.serverTimestamp()
                     });
                     window.location.href = "index.html";
-                } catch (e) { alert("Erro ao cadastrar: " + e.message); }
+                } catch (e) { 
+                    alert("Erro ao cadastrar: " + e.message); 
+                }
             }
         }
     </script>

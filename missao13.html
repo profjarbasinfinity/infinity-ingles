@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 13</title>
+    <title>InFinity | Missão 13 - TH Master</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -18,6 +18,7 @@
             --primary: #00df9a;
             --secondary: #2a5ff0;
             --card-bg: #111827;
+            --text-gray: #94a3b8;
         }
 
         body {
@@ -40,90 +41,104 @@
             border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .mission-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        .mission-header { text-align: center; margin-bottom: 20px; }
         .mission-header h2 { color: var(--primary); margin: 0; font-size: 1.5rem; }
-        .mission-header p { font-size: 0.8rem; color: #94a3b8; }
+        
+        /* Estágios da Missão */
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.5s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%; /* Proporção 16:9 */
-            height: 0;
-            overflow: hidden;
-            border-radius: 16px;
-            background: #000;
-            margin-bottom: 25px;
+            position: relative; padding-bottom: 56.25%; height: 0;
+            overflow: hidden; border-radius: 16px; background: #000; margin-bottom: 20px;
         }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
 
-        .video-wrapper iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border: none;
-        }
-
-        .quiz-section { margin-top: 20px; }
         .question { font-weight: 600; margin-bottom: 15px; font-size: 1rem; line-height: 1.4; }
 
         .option {
             background: rgba(255,255,255,0.05);
             border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
+            border-radius: 12px; padding: 15px; margin-bottom: 10px;
+            cursor: pointer; transition: 0.3s;
         }
-
         .option:hover { background: rgba(42, 95, 240, 0.1); border-color: var(--secondary); }
         .option.correct { background: rgba(0, 223, 154, 0.2); border-color: var(--primary); }
         .option.wrong { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
 
-        .btn-finish {
+        /* Speaking Area */
+        .phrase-box { 
+            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 16px; 
+            margin: 20px 0; font-size: 1.3rem; font-weight: 600; 
+            color: var(--primary); border: 2px dashed var(--secondary); text-align: center;
+        }
+
+        .btn-mic { 
+            display: block; width: 80px; height: 80px; border-radius: 50%; border: none;
+            background: var(--secondary); color: white; font-size: 2rem;
+            margin: 0 auto; cursor: pointer; transition: 0.3s; 
+        }
+        .btn-mic.recording { background: #ef4444; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .status-msg { text-align: center; margin-top: 15px; font-weight: 600; min-height: 24px; }
+        .transcript { text-align: center; font-style: italic; color: var(--text-gray); font-size: 0.9rem; margin-top: 5px; }
+
+        .btn-action {
             display: none; width: 100%; padding: 18px; border: none; border-radius: 12px;
             background: var(--primary); color: #050816; font-weight: 800;
             cursor: pointer; font-size: 1rem; margin-top: 20px;
         }
 
-        #feedback { text-align: center; font-weight: 600; margin-top: 10px; min-height: 24px; }
+        #success-overlay {
+            display: none; position: fixed; inset: 0; background: var(--bg-color);
+            flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; text-align: center; padding: 20px;
+        }
     </style>
 </head>
 <body>
 
     <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
 
-    <div class="container">
+    <div class="container" id="main-container">
         <div class="mission-header">
-            <h2>Missão 13: Listening Master</h2>
-            <p>Assista ao vídeo e responda à pergunta abaixo.</p>
+            <h2>Missão 13: TH Master</h2>
+            <p id="step-indicator">Etapa 1 de 2: Listening & Quiz</p>
         </div>
 
-        <div class="video-wrapper">
-            <iframe src="https://www.youtube.com/embed/S_8_K8NREbI" allowfullscreen></iframe>
-        </div>
-
-        <div class="quiz-section">
-            <p class="question">De acordo com a explicação técnica apresentada, qual é o movimento físico essencial para produzir o som do "TH" (surdo) em inglês?</p>
+        <div id="step1" class="step active">
+            <div class="video-wrapper">
+                <iframe src="https://www.youtube.com/embed/S_8_K8NREbI" allowfullscreen></iframe>
+            </div>
+            <p class="question">Qual é o movimento físico essencial para produzir o som do "TH" (surdo) em inglês?</p>
+            <div class="option" onclick="checkQuiz(this, false)">A) Tocar o céu da boca com a lateral da língua.</div>
+            <div class="option" onclick="checkQuiz(this, true)">B) Colocar a ponta da língua entre os dentes e soprar o ar.</div>
+            <div class="option" onclick="checkQuiz(this, false)">C) Manter a boca fechada e vibrar as cordas vocais.</div>
             
-            <div class="option" onclick="checkAnswer(this, false)">
-                A) Tocar o céu da boca com a lateral da língua.
-            </div>
-            <div class="option" onclick="checkAnswer(this, true)">
-                B) Colocar a ponta da língua entre os dentes e soprar o ar.
-            </div>
-            <div class="option" onclick="checkAnswer(this, false)">
-                C) Manter a boca fechada e vibrar as cordas vocais.
-            </div>
-            <div class="option" onclick="checkAnswer(this, false)">
-                D) Encostar a língua nos dentes inferiores e sugar o ar.
-            </div>
+            <div id="quiz-feedback" class="status-msg"></div>
+            <button id="to-step2" class="btn-action" onclick="goToStep2()">PRÓXIMA ETAPA: PRÁTICA 🎤</button>
         </div>
 
-        <div id="feedback"></div>
-        <button id="finish-btn" class="btn-finish" onclick="saveProgress()">CONCLUIR MISSÃO 13</button>
+        <div id="step2" class="step">
+            <p class="question">Agora é sua vez! Pronuncie a frase abaixo focando no som do "TH":</p>
+            <div class="phrase-box">I think that things will change.</div>
+            
+            <button class="btn-mic" id="mic-btn" onclick="startRecognition()">🎤</button>
+            <div id="speak-status" class="status-msg">Clique para falar</div>
+            <div id="transcript-text" class="transcript"></div>
+
+            <button id="finish-btn" class="btn-action" onclick="saveProgress()">CONCLUIR MISSÃO 13</button>
+        </div>
+    </div>
+
+    <div id="success-overlay">
+        <h1 style="font-size: 4rem; margin: 0;">🎯</h1>
+        <h2 style="color: var(--primary);">CONQUISTA DESBLOQUEADA!</h2>
+        <p>Você compreendeu a teoria e dominou a fala do 'TH'.</p>
+        <button class="btn-action" style="display: block; width: 220px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
@@ -139,61 +154,90 @@
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const adminEmail = "jarbas.lima@ifpb.edu.br";
 
-        // --- SEGURANÇA E MODO DEUS ---
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
-            
-            // MODALIDADE MESTRE: Professor Jarbas tem livre acesso
-            if (user.email === "jarbas.lima@ifpb.edu.br") {
-                console.log("Welcome, Professor. God Mode Active.");
-                return; 
-            }
+            if (user.email === adminEmail) return;
 
-            // Alunos: Verificam a Missão anterior (M12)
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m12").get();
             if (!prevDoc.exists) {
-                alert("Você precisa completar a Missão 12 primeiro!");
+                alert("Professor Jarbas avisa: Complete a Missão 12 primeiro!");
                 window.location.href = 'index.html';
             }
         });
 
         // --- LÓGICA DO QUIZ ---
-        let canAnswer = true;
-
-        function checkAnswer(element, isCorrect) {
-            if (!canAnswer) return;
-
-            const feedback = document.getElementById('feedback');
-            const options = document.querySelectorAll('.option');
-
+        function checkQuiz(element, isCorrect) {
+            const feedback = document.getElementById('quiz-feedback');
             if (isCorrect) {
-                canAnswer = false;
                 element.classList.add('correct');
-                feedback.innerText = "🎯 Resposta Correta!";
+                feedback.innerText = "🎯 Correto! Prepare-se para falar.";
                 feedback.style.color = "var(--primary)";
-                document.getElementById('finish-btn').style.display = 'block';
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.8 } });
+                document.getElementById('to-step2').style.display = 'block';
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 } });
             } else {
                 element.classList.add('wrong');
                 feedback.innerText = "❌ Tente novamente!";
                 feedback.style.color = "#ef4444";
-                setTimeout(() => {
-                    element.classList.remove('wrong');
-                    feedback.innerText = "";
-                }, 1500);
+                setTimeout(() => element.classList.remove('wrong'), 1000);
             }
+        }
+
+        function goToStep2() {
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('step-indicator').innerText = "Etapa 2 de 2: Speaking Practice";
+        }
+
+        // --- LÓGICA DE VOZ ---
+        const target = "i think that things will change";
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (!Speech) {
+            document.getElementById('speak-status').innerText = "Erro: Navegador não suporta voz.";
+        }
+
+        const recognition = Speech ? new Speech() : null;
+        if (recognition) {
+            recognition.lang = 'en-US';
+            recognition.onresult = (event) => {
+                const result = event.results[0][0].transcript.toLowerCase().replace(/[.,!]/g, "");
+                document.getElementById('mic-btn').classList.remove('recording');
+                document.getElementById('transcript-text').innerText = `Você disse: "${result}"`;
+
+                if (result.includes("think") && result.includes("things")) { // Verificação flexível para o TH
+                    document.getElementById('speak-status').innerText = "✅ Pronúncia Validada!";
+                    document.getElementById('speak-status').style.color = "var(--primary)";
+                    document.getElementById('finish-btn').style.display = 'block';
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                } else {
+                    document.getElementById('speak-status').innerText = "❌ Tente focar no som do 'TH'";
+                    document.getElementById('speak-status').style.color = "#ef4444";
+                }
+            };
+        }
+
+        function startRecognition() {
+            if (!recognition) return;
+            recognition.start();
+            document.getElementById('mic-btn').classList.add('recording');
+            document.getElementById('speak-status').innerText = "Ouvindo...";
         }
 
         async function saveProgress() {
             const user = auth.currentUser;
             if (user) {
-                await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m13").set({
-                    concluido: true,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                alert("Missão 13 Concluída com sucesso!");
-                window.location.href = 'index.html';
+                try {
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m13").set({
+                        concluido: true,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    document.getElementById('main-container').style.display = 'none';
+                    document.getElementById('success-overlay').style.display = 'flex';
+                } catch (e) {
+                    alert("Erro ao salvar progresso.");
+                }
             }
         }
     </script>

@@ -1,17 +1,22 @@
 {
-  "name": "InFinity English Platform",
   "short_name": "InFinity",
-  "start_url": "index.html",
-  "display": "standalone",
-  "background_color": "#050816",
-  "theme_color": "#050816",
-  "orientation": "portrait",
+  "name": "InFinity Inglês Acadêmico",
+  "description": "Plataforma de aprendizado de Inglês - Prof. Jarbas",
   "icons": [
     {
-      "src": "logo-horizontal.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "src": "logo-circulo-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo-circulo-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
-  ]
+  ],
+  "start_url": "index.html",
+  "background_color": "#050816",
+  "display": "standalone",
+  "scope": "./",
+  "theme_color": "#2a5ff0"
 }

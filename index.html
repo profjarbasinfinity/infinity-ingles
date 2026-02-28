@@ -33,7 +33,7 @@
             flex-direction: column; 
             align-items: center; 
             cursor: pointer;
-            opacity: 0.7; /* Missões não feitas ficam levemente apagadas */
+            opacity: 0.7; 
             transition: 0.3s;
         }
 
@@ -62,6 +62,9 @@
         .mission-label { font-size: 0.75rem; margin-top: 8px; font-weight: 600; color: #64748b; }
         
         .btn-logout { margin-top: 40px; background: none; border: none; color: #94a3b8; cursor: pointer; text-decoration: underline; font-size: 0.8rem; }
+        
+        /* Estilo especial para o Admin saber que está no Modo Deus */
+        .admin-badge { background: gold; color: black; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 800; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
@@ -70,6 +73,7 @@
         <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-main">
         <h1>InFinity Map</h1>
         <div id="user-email">Carregando aluno...</div>
+        <div id="admin-tag" class="admin-badge">MODO PROFESSOR</div>
         <div id="status-text">Sincronizando progresso...</div>
     </div>
 
@@ -93,34 +97,41 @@
         const db = firebase.firestore();
         const analytics = firebase.analytics();
 
-        const totalMissions = 17; // Atualizado para 17 conforme solicitado
+        const totalMissions = 17; 
         const grid = document.getElementById('grid');
+        const adminEmail = "jarbas.lima@ifpb.edu.br";
 
-        // Monitor de Autenticação
         auth.onAuthStateChanged(user => {
             if (user) {
+                const userEmail = user.email.toLowerCase().trim();
                 document.getElementById('user-email').innerText = `Aluno: ${user.email}`;
+                
+                // Mostrar Badge de Admin
+                if(userEmail === adminEmail) {
+                    document.getElementById('admin-tag').style.display = 'inline-block';
+                }
+
                 analytics.logEvent('page_view', { page_title: 'Mapa Principal' });
-                carregarMapa(user.uid);
+                carregarMapa(user);
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        async function carregarMapa(uid) {
-            grid.innerHTML = ""; // Limpa o grid para carregar
+        async function carregarMapa(user) {
+            grid.innerHTML = ""; 
             let completedCount = 0;
             let ultimaDataConclusao = "";
+            const userEmail = user.email.toLowerCase().trim();
 
             try {
-                // Busca todas as missões concluídas do aluno no Firestore
-                const querySnapshot = await db.collection("progresso").doc(uid).collection("concluidas").get();
+                // Busca progresso no Firestore
+                const querySnapshot = await db.collection("progresso").doc(user.uid).collection("concluidas").get();
                 const concluidas = {};
                 
                 querySnapshot.forEach(doc => {
                     concluidas[doc.id] = doc.data();
                     completedCount++;
-                    // Pegar a data da última missão feita para a trava de 24h
                     if(doc.data().data_formatada) ultimaDataConclusao = doc.data().data_formatada;
                 });
 
@@ -134,12 +145,20 @@
                     
                     node.onclick = () => {
                         const hoje = new Date().toLocaleDateString();
-                        // Trava de 24h: Se já fez uma missão HOJE e esta não é uma missão já concluída (revisão)
-                        if (!isDone && ultimaDataConclusao === hoje) {
-                            alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã.");
-                        } else {
-                            window.location.href = `missao${mId}.html`;
+                        const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+
+                        // --- LÓGICA DE TRAVA ---
+                        // Se NÃO for o professor E NÃO for uma missão já concluída...
+                        if (userEmail !== adminEmail && !isDone) {
+                            // Verifica se já fez uma missão hoje (Firestore ou LocalStorage)
+                            if (ultimaDataConclusao === hoje || lastLocal === hoje) {
+                                alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã.");
+                                return; // Bloqueia o clique
+                            }
                         }
+
+                        // Se passou pelo filtro acima (ou é professor), navega:
+                        window.location.href = `missao${mId}.html`;
                     };
 
                     node.innerHTML = `
@@ -163,4 +182,3 @@
     </script>
 </body>
 </html>
-

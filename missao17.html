@@ -3,13 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>InFinity | Missão 17</title>
+    <title>InFinity | Missão 17 - Present Simple</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; }
         
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: white; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .logo-img { width: 160px; margin: 15px; }
+
         .card { background: var(--card-bg); border-radius: 20px; padding: 25px; width: 100%; max-width: 600px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         
         .progress-container { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
@@ -26,37 +33,45 @@
 
         #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
         .btn-final { width: 100%; max-width: 300px; padding: 18px; border: none; border-radius: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: #000; font-weight: 800; cursor: pointer; margin-top: 20px; }
-        
-        .video-mini { width: 100%; border-radius: 12px; margin-bottom: 15px; border: 1px solid #2a5ff044; }
     </style>
 </head>
 <body>
 
-    <img src="logo-horizontal.jpg" alt="Logo" style="width:160px; margin: 15px;">
+    <img src="logo-horizontal.jpg" alt="Logo" class="logo-img">
 
     <div class="card" id="quiz-card">
         <div class="progress-container"><div id="progress-bar"></div></div>
         
-        <p style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Questão <span id="current-idx">1</span> de 16</p>
+        <p style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+            Questão <span id="current-idx">1</span> de 16
+        </p>
         
-        <div class="sentence-box" id="sentence-display">
-            </div>
-
-        <div class="options-grid" id="options-display">
-            </div>
+        <div class="sentence-box" id="sentence-display"></div>
+        <div class="options-grid" id="options-display"></div>
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 5rem;">🎮</h1>
+        <h1 style="font-size: 5rem; margin:0;">🎮</h1>
         <h2 style="color: var(--primary);">CONJUGAÇÃO LEVEL UP!</h2>
-        <p>Você dominou as variações de 3ª pessoa e os sujeitos do Present Simple.</p>
+        <p style="color: #94a3b8; max-width: 400px;">Você dominou as variações de 3ª pessoa e os sujeitos do Present Simple.</p>
         <button class="btn-final" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
-        const MISSION_ID = 17;
-        const PREVIOUS_MISSION_ID = 16;
-        const SCRIPT_URL = 'SUA_URL_DO_GOOGLE_APPS_SCRIPT_AQUI';
+        // --- CONFIGURAÇÃO FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const adminEmail = "jarbas.lima@ifpb.edu.br";
 
         const questions = [
             { s: "Social media platforms ___ algorithms to show content you like.", opts: ["use", "uses"], ans: "use" },
@@ -78,48 +93,61 @@
         ];
 
         let currentQ = 0;
-        let canClick = true;
+        let canClick = false;
 
-        function checkAccess() {
-            const lastDate = localStorage.getItem('last_mission_date');
-            const prevComplete = localStorage.getItem(`m${PREVIOUS_MISSION_ID}_complete`);
-            const now = new Date().getTime();
+        // --- CONTROLE DE ACESSO ---
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            
+            const userEmail = user.email.toLowerCase().trim();
+            if (userEmail === adminEmail) { startQuiz(); return; }
 
-            if (!prevComplete) {
-                alert(`Acesso bloqueado! Conclua a Missão ${PREVIOUS_MISSION_ID} primeiro.`);
-                window.location.href = 'index.html'; return false;
+            // Verifica se a anterior (M16) está completa
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m16").get();
+            if (!prevDoc.exists) {
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 16 primeiro.");
+                window.location.href = 'index.html';
+                return;
             }
 
-            if (lastDate && !localStorage.getItem(`m${MISSION_ID}_complete`)) {
-                const diff = now - parseInt(lastDate);
-                if (diff < 24 * 60 * 60 * 1000) {
-                    const hours = Math.ceil((24 * 60 * 60 * 1000 - diff) / (3600000));
-                    alert(`Descanse a mente! Volte em ${hours} horas para o próximo desafio.`);
-                    window.location.href = 'index.html'; return false;
-                }
+            // Trava de 24h
+            const today = new Date().toLocaleDateString();
+            const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastLocal === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã.");
+                window.location.href = 'index.html';
+                return;
             }
-            return true;
+
+            startQuiz();
+        });
+
+        function startQuiz() {
+            canClick = true;
+            loadQuestion();
         }
 
         function loadQuestion() {
-            canClick = true;
             const q = questions[currentQ];
             document.getElementById('current-idx').innerText = currentQ + 1;
-            document.getElementById('progress-bar').style.width = `${((currentQ) / questions.length) * 100}%`;
+            document.getElementById('progress-bar').style.width = `${(currentQ / questions.length) * 100}%`;
             
-            // Renderiza a sentença com o espaço vazio
             document.getElementById('sentence-display').innerHTML = q.s.replace("___", "<span class='highlight'>_______</span>");
             
-            // Renderiza as opções
             const optArea = document.getElementById('options-display');
             optArea.innerHTML = '';
-            q.opts.forEach(opt => {
+            
+            // Embaralhar opções para não ficarem sempre na mesma ordem
+            const shuffledOpts = [...q.opts].sort(() => Math.random() - 0.5);
+            
+            shuffledOpts.forEach(opt => {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn';
                 btn.innerText = opt;
                 btn.onclick = () => handleChoice(btn, opt);
                 optArea.appendChild(btn);
             });
+            canClick = true;
         }
 
         function handleChoice(btn, choice) {
@@ -138,7 +166,7 @@
                     } else {
                         finishMission();
                     }
-                }, 1000);
+                }, 800);
             } else {
                 btn.classList.add('wrong');
                 setTimeout(() => btn.classList.remove('wrong'), 500);
@@ -146,23 +174,31 @@
         }
 
         async function finishMission() {
+            const user = auth.currentUser;
+            if (!user) return;
+
             document.getElementById('progress-bar').style.width = '100%';
-            localStorage.setItem(`m${MISSION_ID}_complete`, 'true');
-            localStorage.setItem('last_mission_date', new Date().getTime().toString());
             
-            // Envio Sheet
-            const userData = JSON.parse(localStorage.getItem('user_data') || '{}');
-            fetch(SCRIPT_URL, { 
-                method: 'POST', mode: 'no-cors', 
-                body: JSON.stringify({ nome: userData.nome, email: userData.email, missao: MISSION_ID, status: 'Concluído' }) 
-            });
+            // Trava local para alunos
+            if (user.email.toLowerCase().trim() !== adminEmail) {
+                localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+            }
 
-            confetti({ particleCount: 200, spread: 100 });
-            document.getElementById('quiz-card').style.display = 'none';
-            document.getElementById('success-screen').style.display = 'flex';
+            try {
+                await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m17").set({
+                    concluido: true,
+                    data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                    data_formatada: new Date().toLocaleDateString()
+                });
+
+                confetti({ particleCount: 200, spread: 100 });
+                document.getElementById('quiz-card').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'flex';
+            } catch (e) {
+                console.error(e);
+                alert("Erro ao salvar progresso no Firebase.");
+            }
         }
-
-        if (checkAccess()) loadQuestion();
     </script>
 </body>
 </html>

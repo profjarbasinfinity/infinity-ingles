@@ -119,7 +119,7 @@
             appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
@@ -132,19 +132,34 @@
             { id: 'f', eng: "f) Sergeant Pepper's lonely hearts club band", words: ['Banda', 'Clube', 'dos', 'corações', 'solitários', 'do', 'sargento', 'Pimenta'], correct: 'Banda Clube dos corações solitários do sargento Pimenta' }
         ];
 
-        // Verificação de Acesso
+        // --- LÓGICA DE ACESSO ---
         auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const userEmail = user.email.toLowerCase().trim();
+            const adminEmail = "jarbas.lima@ifpb.edu.br";
+
+            if (userEmail === adminEmail) { initQuiz(); return; }
+
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m09").get();
+            if (currentDoc.exists) { initQuiz(); return; }
+
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m08").get();
             if (!prevDoc.exists) {
-                alert("Conclua a Missão 08 primeiro!");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 08 primeiro.");
                 window.location.href = 'index.html';
-            } else {
-                initQuiz();
+                return;
             }
+
+            const today = new Date().toLocaleDateString();
+            const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastLocal === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia!");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            initQuiz();
         });
 
         function shuffle(array) {
@@ -153,6 +168,8 @@
 
         function initQuiz() {
             const container = document.getElementById('quiz-container');
+            if(container.innerHTML !== "") return; // Evita duplicar se re-carregar
+
             missions.forEach((m, idx) => {
                 const item = document.createElement('div');
                 item.className = 'quiz-item';
@@ -193,10 +210,16 @@
             });
 
             if (allCorrect) {
+                // Trava 24h para alunos
+                if (user.email.toLowerCase().trim() !== "jarbas.lima@ifpb.edu.br") {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
                 try {
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m09").set({
                         concluido: true,
-                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString()
                     });
 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });

@@ -11,155 +11,74 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
+        :root { --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card: #ffffff; }
         
-        :root { 
-            --primary: #00df9a; 
-            --secondary: #2a5ff0; 
-            --bg: #050816; 
-            --card: #ffffff;
-            --text: #1e293b; 
-        }
-        
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background: var(--bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 20px; 
-        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .login-card { background: var(--card); padding: 35px; border-radius: 28px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .logo { width: 150px; margin-bottom: 20px; }
+        h2 { color: var(--secondary); margin-bottom: 5px; font-weight: 800; }
+        .subtitle { color: #64748b; font-size: 0.85rem; margin-bottom: 25px; }
 
-        .login-card { 
-            background: var(--card); 
-            padding: 35px; 
-            border-radius: 28px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center; 
-        }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        label { font-size: 0.7rem; font-weight: 700; color: var(--secondary); margin-left: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 10px; box-sizing: border-box; font-family: 'Poppins'; }
 
-        .logo { width: 160px; margin-bottom: 20px; }
-        
-        h2 { color: var(--secondary); margin: 0; font-weight: 800; }
-        p.subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 25px; }
+        #registration-fields { display: none; border-top: 2px dashed #eee; margin-top: 20px; padding-top: 20px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .input-group { text-align: left; margin-bottom: 12px; }
-        label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--secondary); margin-bottom: 4px; padding-left: 5px; }
-
-        input, select { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            font-family: 'Poppins', sans-serif; 
-            font-size: 0.9rem;
-            background: #f8fafc;
-        }
-
-        input:focus { outline: none; border-color: var(--secondary); background: #fff; }
-
-        #registration-fields { 
-            display: none; 
-            margin-top: 20px; 
-            padding-top: 20px; 
-            border-top: 2px dashed #e2e8f0;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .btn-auth { 
-            width: 100%; 
-            padding: 16px; 
-            background: linear-gradient(135deg, var(--secondary), #4f46e5); 
-            color: white; 
-            border: none; 
-            border-radius: 12px; 
-            font-weight: 800; 
-            cursor: pointer; 
-            font-size: 1rem; 
-            margin-top: 15px;
-            transition: 0.3s;
-        }
-
-        .btn-auth:hover { transform: scale(1.02); filter: brightness(1.1); }
-        .footer-note { font-size: 0.7rem; color: #94a3b8; margin-top: 20px; }
+        .btn-auth { width: 100%; padding: 16px; background: var(--secondary); color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; margin-top: 15px; }
+        .toggle-link { margin-top: 15px; display: block; font-size: 0.8rem; color: var(--secondary); cursor: pointer; text-decoration: underline; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
-        <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo">
-        <h2 id="title">Welcome!</h2>
-        <p id="subtitle" class="subtitle">Acesse sua jornada bilíngue.</p>
+        <img src="logo-horizontal.jpg" alt="Logo" class="logo">
+        <h2 id="title">Welcome</h2>
+        <p id="subtitle" class="subtitle">Acesse sua área de missões.</p>
         
         <div class="input-group">
-            <input type="email" id="email" placeholder="E-mail Institucional">
+            <input type="email" id="email" placeholder="E-mail">
         </div>
         <div class="input-group">
-            <input type="password" id="password" placeholder="Sua senha">
+            <input type="password" id="password" placeholder="Senha (mín. 6 dígitos)">
         </div>
 
         <div id="registration-fields">
             <div class="input-group">
                 <input type="text" id="nomeCompleto" placeholder="Nome Completo">
             </div>
-            
             <div class="input-group">
                 <label>Modalidade</label>
                 <select id="modalidade">
                     <option value="Integrado">Integrado</option>
                     <option value="Subsequente">Subsequente</option>
                     <option value="Superior">Superior</option>
-                    <option value="Visitante">Sou Visitante (Externo)</option>
+                    <option value="Externo">Visitante</option>
                 </select>
             </div>
-
             <div class="input-group">
                 <label>Curso</label>
                 <select id="curso">
                     <option value="Informática">Informática</option>
                     <option value="Eletrotécnica">Eletrotécnica</option>
                     <option value="Edificações">Edificações</option>
-                    <option value="Segurança no Trabalho">Segurança no Trabalho</option>
-                    <option value="Engenharia Civil">Engenharia Civil</option>
-                    <option value="Visitante">Visitante / Nenhum</option>
+                    <option value="Segurança">Segurança no Trabalho</option>
+                    <option value="Engenharia">Engenharia Civil</option>
                 </select>
             </div>
-
             <div class="input-group">
-                <label>Ano ou Período</label>
+                <label>Ano/Período</label>
                 <select id="periodo">
-                    <option value="1º Ano">1º Ano</option>
-                    <option value="2º Ano">2º Ano</option>
-                    <option value="3º Ano">3º Ano</option>
-                    <option value="1º Período">1º Período</option>
-                    <option value="2º Período">2º Período</option>
-                    <option value="Turma de Engenharia">Engenharia Civil</option>
-                    <option value="Visitante">Visitante / Nenhum</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label>Turma</label>
-                <select id="turma">
-                    <option value="Única">Única (Aluno IF)</option>
-                    <option value="Turma A">Turma A</option>
-                    <option value="Turma B">Turma B</option>
-                    <option value="Visitante">Visitante / Externo</option>
+                    <option value="1">1º Ano / Período</option>
+                    <option value="2">2º Ano / Período</option>
+                    <option value="3">3º Ano / Período</option>
                 </select>
             </div>
         </div>
         
         <button class="btn-auth" id="btn-main" onclick="handleAuth()">ENTRAR</button>
-        <p class="footer-note">Se for seu primeiro acesso, os campos de cadastro aparecerão automaticamente.</p>
+        <span class="toggle-link" id="toggle-text" onclick="toggleMode()">Não tem conta? Cadastre-se aqui</span>
     </div>
 
     <script>
@@ -178,63 +97,40 @@
 
         let isRegistering = false;
 
+        function toggleMode() {
+            isRegistering = !isRegistering;
+            document.getElementById('registration-fields').style.display = isRegistering ? 'block' : 'none';
+            document.getElementById('title').innerText = isRegistering ? 'Criar Conta' : 'Welcome';
+            document.getElementById('btn-main').innerText = isRegistering ? 'FINALIZAR CADASTRO' : 'ENTRAR';
+            document.getElementById('toggle-text').innerText = isRegistering ? 'Já tenho conta? Fazer Login' : 'Não tem conta? Cadastre-se aqui';
+        }
+
         async function handleAuth() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
-            if (!email || password.length < 6) {
-                alert("Preencha o e-mail e uma senha com no mínimo 6 dígitos.");
-                return;
-            }
-
             if (!isRegistering) {
-                // Tenta Login
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
                     window.location.href = "index.html";
-                } catch (error) {
-                    if (error.code === 'auth/user-not-found') {
-                        activateRegistration();
-                    } else {
-                        alert("Acesso negado: Verifique seus dados.");
-                    }
-                }
+                } catch (e) { alert("Erro: Usuário não encontrado ou senha incorreta."); }
             } else {
-                // Tenta Cadastro
-                const nome = document.getElementById('nomeCompleto').value.trim();
-                if (!nome) { alert("Digite seu nome completo."); return; }
-
+                const nome = document.getElementById('nomeCompleto').value;
+                if (!nome) { alert("Preencha seu nome!"); return; }
+                
                 try {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    const user = userCredential.user;
-
-                    // Salva Perfil Detalhado
-                    await db.collection("usuarios").doc(user.uid).set({
+                    const res = await auth.createUserWithEmailAndPassword(email, password);
+                    await db.collection("usuarios").doc(res.user.uid).set({
                         nome: nome,
                         email: email,
                         modalidade: document.getElementById('modalidade').value,
                         curso: document.getElementById('curso').value,
                         periodo: document.getElementById('periodo').value,
-                        turma: document.getElementById('turma').value,
-                        isAdmin: email === "jarbas.lima@ifpb.edu.br",
-                        created_at: firebase.firestore.FieldValue.serverTimestamp()
+                        isAdmin: email === "jarbas.lima@ifpb.edu.br"
                     });
-
-                    alert("Bem-vindo à InFinity!");
                     window.location.href = "index.html";
-                } catch (error) {
-                    alert("Erro ao criar conta: " + error.message);
-                }
+                } catch (e) { alert("Erro ao cadastrar: " + e.message); }
             }
-        }
-
-        function activateRegistration() {
-            isRegistering = true;
-            document.getElementById('registration-fields').style.display = 'block';
-            document.getElementById('title').innerText = "Novo Cadastro";
-            document.getElementById('subtitle').innerText = "Preencha seus dados acadêmicos.";
-            document.getElementById('btn-main').innerText = "CONCLUIR CADASTRO";
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
     </script>
 </body>

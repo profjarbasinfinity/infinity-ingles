@@ -12,68 +12,101 @@
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
-        :root { --if-green: #2f9e41; --primary: #00df9a; --secondary: #2a5ff0; --bg: #050816; --card-bg: #101630; --text: #ffffff; }
         
-        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .logo-img { width: 180px; margin: 20px 0; }
-
-        .card { background: var(--card-bg); border-radius: 20px; padding: 20px; width: 100%; max-width: 600px; border: 1px solid #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        .video-wrapper { position: relative; padding-bottom: 177.78%; height: 0; border-radius: 12px; overflow: hidden; margin-bottom: 25px; background: #000; border: 2px solid var(--secondary); }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
-        .task-title { color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--if-green); padding-left: 10px; text-transform: uppercase; }
-        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
-
-        .quiz-item { margin-bottom: 30px; background: #161d3a; padding: 20px; border-radius: 15px; border: 1px solid #2a5ff044; }
-        .eng-phrase { display: block; font-weight: 800; color: #fff; margin-bottom: 15px; font-size: 1.1rem; text-align: center; background: #0a1025; padding: 10px; border-radius: 8px; border: 1px solid #1e293b; }
-
-        .answer-zone { 
-            display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; 
-            min-height: 55px; padding: 12px; border: 2px dashed var(--secondary); 
-            border-radius: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3);
+        :root { 
+            --if-green: #2f9e41; 
+            --primary: #00df9a; 
+            --secondary: #2a5ff0; 
+            --bg: #050816; 
+            --card-bg: #101630; 
+            --text: #ffffff; 
         }
         
-        .word-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; padding: 10px; }
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; padding: 15px; 
+            display: flex; flex-direction: column; align-items: center; 
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 20px; 
+            padding: 20px; 
+            width: 100%; max-width: 550px; 
+            border: 1px solid #1e293b; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+        }
+
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            border-radius: 12px; overflow: hidden; margin-bottom: 25px; 
+            border: 1px solid var(--secondary); background: #000; 
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        .task-title { 
+            color: var(--primary); font-weight: 600; margin-bottom: 10px; 
+            border-left: 4px solid var(--if-green); padding-left: 10px; 
+            text-transform: uppercase; 
+        }
+        .instruction { font-size: 0.85rem; color: #94a3b8; margin-bottom: 20px; }
+
+        .quiz-scroll-area { max-height: 450px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .quiz-scroll-area::-webkit-scrollbar { width: 5px; }
+        .quiz-scroll-area::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .quiz-item { margin-bottom: 25px; background: #161d3a; padding: 18px; border-radius: 12px; border: 1px solid #1e293b; }
+        .eng-phrase { display: block; font-weight: 800; color: var(--primary); margin-bottom: 15px; font-size: 1.1rem; text-align: center; }
+
+        .word-pool, .answer-zone { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; min-height: 45px; padding: 10px; border-radius: 8px; }
+        .answer-zone { border: 2px dashed var(--secondary); margin-bottom: 15px; background: #0a1025; }
         
         .word-btn { 
-            padding: 8px 14px; background: #ffffff; color: #000; border-radius: 6px; 
-            cursor: pointer; font-weight: 600; font-size: 0.85rem; border: none;
-            transition: all 0.2s; box-shadow: 0 4px 0 #cbd5e1;
+            padding: 8px 12px; background: #ffffff; color: #000; border-radius: 6px; 
+            cursor: pointer; font-weight: 600; font-size: 0.85rem; user-select: none;
+            transition: 0.2s; border: none; box-shadow: 0 4px 0 #cbd5e1;
         }
         .word-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #cbd5e1; }
 
-        .btn-verify { 
-            width: 100%; padding: 20px; border: none; border-radius: 12px; 
+        .btn-check { 
+            width: 100%; padding: 18px; border: none; border-radius: 12px; 
             background: linear-gradient(45deg, var(--primary), var(--secondary)); 
-            color: #000; font-weight: 800; cursor: pointer; margin-top: 10px; font-size: 1.1rem;
+            color: #000; font-weight: 800; cursor: pointer; font-size: 1rem; 
         }
-
-        #success-screen { display: none; position: fixed; inset: 0; background: var(--bg); flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; text-align: center; }
+        
+        #success-screen { 
+            display: none; position: fixed; inset: 0; background: var(--bg); 
+            flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 1000; padding: 20px; text-align: center; 
+        }
     </style>
 </head>
 <body>
 
-    <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo-img">
+    <img src="logo-horizontal.jpg" alt="InFinity Logo" style="width: 180px; margin: 20px 0;">
 
     <div class="card" id="quiz-card">
         <div class="video-wrapper">
-            <iframe src="https://www.youtube-nocookie.com/embed/B88YDENvsxk" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/48qf5LEMc_U" allowfullscreen></iframe>
         </div>
 
-        <div class="task-title">MISSÃO 11: RETEXTUALIZAÇÃO</div>
-        <p class="instruction">Evite a tradução literal! Escolha apenas as palavras que formam uma adaptação natural para o português:</p>
+        <div class="task-title">MISSÃO 11: REORDENAÇÃO</div>
+        <p class="instruction">Toque nas palavras para montar a tradução natural (lembre-se da regra dos adjetivos!):</p>
 
-        <div id="quiz-container"></div>
+        <div class="quiz-scroll-area" id="quiz-container"></div>
 
-        <button class="btn-verify" onclick="verifyFinalMission()">FINALIZAR MISSÃO 11</button>
+        <button class="btn-check" onclick="verifyAll()">CONCLUIR MISSÃO 11</button>
     </div>
 
     <div id="success-screen">
-        <h1 style="font-size: 5rem; margin: 0;">🎓</h1>
-        <h2 style="color: var(--primary); font-size: 2.2rem;">MISSÃO CONCLUÍDA!</h2>
-        <p style="max-width: 400px; color: #94a3b8;">Você provou que não é um robô. Suas adaptações foram naturais e profissionais.</p>
-        <button class="btn-verify" style="width:280px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+        <h1 style="font-size: 5rem; margin: 0;">🔄</h1>
+        <h2 style="color: var(--primary); font-size: 2rem;">ESTRUTURA DOMINADA!</h2>
+        <p>Sua análise sintática está ficando afiada.</p>
+        <button class="btn-check" style="width:260px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
     </div>
 
     <script>
@@ -86,29 +119,31 @@
             appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const adminEmail = "jarbas.lima@ifpb.edu.br";
 
         const missions = [
-            { eng: "The old man lost his earpiece", pool: ['O', 'idoso', 'perdeu', 'seu', 'ponto', 'eletrônico', 'velho', 'homem', 'pedaço', 'de', 'orelha'], correct: 'O idoso perdeu seu ponto eletrônico' },
-            { eng: "She is so free-spirited!", pool: ['Ela', 'é', 'tão', 'independente', 'livre', 'de', 'espírito'], correct: 'Ela é tão independente' },
-            { eng: "The police officer took my driver's license", pool: ['O', 'policial', 'pegou', 'minha', 'habilitação', 'oficial', 'de', 'polícia', 'licença', 'dirigir'], correct: 'O policial pegou minha habilitação' },
-            { eng: "The businessman wore a baseball hat", pool: ['O', 'empresário', 'usou', 'um', 'boné', 'homem', 'negócios', 'chapéu', 'beisebol'], correct: 'O empresário usou um boné' },
-            { eng: "The delivery guy bought his spare tire at the city market", pool: ['O', 'entregador', 'comprou', 'seu', 'estepe', 'na', 'feira', 'rapaz', 'entregas', 'pneu', 'sobressalente', 'mercado', 'cidade'], correct: 'O entregador comprou seu estepe na feira' }
+            { id: 'a', eng: 'a) A very important decision', words: ['Uma', 'decisão', 'muito', 'importante'], correct: 'Uma decisão muito importante' },
+            { id: 'b', eng: 'b) Gross Domestic Product', words: ['Produto', 'Interno', 'Bruto'], correct: 'Produto Interno Bruto' },
+            { id: 'c', eng: 'c) The school teacher saved the school system', words: ['O', 'professor', 'escolar', 'salvou', 'o', 'sistema', 'escolar'], correct: 'O professor escolar salvou o sistema escolar' },
+            { id: 'd', eng: 'd) His new car activated an advanced electric system', words: ['O', 'carro', 'novo', 'dele', 'ativou', 'um', 'sistema', 'elétrico', 'avançado'], correct: 'O carro novo dele ativou um sistema elétrico avançado' },
+            { id: 'e', eng: 'e) His younger brother had a better idea', words: ['O', 'irmão', 'mais', 'novo', 'dele', 'teve', 'uma', 'ideia', 'melhor'], correct: 'O irmão mais novo dele teve uma ideia melhor' },
+            { id: 'f', eng: "f) Sergeant Pepper's lonely hearts club band", words: ['Banda', 'Clube', 'dos', 'corações', 'solitários', 'do', 'sargento', 'Pimenta'], correct: 'Banda Clube dos corações solitários do sargento Pimenta' }
         ];
 
-        // --- CONTROLE DE ACESSO ---
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
-
             const userEmail = user.email.toLowerCase().trim();
-            if (userEmail === adminEmail) { init(); return; }
 
+            if (userEmail === adminEmail) { initQuiz(); return; }
+
+            // Verifica se já concluiu a 11
             const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").get();
-            if (currentDoc.exists) { init(); return; }
+            if (currentDoc.exists) { initQuiz(); return; }
 
+            // Bloqueio: Deve concluir a Missão 10 antes
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m10").get();
             if (!prevDoc.exists) {
                 alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 10 primeiro.");
@@ -116,6 +151,7 @@
                 return;
             }
 
+            // Trava de 24h
             const today = new Date().toLocaleDateString();
             const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
             if (lastLocal === today) {
@@ -124,68 +160,72 @@
                 return;
             }
 
-            init();
+            initQuiz();
         });
 
-        function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
+        function shuffle(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
 
-        function init() {
+        function initQuiz() {
             const container = document.getElementById('quiz-container');
-            if (container.innerHTML !== "") return;
+            if(container.innerHTML !== "") return;
 
             missions.forEach((m, idx) => {
-                const div = document.createElement('div');
-                div.className = 'quiz-item';
-                const shuffledPool = shuffle([...m.pool]);
-                div.innerHTML = `
+                const item = document.createElement('div');
+                item.className = 'quiz-item';
+                const shuffledWords = shuffle([...m.words]);
+
+                item.innerHTML = `
                     <span class="eng-phrase">${m.eng}</span>
                     <div class="answer-zone" id="ans-${idx}"></div>
                     <div class="word-pool" id="pool-${idx}">
-                        ${shuffledPool.map(w => `<button class="word-btn" onclick="toggleWord(this, ${idx})">${w}</button>`).join('')}
+                        ${shuffledWords.map(w => `<button class="word-btn" onclick="moveWord(this, '${idx}')">${w}</button>`).join('')}
                     </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(item);
             });
         }
 
-        function toggleWord(btn, idx) {
-            const ans = document.getElementById(`ans-${idx}`);
+        function moveWord(btn, idx) {
+            const answerZone = document.getElementById(`ans-${idx}`);
             const pool = document.getElementById(`pool-${idx}`);
-            if (btn.parentElement === pool) ans.appendChild(btn);
+            if (btn.parentElement === pool) answerZone.appendChild(btn);
             else pool.appendChild(btn);
         }
 
-        async function verifyFinalMission() {
+        async function verifyAll() {
             const user = auth.currentUser;
             if (!user) return;
 
-            let win = true;
+            let allCorrect = true;
             missions.forEach((m, idx) => {
-                const userText = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText).join(' ').toLowerCase();
-                if (userText !== m.correct.toLowerCase()) win = false;
+                const userWords = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText);
+                const userPhrase = userWords.join(' ');
+                if (userPhrase.toLowerCase() !== m.correct.toLowerCase()) allCorrect = false;
             });
 
-            if (win) {
-                // Ativa trava de 24h para alunos
+            if (allCorrect) {
                 if (user.email.toLowerCase().trim() !== adminEmail) {
                     localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
                 }
 
                 try {
+                    // Gravando com ID m11 conforme a nova estrutura
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").set({
                         concluido: true,
                         data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
                         data_formatada: new Date().toLocaleDateString()
                     });
-                    
-                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     document.getElementById('quiz-card').style.display = 'none';
                     document.getElementById('success-screen').style.display = 'flex';
                 } catch (e) {
                     alert("Erro ao salvar progresso.");
                 }
             } else {
-                alert("Professor Jarbas avisa: Atenção! Algumas traduções ainda contêm termos literais. Pense como um tradutor profissional!");
+                alert("Alguma frase está incorreta. Lembre-se: em português dizemos 'Carro Azul', mas em inglês a estrutura mental é 'Azul Carro'!");
             }
         }
     </script>

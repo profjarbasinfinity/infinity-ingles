@@ -74,23 +74,33 @@
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
 
-            // MODO DEUS
-            if (user.email === "jarbas.lima@ifpb.edu.br") return;
+            // --- 1. MODO DEUS (PROFESSOR) ---
+            if (user.email === "jarbas.lima@ifpb.edu.br") {
+                console.log("God Mode Active. No restrictions applied.");
+                return; 
+            }
 
-            // VERIFICAÇÃO DE SEQUÊNCIA (M03)
+            // --- 2. VERIFICA SE JÁ COMPLETOU (LIVRE REVISÃO) ---
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m04").get();
+            if (currentDoc.exists) {
+                console.log("Mission already completed. Review mode active.");
+                return; // Se já completou, ignora todas as travas abaixo
+            }
+
+            // --- 3. TRAVA DE SEQUÊNCIA (M03 PRECISA ESTAR FEITA) ---
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m03").get();
             if (!prevDoc.exists) {
-                alert("Acesso negado! Conclua a Missão 03 primeiro.");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 03 primeiro.");
                 window.location.href = 'index.html';
                 return;
             }
 
-            // TRAVA DE 24 HORAS (UMA POR DIA)
+            // --- 4. TRAVA DE 24 HORAS (APENAS PARA MISSÃO INÉDITA) ---
             const today = new Date().toLocaleDateString();
             const lastMissionDate = localStorage.getItem(`last_mission_${user.uid}`);
             
             if (lastMissionDate === today) {
-                alert("Professor Jarbas avisa: Uma missão por dia! Volte amanhã.");
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã para este novo desafio.");
                 window.location.href = 'index.html';
             }
         });
@@ -111,19 +121,21 @@
             ];
 
             if(res.every(c => c)) {
+                // Só salva a data no localStorage se o usuário não for o admin
+                if (user.email !== "jarbas.lima@ifpb.edu.br") {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
                 await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m04").set({
                     concluido: true,
                     data: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // SALVA A DATA NO NAVEGADOR PARA A TRAVA DE 24H
-                localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
-
                 confetti({ particleCount: 150, spread: 70 });
                 document.getElementById('main-card').style.display = 'none';
                 document.getElementById('success-screen').style.display = 'flex';
             } else {
-                alert("Revise suas respostas!");
+                alert("Check your answers! Some profession or place is incorrect.");
             }
         }
     </script>

@@ -176,20 +176,39 @@
             appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Verificação de Acesso (Requer M07)
+        // --- CONTROLE DE ACESSO ---
         auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const userEmail = user.email.toLowerCase().trim();
+            const adminEmail = "jarbas.lima@ifpb.edu.br";
+
+            // 1. MODO DEUS
+            if (userEmail === adminEmail) return;
+
+            // 2. LIVRE REVISÃO
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m08").get();
+            if (currentDoc.exists) return;
+
+            // 3. SEQUÊNCIA (M07)
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m07").get();
             if (!prevDoc.exists) {
-                alert("Você precisa completar a Missão 07 antes!");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 07 primeiro.");
                 window.location.href = 'index.html';
+                return;
+            }
+
+            // 4. TRAVA 24H
+            const today = new Date().toLocaleDateString();
+            const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastLocal === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia!");
+                window.location.href = 'index.html';
+                return;
             }
         });
 
@@ -202,10 +221,16 @@
             const r3 = document.getElementById('q3').value;
 
             if (r1 === 'my' && r2 === 'her' && r3 === 'its') {
+                // Ativa a trava de 24h apenas para alunos
+                if (user.email.toLowerCase().trim() !== "jarbas.lima@ifpb.edu.br") {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
                 try {
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m08").set({
                         concluido: true,
-                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString() // Importante para o mapa
                     });
 
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });

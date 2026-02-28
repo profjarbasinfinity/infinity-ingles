@@ -89,6 +89,7 @@
         const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        const adminEmail = "jarbas.lima@ifpb.edu.br";
 
         const missions = [
             { eng: "The old man lost his earpiece", pool: ['O', 'idoso', 'perdeu', 'seu', 'ponto', 'eletrônico', 'velho', 'homem', 'pedaço', 'de', 'orelha'], correct: 'O idoso perdeu seu ponto eletrônico' },
@@ -98,21 +99,40 @@
             { eng: "The delivery guy bought his spare tire at the city market", pool: ['O', 'entregador', 'comprou', 'seu', 'estepe', 'na', 'feira', 'rapaz', 'entregas', 'pneu', 'sobressalente', 'mercado', 'cidade'], correct: 'O entregador comprou seu estepe na feira' }
         ];
 
+        // --- CONTROLE DE ACESSO ---
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
+
+            const userEmail = user.email.toLowerCase().trim();
+            if (userEmail === adminEmail) { init(); return; }
+
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").get();
+            if (currentDoc.exists) { init(); return; }
+
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m10").get();
             if (!prevDoc.exists) {
-                alert("Conclua a Missão 10 antes de acessar a 11!");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 10 primeiro.");
                 window.location.href = 'index.html';
-            } else {
-                init();
+                return;
             }
+
+            const today = new Date().toLocaleDateString();
+            const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastLocal === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            init();
         });
 
         function shuffle(array) { return array.sort(() => Math.random() - 0.5); }
 
         function init() {
             const container = document.getElementById('quiz-container');
+            if (container.innerHTML !== "") return;
+
             missions.forEach((m, idx) => {
                 const div = document.createElement('div');
                 div.className = 'quiz-item';
@@ -137,22 +157,35 @@
 
         async function verifyFinalMission() {
             const user = auth.currentUser;
+            if (!user) return;
+
             let win = true;
             missions.forEach((m, idx) => {
                 const userText = Array.from(document.getElementById(`ans-${idx}`).children).map(b => b.innerText).join(' ').toLowerCase();
                 if (userText !== m.correct.toLowerCase()) win = false;
             });
 
-            if (win && user) {
-                await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").set({
-                    concluido: true,
-                    data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
-                document.getElementById('quiz-card').style.display = 'none';
-                document.getElementById('success-screen').style.display = 'flex';
+            if (win) {
+                // Ativa trava de 24h para alunos
+                if (user.email.toLowerCase().trim() !== adminEmail) {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
+                try {
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m11").set({
+                        concluido: true,
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString()
+                    });
+                    
+                    confetti({ particleCount: 200, spread: 100, origin: { y: 0.6 } });
+                    document.getElementById('quiz-card').style.display = 'none';
+                    document.getElementById('success-screen').style.display = 'flex';
+                } catch (e) {
+                    alert("Erro ao salvar progresso.");
+                }
             } else {
-                alert("Atenção! Algumas traduções ainda contêm termos literais ou estão incompletas. Pense como um tradutor profissional!");
+                alert("Professor Jarbas avisa: Atenção! Algumas traduções ainda contêm termos literais. Pense como um tradutor profissional!");
             }
         }
     </script>

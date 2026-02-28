@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -128,82 +127,35 @@
         <div class="quiz-scroll">
             <div class="quiz-item">
                 <p>a) O mestre me falou a verdade mas <span class="highlight">ela</span> não me convenceu.</p>
-                <select id="q1">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q1"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>b) Meu irmão subiu na moto mas <span class="highlight">ele</span> não saiu do lugar.</p>
-                <select id="q2">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q2"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>c) Mesmo <span class="highlight">ela</span> não sendo forte, o vento não atrasou a mulher.</p>
-                <select id="q3">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q3"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>d) A tempestade não abalou a pescadora, apesar de <span class="highlight">ela</span> ser jovem.</p>
-                <select id="q4">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q4"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>e) O barulho assustou o guarda, mas <span class="highlight">ele</span> não me incomodou.</p>
-                <select id="q5">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q5"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>f) A lua iluminou a casa onde a mulher estava e podíamos ouvi-<span class="highlight">la</span> de longe.</p>
-                <select id="q6">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q6"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>g) A cobra mordeu o tejo enquanto José filmava, mas <span class="highlight">ele</span> não se deu por vencido.</p>
-                <select id="q7">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q7"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
-
             <div class="quiz-item">
                 <p>h) O homem pegou a chave para consertar o rádio mas <span class="highlight">ele</span> estava perdido.</p>
-                <select id="q8">
-                    <option value="">Escolha...</option>
-                    <option value="he">HE</option>
-                    <option value="she">SHE</option>
-                    <option value="it">IT</option>
-                </select>
+                <select id="q8"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
         </div>
 
@@ -214,4 +166,83 @@
         <h1 style="font-size: 5rem; margin:0;">🧠</h1>
         <h2 style="color: var(--secondary); font-size: 2rem;">Análise Perfeita!</h2>
         <p style="color: #64748b;">Você dominou a regra do pronome neutro.</p>
-        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">
+        <button class="btn" style="max-width:280px; margin-top: 20px;" onclick="location.href='index.html'">VOLTAR AO MAPA</button>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
+            authDomain: "infinity-ingles.firebaseapp.com",
+            projectId: "infinity-ingles",
+            storageBucket: "infinity-ingles.firebasestorage.app",
+            messagingSenderId: "83199259838",
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            // 1. MODO DEUS (PROFESSOR)
+            if (user.email === "jarbas.lima@ifpb.edu.br") return;
+
+            // 2. LIVRE REVISÃO
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m06").get();
+            if (currentDoc.exists) return;
+
+            // 3. SEQUÊNCIA PEDAGÓGICA (MISSÃO 05)
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m05").get();
+            if (!prevDoc.exists) {
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 05 primeiro.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // 4. TRAVA DE 24 HORAS (PARA INÉDITAS)
+            const today = new Date().toLocaleDateString();
+            const lastMissionDate = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastMissionDate === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã.");
+                window.location.href = 'index.html';
+            }
+        });
+
+        async function checkMission() {
+            const user = auth.currentUser;
+            const answers = {
+                q1: 'it', q2: 'it', q3: 'she', q4: 'she',
+                q5: 'it', q6: 'it', q7: 'it', q8: 'he'
+            };
+
+            let allCorrect = true;
+            for (let i = 1; i <= 8; i++) {
+                if (document.getElementById(`q${i}`).value !== answers[`q${i}`]) {
+                    allCorrect = false;
+                    break;
+                }
+            }
+
+            if(allCorrect) {
+                // Só trava se não for o admin
+                if (user.email !== "jarbas.lima@ifpb.edu.br") {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
+                await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m06").set({
+                    concluido: true,
+                    data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('main-card').style.display = 'none';
+                document.getElementById('success-screen').style.display = 'flex';
+            } else {
+                alert("Alguma resposta está incorreta. Lembre-se: se refere a objeto ou situação (neutro), use IT!");
+            }
+        }
+    </script>
+</body>
+</html>

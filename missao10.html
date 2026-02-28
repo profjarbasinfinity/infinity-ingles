@@ -125,16 +125,36 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Verificação de Acesso (Exige M09)
+        const adminEmail = "jarbas.lima@ifpb.edu.br";
+
+        // --- CONTROLE DE ACESSO ---
         auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            const userEmail = user.email.toLowerCase().trim();
+
+            // 1. MODO DEUS (Professor livre)
+            if (userEmail === adminEmail) return;
+
+            // 2. LIVRE REVISÃO (Se já concluiu, pode entrar)
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m10").get();
+            if (currentDoc.exists) return;
+
+            // 3. SEQUÊNCIA (Exige M09)
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m09").get();
             if (!prevDoc.exists) {
-                alert("Você precisa completar a Missão 09 antes!");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 09 primeiro.");
                 window.location.href = 'index.html';
+                return;
+            }
+
+            // 4. TRAVA 24H (Uma por dia)
+            const today = new Date().toLocaleDateString();
+            const lastLocal = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastLocal === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã.");
+                window.location.href = 'index.html';
+                return;
             }
         });
 
@@ -151,14 +171,18 @@
             const r4f = getV('q4f');
             const r5f = getV('q5f');
 
-            // Validação simples: todos os campos devem ter mais de 3 caracteres
             if(r1f.length > 3 && r1o.length > 1 && r2f.length > 3 && r3f.length > 3 && r4f.length > 3 && r5f.length > 3) {
                 
+                // Ativa trava de 24h para alunos
+                if (user.email.toLowerCase().trim() !== adminEmail) {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
                 try {
-                    // Salva o progresso e as respostas
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m10").set({
                         concluido: true,
                         data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
+                        data_formatada: new Date().toLocaleDateString(),
                         respostas: {
                             exercicio_a: { traducao: r1f, omitidas: r1o },
                             exercicio_b: r2f,
@@ -172,11 +196,11 @@
                     document.getElementById('main-card').style.display = 'none';
                     document.getElementById('success-screen').style.display = 'flex';
                 } catch (e) {
-                    alert("Erro ao salvar suas respostas. Tente novamente.");
+                    alert("Erro ao salvar suas respostas.");
                     console.error(e);
                 }
             } else {
-                alert("Por favor, preencha todas as traduções para concluir a missão!");
+                alert("Professor Jarbas avisa: Preencha todas as traduções para concluir a missão!");
             }
         }
     </script>

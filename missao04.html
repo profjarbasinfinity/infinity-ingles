@@ -8,13 +8,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap');
         
-        /* TEMA CLARO PARA MISSÕES PARES */
         :root { 
             --if-green: #2f9e41; 
             --primary: #00df9a; 
@@ -183,29 +181,35 @@
             projectId: "infinity-ingles",
             storageBucket: "infinity-ingles.firebasestorage.app",
             messagingSenderId: "83199259838",
-            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
-            measurementId: "G-3EKYW8RVBQ"
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
-        const analytics = firebase.analytics();
 
-        // 1. Verificação de Acesso (Segurança)
+        const MISSION_ID = "m04";
+        const PREVIOUS_MISSION = "m03";
+
+        // 1. Verificação de Acesso e MODO DEUS
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            // Verifica se concluiu a missão anterior no Firestore
-            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m03").get();
+            // MODO DEUS: Professor Jarbas pula a trava
+            if (user.email === "jarbas.lima@ifpb.edu.br") {
+                console.log("God Mode: Acesso Liberado");
+                return;
+            }
+
+            // Trava para alunos: verifica Missão 03
+            const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc(PREVIOUS_MISSION).get();
             if (!prevDoc.exists) {
                 alert("Acesso negado! Conclua a Missão 03 primeiro.");
                 window.location.href = 'index.html';
             }
-            analytics.logEvent('mission_start', { id: '04' });
         });
 
         // 2. Validação e Salvamento
@@ -228,23 +232,19 @@
 
             if(checks.every(c => c === true)) {
                 try {
-                    // Salva no Firestore
-                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m04").set({
+                    await db.collection("progresso").doc(user.uid).collection("concluidas").doc(MISSION_ID).set({
                         concluido: true,
-                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp(),
-                        data_formatada: new Date().toLocaleDateString()
+                        data_conclusao: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
-                    analytics.logEvent('mission_complete', { id: '04' });
                     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
                     document.getElementById('main-card').style.display = 'none';
                     document.getElementById('success-screen').style.display = 'flex';
                 } catch (error) {
                     console.error("Erro ao salvar:", error);
-                    alert("Erro ao salvar progresso. Tente novamente.");
+                    alert("Erro ao salvar progresso.");
                 }
             } else {
-                analytics.logEvent('mission_error', { id: '04' });
                 alert("Alguma profissão está com o artigo ou o lugar errado. Verifique novamente!");
             }
         }

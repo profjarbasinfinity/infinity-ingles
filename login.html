@@ -15,9 +15,9 @@
         :root { 
             --primary: #00df9a; 
             --secondary: #2a5ff0; 
-            --bg: #f8fafc; 
+            --bg: #050816; 
+            --card: #ffffff;
             --text: #1e293b; 
-            --border: #e2e8f0;
         }
         
         body { 
@@ -32,88 +32,79 @@
         }
 
         .login-card { 
-            background: white; 
+            background: var(--card); 
             padding: 35px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.08); 
+            border-radius: 28px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2); 
             width: 100%; 
-            max-width: 450px; 
+            max-width: 420px; 
             text-align: center; 
-            border: 1px solid var(--border);
         }
 
         .logo { width: 160px; margin-bottom: 20px; }
         
-        h2 { color: var(--secondary); margin: 0 0 5px 0; font-weight: 800; }
+        h2 { color: var(--secondary); margin: 0; font-weight: 800; }
         p.subtitle { color: #64748b; font-size: 0.9rem; margin-bottom: 25px; }
 
-        .input-group { text-align: left; margin-bottom: 15px; }
-        label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--secondary); margin-bottom: 5px; margin-left: 5px; }
+        .input-group { text-align: left; margin-bottom: 12px; }
+        label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--secondary); margin-bottom: 4px; padding-left: 5px; }
 
         input, select { 
             width: 100%; 
             padding: 14px; 
-            border: 1px solid var(--border); 
+            border: 1px solid #e2e8f0; 
             border-radius: 12px; 
             box-sizing: border-box; 
             font-family: 'Poppins', sans-serif; 
             font-size: 0.9rem;
-            transition: 0.3s;
-            background-color: #fcfdfe;
+            background: #f8fafc;
         }
 
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(42, 95, 240, 0.1);
-        }
+        input:focus { outline: none; border-color: var(--secondary); background: #fff; }
 
-        /* Estilo para os campos de cadastro que surgem depois */
         #registration-fields { 
             display: none; 
             margin-top: 20px; 
             padding-top: 20px; 
-            border-top: 2px dashed var(--border);
-            animation: fadeIn 0.5s ease;
+            border-top: 2px dashed #e2e8f0;
+            animation: slideUp 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .btn-auth { 
             width: 100%; 
-            padding: 18px; 
+            padding: 16px; 
             background: linear-gradient(135deg, var(--secondary), #4f46e5); 
             color: white; 
             border: none; 
-            border-radius: 14px; 
+            border-radius: 12px; 
             font-weight: 800; 
             cursor: pointer; 
             font-size: 1rem; 
-            margin-top: 20px;
-            box-shadow: 0 4px 15px rgba(42, 95, 240, 0.3);
+            margin-top: 15px;
             transition: 0.3s;
         }
 
-        .btn-auth:hover { transform: translateY(-2px); opacity: 0.95; }
-
-        .info-footer { font-size: 0.7rem; color: #94a3b8; margin-top: 20px; line-height: 1.5; }
+        .btn-auth:hover { transform: scale(1.02); filter: brightness(1.1); }
+        .footer-note { font-size: 0.7rem; color: #94a3b8; margin-top: 20px; }
     </style>
 </head>
 <body>
 
     <div class="login-card">
         <img src="logo-horizontal.jpg" alt="InFinity Logo" class="logo">
-        <h2 id="auth-title">Welcome!</h2>
-        <p id="auth-subtitle" class="subtitle">Insira seus dados para começar.</p>
+        <h2 id="title">Welcome!</h2>
+        <p id="subtitle" class="subtitle">Acesse sua jornada bilíngue.</p>
         
         <div class="input-group">
-            <input type="email" id="email" placeholder="E-mail">
+            <input type="email" id="email" placeholder="E-mail Institucional">
         </div>
         <div class="input-group">
-            <input type="password" id="password" placeholder="Senha (mínimo 6 dígitos)">
+            <input type="password" id="password" placeholder="Sua senha">
         </div>
 
         <div id="registration-fields">
@@ -151,7 +142,7 @@
                     <option value="3º Ano">3º Ano</option>
                     <option value="1º Período">1º Período</option>
                     <option value="2º Período">2º Período</option>
-                    <option value="Turma de Engenharia">Turma de Engenharia Civil</option>
+                    <option value="Turma de Engenharia">Engenharia Civil</option>
                     <option value="Visitante">Visitante / Nenhum</option>
                 </select>
             </div>
@@ -167,15 +158,11 @@
             </div>
         </div>
         
-        <button class="btn-auth" id="btn-main" onclick="handleAuth()">ENTRAR NA PLATAFORMA</button>
-        
-        <p class="info-footer">
-            Se for seu primeiro acesso, o sistema abrirá automaticamente os campos de cadastro após você clicar no botão.
-        </p>
+        <button class="btn-auth" id="btn-main" onclick="handleAuth()">ENTRAR</button>
+        <p class="footer-note">Se for seu primeiro acesso, os campos de cadastro aparecerão automaticamente.</p>
     </div>
 
     <script>
-        // Configurações do Firebase (Suas credenciais mantidas)
         const firebaseConfig = {
             apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
             authDomain: "infinity-ingles.firebaseapp.com",
@@ -185,64 +172,55 @@
             appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let isRegistrationMode = false;
+        let isRegistering = false;
 
         async function handleAuth() {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             if (!email || password.length < 6) {
-                alert("Por favor, insira um e-mail válido e uma senha de no mínimo 6 caracteres.");
+                alert("Preencha o e-mail e uma senha com no mínimo 6 dígitos.");
                 return;
             }
 
-            if (!isRegistrationMode) {
-                // TENTATIVA DE LOGIN NORMAL
+            if (!isRegistering) {
+                // Tenta Login
                 try {
                     await auth.signInWithEmailAndPassword(email, password);
                     window.location.href = "index.html";
                 } catch (error) {
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                        // Se não achar o usuário, assume-se que é um novo aluno
-                        showRegistrationFields();
+                    if (error.code === 'auth/user-not-found') {
+                        activateRegistration();
                     } else {
-                        alert("Erro ao acessar: " + error.message);
+                        alert("Acesso negado: Verifique seus dados.");
                     }
                 }
             } else {
-                // MODO CADASTRO - SALVAR NO FIRESTORE
+                // Tenta Cadastro
                 const nome = document.getElementById('nomeCompleto').value.trim();
-                const modalidade = document.getElementById('modalidade').value;
-                const curso = document.getElementById('curso').value;
-                const periodo = document.getElementById('periodo').value;
-                const turma = document.getElementById('turma').value;
-
-                if (!nome) {
-                    alert("Por favor, preencha seu nome completo para o certificado.");
-                    return;
-                }
+                if (!nome) { alert("Digite seu nome completo."); return; }
 
                 try {
                     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                     const user = userCredential.user;
 
-                    // Criar documento do aluno com os filtros detalhados
+                    // Salva Perfil Detalhado
                     await db.collection("usuarios").doc(user.uid).set({
                         nome: nome,
                         email: email,
-                        modalidade: modalidade,
-                        curso: curso,
-                        periodo: periodo,
-                        turma: turma,
-                        dataCadastro: firebase.firestore.FieldValue.serverTimestamp(),
-                        tipo: modalidade === "Visitante" ? "Externo" : "Aluno IFPB"
+                        modalidade: document.getElementById('modalidade').value,
+                        curso: document.getElementById('curso').value,
+                        periodo: document.getElementById('periodo').value,
+                        turma: document.getElementById('turma').value,
+                        isAdmin: email === "jarbas.lima@ifpb.edu.br",
+                        created_at: firebase.firestore.FieldValue.serverTimestamp()
                     });
 
-                    alert("Cadastro realizado com sucesso! Bem-vindo à InFinity.");
+                    alert("Bem-vindo à InFinity!");
                     window.location.href = "index.html";
                 } catch (error) {
                     alert("Erro ao criar conta: " + error.message);
@@ -250,14 +228,12 @@
             }
         }
 
-        function showRegistrationFields() {
-            isRegistrationMode = true;
+        function activateRegistration() {
+            isRegistering = true;
             document.getElementById('registration-fields').style.display = 'block';
-            document.getElementById('auth-title').innerText = "Novo Cadastro";
-            document.getElementById('auth-subtitle').innerText = "Complete seu perfil educacional.";
-            document.getElementById('btn-main').innerText = "CONCLUIR E ENTRAR";
-            
-            // Rola a tela para baixo suavemente para mostrar os novos campos
+            document.getElementById('title').innerText = "Novo Cadastro";
+            document.getElementById('subtitle').innerText = "Preencha seus dados acadêmicos.";
+            document.getElementById('btn-main').innerText = "CONCLUIR CADASTRO";
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
     </script>

@@ -8,7 +8,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
     <style>
@@ -110,18 +109,16 @@
     </div>
 
     <script>
-        // CONFIGURAÇÃO FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyC74EL1UJqTimRcCl888splwqqw2U3SLTs",
             authDomain: "infinity-ingles.firebaseapp.com",
             projectId: "infinity-ingles",
             storageBucket: "infinity-ingles.firebasestorage.app",
             messagingSenderId: "83199259838",
-            appId: "1:83199259838:web:f99e2a72d21b7bed421aef",
-            measurementId: "G-3EKYW8RVBQ"
+            appId: "1:83199259838:web:f99e2a72d21b7bed421aef"
         };
 
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
@@ -140,19 +137,39 @@
         let timerWidth = 100;
         let timerInterval;
 
-        // Verificação de Acesso
+        // --- LÓGICA DE ACESSO INFINITY ---
         auth.onAuthStateChanged(async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
+            if (!user) { window.location.href = 'login.html'; return; }
+
+            // 1. MODO DEUS (Admin)
+            if (user.email === "jarbas.lima@ifpb.edu.br") {
+                loadVerb(); return;
             }
+
+            // 2. LIVRE REVISÃO
+            const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m07").get();
+            if (currentDoc.exists) {
+                loadVerb(); return;
+            }
+
+            // 3. SEQUÊNCIA PEDAGÓGICA (M06)
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m06").get();
             if (!prevDoc.exists) {
-                alert("Conclua a Missão 06 primeiro!");
+                alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 06 primeiro.");
                 window.location.href = 'index.html';
-            } else {
-                loadVerb(); // Só começa o quiz se tiver acesso
+                return;
             }
+
+            // 4. TRAVA DE 24H (Para Inéditas)
+            const today = new Date().toLocaleDateString();
+            const lastMissionDate = localStorage.getItem(`last_mission_${user.uid}`);
+            if (lastMissionDate === today) {
+                alert("Professor Jarbas avisa: Uma missão inédita por dia! Volte amanhã.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            loadVerb();
         });
 
         function startTimer() {
@@ -209,6 +226,11 @@
         async function showSuccess() {
             const user = auth.currentUser;
             if (user) {
+                // Só ativa a trava de 24h se não for o Admin
+                if (user.email !== "jarbas.lima@ifpb.edu.br") {
+                    localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
+                }
+
                 try {
                     await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m07").set({
                         concluido: true,

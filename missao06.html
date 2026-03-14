@@ -134,7 +134,7 @@
                 <select id="q2"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
-                <p>c) Mesmo <span class="highlight">ela</span> não sendo forte, o vento não atrasou a mulher.</p>
+                <p>c) Apesar de <span class="highlight">ela</span> ser muito resistente, o vento acabou atrasando a mulher.</p>
                 <select id="q3"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
@@ -142,11 +142,11 @@
                 <select id="q4"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
-                <p>e) O barulho assustou o guarda, mas <span class="highlight">ele</span> não me incomodou.</p>
+                <p>e) O trovão assustou o guarda, mas <span class="highlight">ele</span> não me incomodou.</p>
                 <select id="q5"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
-                <p>f) A lua iluminou a casa onde a mulher estava e podíamos ouvi-<span class="highlight">la</span> de longe.</p>
+                <p>f) A lua iluminou a casa onde a mulher estava. <span class="highlight">Ela</span> podia ser ouvida de longe.</p>
                 <select id="q6"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
@@ -154,7 +154,7 @@
                 <select id="q7"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
             <div class="quiz-item">
-                <p>h) O homem pegou a chave para consertar o rádio mas <span class="highlight">ele</span> estava perdido.</p>
+                <p>h) O homem procurou a ferramenta para consertar o rádio mas <span class="highlight">ela</span> estava perdida.</p>
                 <select id="q8"><option value="">Escolha...</option><option value="he">HE</option><option value="she">SHE</option><option value="it">IT</option></select>
             </div>
         </div>
@@ -185,15 +185,11 @@
 
         auth.onAuthStateChanged(async (user) => {
             if (!user) { window.location.href = 'login.html'; return; }
-
-            // 1. MODO DEUS (PROFESSOR)
             if (user.email === "jarbas.lima@ifpb.edu.br") return;
 
-            // 2. LIVRE REVISÃO
             const currentDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m06").get();
             if (currentDoc.exists) return;
 
-            // 3. SEQUÊNCIA PEDAGÓGICA (MISSÃO 05)
             const prevDoc = await db.collection("progresso").doc(user.uid).collection("concluidas").doc("m05").get();
             if (!prevDoc.exists) {
                 alert("Professor Jarbas avisa: Siga a trilha! Complete a Missão 05 primeiro.");
@@ -201,7 +197,6 @@
                 return;
             }
 
-            // 4. TRAVA DE 24 HORAS (PARA INÉDITAS)
             const today = new Date().toLocaleDateString();
             const lastMissionDate = localStorage.getItem(`last_mission_${user.uid}`);
             if (lastMissionDate === today) {
@@ -212,9 +207,17 @@
 
         async function checkMission() {
             const user = auth.currentUser;
+            
+            // GABARITO ATUALIZADO CONFORME REFORMULAÇÃO
             const answers = {
-                q1: 'it', q2: 'it', q3: 'she', q4: 'she',
-                q5: 'it', q6: 'it', q7: 'it', q8: 'he'
+                q1: 'it',  // a verdade
+                q2: 'he',  // meu irmão
+                q3: 'she', // a mulher
+                q4: 'she', // a pescadora
+                q5: 'it',  // o trovão
+                q6: 'she', // a mulher
+                q7: 'it',  // o tejo (animal/neutro)
+                q8: 'it'   // a ferramenta
             };
 
             let allCorrect = true;
@@ -226,7 +229,6 @@
             }
 
             if(allCorrect) {
-                // Só trava se não for o admin
                 if (user.email !== "jarbas.lima@ifpb.edu.br") {
                     localStorage.setItem(`last_mission_${user.uid}`, new Date().toLocaleDateString());
                 }
